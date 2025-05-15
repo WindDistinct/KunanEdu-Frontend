@@ -17,12 +17,20 @@ export default function FormularioGrado({ onExito, initialData }) {
 		setForm((prev) => ({ ...prev, [name]: value }));
 	};
 
+	// Función para validar texto solo letras y espacios (incluye acentos y ñ)
+	const esTextoValido = (texto) => /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/.test(texto.trim());
+
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 		setError(null);
 
 		if (!form.nombre_grado || !form.descripcion_grado) {
 			setError("Todos los campos son obligatorios");
+			return;
+		}
+
+		if (!esTextoValido(form.descripcion_grado)) {
+			setError("La descripción solo debe contener letras y espacios");
 			return;
 		}
 

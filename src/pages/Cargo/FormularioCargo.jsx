@@ -16,12 +16,20 @@ export default function FormularioCargo({ onExito, initialData }) {
 		setForm({ nombre_cargo: e.target.value });
 	};
 
+	const esTextoValido = (texto) =>
+		/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/.test(texto) && texto.trim().length >= 3;
+
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 		setError(null);
 
 		if (!form.nombre_cargo.trim()) {
 			setError("El nombre del cargo es obligatorio");
+			return;
+		}
+
+		if (!esTextoValido(form.nombre_cargo)) {
+			setError("El nombre del cargo debe contener solo letras y al menos 3 caracteres");
 			return;
 		}
 

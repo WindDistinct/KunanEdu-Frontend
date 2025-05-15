@@ -27,6 +27,10 @@ export default function FormularioEmpleado({ onExito, initialData }) {
 		setForm((prev) => ({ ...prev, [name]: value }));
 	};
 
+	const esTextoValido = (texto) => /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/.test(texto.trim());
+	const esNumeroExacto = (numero, longitud) =>
+		new RegExp(`^\\d{${longitud}}$`).test(numero.trim());
+
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 		setError(null);
@@ -44,6 +48,35 @@ export default function FormularioEmpleado({ onExito, initialData }) {
 
 		if (camposObligatorios.some((campo) => !form[campo])) {
 			setError("Todos los campos obligatorios deben estar completos");
+			return;
+		}
+
+		if (!esTextoValido(form.nombre_empleado)) {
+			setError("El nombre solo debe contener letras y espacios");
+			return;
+		}
+		if (!esTextoValido(form.apellido_paterno)) {
+			setError("El apellido paterno solo debe contener letras y espacios");
+			return;
+		}
+		if (!esTextoValido(form.apellido_materno)) {
+			setError("El apellido materno solo debe contener letras y espacios");
+			return;
+		}
+		if (!esTextoValido(form.especialidad)) {
+			setError("La especialidad solo debe contener letras y espacios");
+			return;
+		}
+		if (!esNumeroExacto(form.dni, 8)) {
+			setError("El DNI debe contener exactamente 8 dígitos numéricos");
+			return;
+		}
+		if (!esNumeroExacto(form.telefono, 9)) {
+			setError("El teléfono debe contener exactamente 9 dígitos numéricos");
+			return;
+		}
+		if (!/^\d+$/.test(form.cargo.trim())) {
+			setError("El cargo debe contener solo números");
 			return;
 		}
 
@@ -116,6 +149,8 @@ export default function FormularioEmpleado({ onExito, initialData }) {
 				className="input-form"
 				value={form.dni}
 				onChange={handleChange}
+				maxLength={8}
+				inputMode="numeric"
 			/>
 			<input
 				name="telefono"
@@ -123,6 +158,8 @@ export default function FormularioEmpleado({ onExito, initialData }) {
 				className="input-form"
 				value={form.telefono}
 				onChange={handleChange}
+				maxLength={9}
+				inputMode="numeric"
 			/>
 			<input
 				name="observacion"
@@ -137,6 +174,7 @@ export default function FormularioEmpleado({ onExito, initialData }) {
 				className="input-form"
 				value={form.cargo}
 				onChange={handleChange}
+				inputMode="numeric"
 			/>
 			<div className="grid2">
 				<button type="submit" className="aceptar-button">

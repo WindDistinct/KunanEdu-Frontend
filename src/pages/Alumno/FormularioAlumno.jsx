@@ -26,23 +26,77 @@ export default function FormularioAlumno({ onExito, initialData }) {
 		setForm((prev) => ({ ...prev, [name]: value }));
 	};
 
+	const esTextoValido = (texto, minLength = 2) =>
+		/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/.test(texto) && texto.length >= minLength;
+
+	const esNumeroExacto = (valor, digitos) =>
+		/^\d+$/.test(valor) && valor.length === digitos;
+
+	const esNumero = (valor) => /^\d+$/.test(valor);
+
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 		setError(null);
 
-		const camposObligatorios = [
-			"nombre_alumno",
-			"apellido_paterno",
-			"apellido_materno",
-			"dni_alumno",
-			"direccion",
-			"grado",
-			"telefono",
-			"fecha_nacimiento",
-		];
+		const {
+			nombre_alumno,
+			apellido_paterno,
+			apellido_materno,
+			dni_alumno,
+			direccion,
+			grado,
+			telefono,
+			fecha_nacimiento,
+		} = form;
 
-		if (camposObligatorios.some((campo) => !form[campo])) {
+		// Validaciones obligatorias
+		if (
+			!nombre_alumno ||
+			!apellido_paterno ||
+			!apellido_materno ||
+			!dni_alumno ||
+			!direccion ||
+			!grado ||
+			!telefono ||
+			!fecha_nacimiento
+		) {
 			setError("Todos los campos son obligatorios");
+			return;
+		}
+
+		// Validaciones específicas
+		if (!esTextoValido(nombre_alumno, 5)) {
+			setError("El nombre debe tener al menos 5 letras y no contener números");
+			return;
+		}
+
+		if (!esTextoValido(apellido_paterno)) {
+			setError("El apellido paterno debe tener al menos 2 letras y no contener números");
+			return;
+		}
+
+		if (!esTextoValido(apellido_materno)) {
+			setError("El apellido materno debe tener al menos 2 letras y no contener números");
+			return;
+		}
+
+		if (!esNumeroExacto(dni_alumno, 8)) {
+			setError("El DNI debe tener exactamente 8 dígitos numéricos");
+			return;
+		}
+
+		if (direccion.length < 5) {
+			setError("La dirección debe tener al menos 5 caracteres");
+			return;
+		}
+
+		if (!esNumero(grado)) {
+			setError("El grado debe ser un número");
+			return;
+		}
+
+		if (!esNumeroExacto(telefono, 9)) {
+			setError("El teléfono debe tener exactamente 9 dígitos numéricos");
 			return;
 		}
 
@@ -54,6 +108,7 @@ export default function FormularioAlumno({ onExito, initialData }) {
 				await crearAlumno(form);
 				onExito("Alumno registrado con éxito");
 			}
+
 			setForm({
 				nombre_alumno: "",
 				apellido_paterno: "",
@@ -99,6 +154,8 @@ export default function FormularioAlumno({ onExito, initialData }) {
 				className="input-form"
 				value={form.dni_alumno}
 				onChange={handleChange}
+				maxLength={8}
+				inputMode="numeric"
 			/>
 			<input
 				name="direccion"
@@ -113,6 +170,7 @@ export default function FormularioAlumno({ onExito, initialData }) {
 				className="input-form"
 				value={form.grado}
 				onChange={handleChange}
+				inputMode="numeric"
 			/>
 			<input
 				name="telefono"
@@ -120,11 +178,12 @@ export default function FormularioAlumno({ onExito, initialData }) {
 				className="input-form"
 				value={form.telefono}
 				onChange={handleChange}
+				maxLength={9}
+				inputMode="numeric"
 			/>
 			<input
 				name="fecha_nacimiento"
 				type="date"
-				placeholder="Fecha de Nacimiento"
 				className="input-form"
 				value={form.fecha_nacimiento}
 				onChange={handleChange}
