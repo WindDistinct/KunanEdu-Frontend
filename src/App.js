@@ -5,8 +5,14 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 import LoginUser from "./components/LoginUser";
 import MenuPrincipal from "./pages/MenuPrincipal";
+
 import ListadoAula from "./pages/Aula/ListadoAula";
-// Aquí puedes importar más entidades conforme las vayas creando
+import ListadoAlumno from "./pages/Alumno/ListadoAlumno";
+import ListadoCargo from "./pages/Cargo/ListadoCargo";
+import ListadoCurso from "./pages/Curso/ListadoCurso";
+import ListadoEmpleado from "./pages/Empleado/ListadoEmpleado";
+import ListadoGrado from "./pages/Grado/ListadoGrado";
+import ListadoUsuario from "./pages/Usuario/ListadoUsuario";
 
 function App() {
 	const [autenticado, setAutenticado] = useState(false);
@@ -23,7 +29,12 @@ function App() {
 						<Routes>
 							<Route path="/" element={<MenuPrincipal />} />
 							<Route path="/aulas" element={<ListadoAula />} />
-							{/* Agrega aquí más rutas conforme avances */}
+							<Route path="/alumnos" element={<ListadoAlumno />} />
+							<Route path="/cargos" element={<ListadoCargo />} />
+							<Route path="/cursos" element={<ListadoCurso />} />
+							<Route path="/empleados" element={<ListadoEmpleado />} />
+							<Route path="/grados" element={<ListadoGrado />} />
+							<Route path="/usuarios" element={<ListadoUsuario />} />
 						</Routes>
 					</Router>
 				) : (

@@ -1,35 +1,35 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { obtenerAulas, eliminarAula } from "../../api/aulaService";
+import { obtenerGrados, eliminarGrado } from "../../api/gradoService";
 import Tabla from "../../components/Tabla";
-import FormularioAula from "./FormularioAula";
+import FormularioGrado from "./FormularioGrado";
 import Notificacion from "../../components/Notificacion";
 import "../../styles/Botones.css";
 
-export default function ListadoAula() {
-	const [aulas, setAulas] = useState([]);
+export default function ListadoGrado() {
+	const [grados, setGrados] = useState([]);
 	const [formData, setFormData] = useState(null);
 	const [mensaje, setMensaje] = useState(null);
 	const [mostrarFormulario, setMostrarFormulario] = useState(false);
 	const navigate = useNavigate();
 
-	const cargarAulas = async () => {
-		const data = await obtenerAulas();
-		setAulas(data);
+	const cargarGrados = async () => {
+		const data = await obtenerGrados();
+		setGrados(data);
 	};
 
 	useEffect(() => {
-		cargarAulas();
+		cargarGrados();
 	}, []);
 
 	const handleEliminar = async (id) => {
-		await eliminarAula(id);
-		setMensaje({ tipo: "success", texto: "Aula eliminada correctamente" });
-		cargarAulas();
+		await eliminarGrado(id);
+		setMensaje({ tipo: "success", texto: "Grado eliminado correctamente" });
+		cargarGrados();
 	};
 
-	const handleEditar = (aula) => {
-		setFormData(aula);
+	const handleEditar = (grado) => {
+		setFormData(grado);
 		setMostrarFormulario(true);
 	};
 
@@ -37,41 +37,39 @@ export default function ListadoAula() {
 		setMensaje({ tipo: "success", texto });
 		setFormData(null);
 		setMostrarFormulario(false);
-		cargarAulas();
+		cargarGrados();
 	};
 
 	return (
 		<div>
 			<div>
-				<h1>Gestión de Aulas</h1>
+				<h1>Gestión de Grados</h1>
 				<button onClick={() => navigate("/")} className="menu-button">
 					Volver al Menú
 				</button>
 			</div>
-			<br></br>
+			<br />
 			<Notificacion mensaje={mensaje?.texto} tipo={mensaje?.tipo} />
-			<br></br>
+			<br />
 			{mostrarFormulario || formData ? (
-				<FormularioAula onExito={handleExito} initialData={formData} />
+				<FormularioGrado onExito={handleExito} initialData={formData} />
 			) : (
 				<button
 					onClick={() => setMostrarFormulario(true)}
 					className="registrar-button"
 				>
-					Registrar nueva Aula
+					Registrar nuevo Grado
 				</button>
 			)}
-			<br></br>
-			<br></br>
+			<br />
+			<br />
 			<Tabla
 				columnas={[
-					{ key: "numero_aula", label: "N° Aula" },
-					{ key: "grado", label: "Grado" },
-					{ key: "aforo", label: "Aforo" },
-					{ key: "ubicacion", label: "Ubicación" },
+					{ key: "nombre_grado", label: "Nombre del Grado" },
+					{ key: "descripcion_grado", label: "Descripción" },
 					{ key: "estado", label: "Estado" },
 				]}
-				datos={aulas}
+				datos={grados}
 				onEditar={handleEditar}
 				onEliminar={handleEliminar}
 			/>

@@ -1,35 +1,35 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { obtenerAulas, eliminarAula } from "../../api/aulaService";
+import { obtenerEmpleados, eliminarEmpleado } from "../../api/empleadoService";
 import Tabla from "../../components/Tabla";
-import FormularioAula from "./FormularioAula";
+import FormularioEmpleado from "./FormularioEmpleado";
 import Notificacion from "../../components/Notificacion";
 import "../../styles/Botones.css";
 
-export default function ListadoAula() {
-	const [aulas, setAulas] = useState([]);
+export default function ListadoEmpleado() {
+	const [empleados, setEmpleados] = useState([]);
 	const [formData, setFormData] = useState(null);
 	const [mensaje, setMensaje] = useState(null);
 	const [mostrarFormulario, setMostrarFormulario] = useState(false);
 	const navigate = useNavigate();
 
-	const cargarAulas = async () => {
-		const data = await obtenerAulas();
-		setAulas(data);
+	const cargarEmpleados = async () => {
+		const data = await obtenerEmpleados();
+		setEmpleados(data);
 	};
 
 	useEffect(() => {
-		cargarAulas();
+		cargarEmpleados();
 	}, []);
 
 	const handleEliminar = async (id) => {
-		await eliminarAula(id);
-		setMensaje({ tipo: "success", texto: "Aula eliminada correctamente" });
-		cargarAulas();
+		await eliminarEmpleado(id);
+		setMensaje({ tipo: "success", texto: "Empleado eliminado correctamente" });
+		cargarEmpleados();
 	};
 
-	const handleEditar = (aula) => {
-		setFormData(aula);
+	const handleEditar = (empleado) => {
+		setFormData(empleado);
 		setMostrarFormulario(true);
 	};
 
@@ -37,41 +37,45 @@ export default function ListadoAula() {
 		setMensaje({ tipo: "success", texto });
 		setFormData(null);
 		setMostrarFormulario(false);
-		cargarAulas();
+		cargarEmpleados();
 	};
 
 	return (
 		<div>
 			<div>
-				<h1>Gestión de Aulas</h1>
+				<h1>Gestión de Empleados</h1>
 				<button onClick={() => navigate("/")} className="menu-button">
 					Volver al Menú
 				</button>
 			</div>
-			<br></br>
+			<br />
 			<Notificacion mensaje={mensaje?.texto} tipo={mensaje?.tipo} />
-			<br></br>
+			<br />
 			{mostrarFormulario || formData ? (
-				<FormularioAula onExito={handleExito} initialData={formData} />
+				<FormularioEmpleado onExito={handleExito} initialData={formData} />
 			) : (
 				<button
 					onClick={() => setMostrarFormulario(true)}
 					className="registrar-button"
 				>
-					Registrar nueva Aula
+					Registrar nuevo Empleado
 				</button>
 			)}
-			<br></br>
-			<br></br>
+			<br />
+			<br />
 			<Tabla
 				columnas={[
-					{ key: "numero_aula", label: "N° Aula" },
-					{ key: "grado", label: "Grado" },
-					{ key: "aforo", label: "Aforo" },
-					{ key: "ubicacion", label: "Ubicación" },
+					{ key: "nombre_empleado", label: "Nombres" },
+					{ key: "apellido_paterno", label: "Apellido" },
+					{ key: "dni", label: "DNI" },
+					{ key: "especialidad", label: "Especialidad" },
+					{ key: "cargo", label: "Cargo" },
 					{ key: "estado", label: "Estado" },
 				]}
-				datos={aulas}
+				datos={empleados.map((e) => ({
+					...e,
+					nombre: `${e.nombre_empleado} ${e.apellido_paterno} ${e.apellido_materno}`,
+				}))}
 				onEditar={handleEditar}
 				onEliminar={handleEliminar}
 			/>
