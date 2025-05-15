@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { crearAula, actualizarAula } from "../../api/aulaService";
+import '../../styles/Botones.css';
+import '../../styles/inputs.css';
+import '../../styles/Notificacion.css';
 
 export default function FormularioAula({ onExito, initialData }) {
 	const [form, setForm] = useState({
@@ -7,7 +10,6 @@ export default function FormularioAula({ onExito, initialData }) {
 		grado: "",
 		aforo: "",
 		ubicacion: "",
-		estado: "",
 	});
 	const [error, setError] = useState(null);
 
@@ -28,8 +30,7 @@ export default function FormularioAula({ onExito, initialData }) {
 			!form.numero_aula ||
 			!form.grado ||
 			!form.aforo ||
-			!form.ubicacion ||
-			!form.estado
+			!form.ubicacion
 		) {
 			setError("Todos los campos son obligatorios");
 			return;
@@ -48,7 +49,6 @@ export default function FormularioAula({ onExito, initialData }) {
 				grado: "",
 				aforo: "",
 				ubicacion: "",
-				estado: "",
 			});
 		} catch (err) {
 			setError(
@@ -58,49 +58,54 @@ export default function FormularioAula({ onExito, initialData }) {
 	};
 
 	return (
-		<form onSubmit={handleSubmit} className="mb-4 grid grid-cols-2 gap-4">
-			{error && <div className="col-span-2 text-red-600">{error}</div>}
+		<form onSubmit={handleSubmit} className="form">
+			{error && <div className="error grid2">{error}</div>}
 			<input
-				name="numero_aula"
-				placeholder="Número de Aula"
-				className="p-2 border rounded"
-				value={form.numero_aula}
-				onChange={handleChange}
+			name="numero_aula"
+			placeholder="Número de Aula"
+			className="input-form"
+			value={form.numero_aula}
+			onChange={handleChange}
+			maxLength={3}
+			pattern="\d*"
+			inputMode="numeric"
 			/>
+
 			<input
-				name="grado"
-				placeholder="Grado"
-				className="p-2 border rounded"
-				value={form.grado}
-				onChange={handleChange}
+			name="grado"
+			placeholder="Grado"
+			className="input-form"
+			value={form.grado}
+			onChange={handleChange}
+			maxLength={1}
+			pattern="\d*"
+			inputMode="numeric"
 			/>
+
 			<input
-				name="aforo"
-				placeholder="Aforo"
-				className="p-2 border rounded"
-				value={form.aforo}
-				onChange={handleChange}
+			name="aforo"
+			placeholder="Aforo"
+			className="input-form"
+			value={form.aforo}
+			onChange={handleChange}
+			maxLength={2}
+			pattern="\d*"
+			inputMode="numeric"
 			/>
+
 			<input
-				name="ubicacion"
-				placeholder="Ubicación"
-				className="p-2 border rounded"
-				value={form.ubicacion}
-				onChange={handleChange}
+			name="ubicacion"
+			placeholder="Ubicación"
+			className="input-form"
+			value={form.ubicacion}
+			onChange={handleChange}
+			maxLength={20}
 			/>
-			<select
-				name="estado"
-				className="p-2 border rounded"
-				value={form.estado}
-				onChange={handleChange}
-			>
-				<option value={1}>Activo</option>
-				<option value={0}>Inactivo</option>
-			</select>
-			<div className="col-span-2">
+
+			<div className="grid2">
 				<button
 					type="submit"
-					className="bg-blue-500 text-white px-4 py-2 rounded"
+					className="aceptar-button"
 				>
 					{form.id_aula ? "Actualizar" : "Registrar"} Aula
 				</button>

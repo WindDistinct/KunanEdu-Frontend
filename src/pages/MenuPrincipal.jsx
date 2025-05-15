@@ -1,14 +1,22 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import '../styles/Botones.css';
 
 export default function MenuPrincipal() {
 	return (
-		<div className="p-8 max-w-xl mx-auto">
-			<h1 className="text-2xl font-bold mb-6">Menú Principal</h1>
-			<div className="grid grid-cols-1 gap-4">
+		<div>
+			<h1>Menú Principal</h1>
+			<div>
 				<Link
 					to="/aulas"
-					className="bg-blue-500 text-white px-4 py-2 rounded text-center"
+					className="registrar-button space-link"
+				>
+					Gestionar Aulas
+				</Link>
+				<br></br><br></br><br></br>
+				<Link
+					to="/aulas"
+					className="registrar-button space-link"
 				>
 					Gestionar Aulas
 				</Link>

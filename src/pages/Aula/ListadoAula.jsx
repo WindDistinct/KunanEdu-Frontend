@@ -4,6 +4,7 @@ import { obtenerAulas, eliminarAula } from "../../api/aulaService";
 import Tabla from "../../components/Tabla";
 import FormularioAula from "./FormularioAula";
 import Notificacion from "../../components/Notification";
+import '../../styles/Botones.css';
 
 export default function ListadoAula() {
 	const [aulas, setAulas] = useState([]);
@@ -40,27 +41,30 @@ export default function ListadoAula() {
 	};
 
 	return (
-		<div className="p-4 max-w-4xl mx-auto">
-			<div className="flex justify-between items-center mb-4">
-				<h1 className="text-xl font-bold">Gestión de Aulas</h1>
+		<div>
+			<div>
+				<h1>Gestión de Aulas</h1>
 				<button
 					onClick={() => navigate("/")}
-					className="bg-gray-300 text-sm px-2 py-1 rounded"
+					className="menu-button"
 				>
 					Volver al Menú
 				</button>
 			</div>
+			<br></br>
 			<Notificacion mensaje={mensaje?.texto} tipo={mensaje?.tipo} />
+			<br></br>
 			{mostrarFormulario || formData ? (
 				<FormularioAula onExito={handleExito} initialData={formData} />
 			) : (
 				<button
 					onClick={() => setMostrarFormulario(true)}
-					className="mb-4 bg-blue-500 text-white px-4 py-2 rounded"
+					className="registrar-button"
 				>
 					Registrar nueva Aula
 				</button>
 			)}
+			<br></br><br></br>
 			<Tabla
 				columnas={["N° Aula", "Grado", "Aforo", "Ubicación", "Estado"]}
 				datos={aulas}

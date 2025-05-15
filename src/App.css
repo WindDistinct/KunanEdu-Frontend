@@ -47,8 +47,9 @@ html, body {
   justify-content: center;
   align-items: center;
   flex: 1;
-  padding: 0px;
+  padding: 30px;
   background-color: #f7f7f7;
+  position: relative;
 }
 
 @keyframes App-logo-spin {
