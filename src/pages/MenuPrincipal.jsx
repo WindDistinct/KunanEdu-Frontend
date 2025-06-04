@@ -15,6 +15,7 @@ export default function MenuPrincipal() {
 			<Link to="/grados" className="menu-button space-link">Gestionar Grados</Link>
 			<Link to="/usuarios" className="menu-button space-link">Gestionar Usuarios</Link>
 			<Link to="/periodos" className="menu-button space-link">Gestionar Periodos</Link>
+			<Link to="/notas" className="menu-button space-link">Notas</Link>
 		</div>
 	</div>
 	<h1 className="text-2xl font-bold mb-6">Registros de Auditoria</h1>
