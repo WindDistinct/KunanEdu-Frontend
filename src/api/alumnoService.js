@@ -1,36 +1,21 @@
-import axios from "axios";
-
-////////////////// VALIDACION DE TOKEN FICTICIO /////////////////
-
-const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Miwicm9sIjoiYWRtaW5pc3RyYWRvciIsInVzdWFyaW8iOiJQUkpVQU4iLCJpYXQiOjE3NDkwMDI3OTIsImV4cCI6MTc0OTAwNjM5Mn0.DeyWcbND0suAGjS1LlmW9CxHNT8F1e9jgqSEl4Y3mvc";
-
-const axiosInstance = axios.create({
-	baseURL: process.env.REACT_APP_API_URL + "/api/estudiante",
-	headers: {
-		Authorization: `Bearer ${token}`,
-	},
-});
-
-console.log("Token enviado:", axiosInstance.defaults.headers.Authorization);
-
-///////////////////////////////////////////////////////////////////
+import axiosInstance from "./axiosInstance";
 
 export const obtenerAlumnos = async () => {
-	const res = await axiosInstance.get(`/all-adm`);
+	const res = await axiosInstance.get(`/api/estudiante/all-adm`);
 	return res.data;
 };
 
 export const crearAlumno = async (data) => {
-	const res = await axiosInstance.post(`/create`, data);
+	const res = await axiosInstance.post(`/api/estudiante/create`, data);
 	return res.data;
 };
 
 export const actualizarAlumno = async (id, data) => {
-	const res = await axiosInstance.put(`/update/${id}`, data);
+	const res = await axiosInstance.put(`/api/estudiante/update/${id}`, data);
 	return res.data;
 };
 
 export const eliminarAlumno = async (id) => {
-	const res = await axiosInstance.delete(`/delete/${id}`);
+	const res = await axiosInstance.delete(`/api/estudiante/delete/${id}`);
 	return res.data;
 };
