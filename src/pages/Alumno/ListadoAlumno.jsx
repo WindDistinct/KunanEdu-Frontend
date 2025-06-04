@@ -66,11 +66,13 @@ export default function ListadoAlumno() {
 			<br />
 			<Tabla
 				columnas={[
-					{ key: "nombre_alumno", label: "Nombres" },
+					{ key: "nombre", label: "Nombres" },
 					{ key: "apellido_paterno", label: "Apellido Paterno" },
-					{ key: "grado", label: "Grado" },
-					{ key: "dni_alumno", label: "DNI" },
+					{ key: "apellido_materno", label: "Apellido Materno" },
+					{ key: "dni", label: "DNI" },
+					{ key: "direccion", label: "Dirección" },
 					{ key: "telefono", label: "Teléfono" },
+					{ key: "fecha_nacimiento", label: "Fecha Nacimiento" },
 					{ key: "estado", label: "Estado" },
 				]}
 				datos={alumnos}

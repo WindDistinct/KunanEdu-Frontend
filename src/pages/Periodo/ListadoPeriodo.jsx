@@ -1,35 +1,35 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { obtenerCargos, eliminarCargo } from "../../api/cargoService";
+import { obtenerPeriodos, eliminarPeriodo } from "../../api/periodoService";
 import Tabla from "../../components/Tabla";
-import FormularioCargo from "./FormularioCargo";
+import FormularioPeriodo from "./FormularioPeriodo";
 import Notificacion from "../../components/Notificacion";
 import "../../styles/Botones.css";
 
-export default function ListadoCargo() {
-	const [cargos, setCargos] = useState([]);
+export default function ListadoPeriodo() {
+	const [periodos, setPeriodos] = useState([]);
 	const [formData, setFormData] = useState(null);
 	const [mensaje, setMensaje] = useState(null);
 	const [mostrarFormulario, setMostrarFormulario] = useState(false);
 	const navigate = useNavigate();
 
-	const cargarCargos = async () => {
-		const data = await obtenerCargos();
-		setCargos(data);
+	const cargarPeriodos = async () => {
+		const data = await obtenerPeriodos();
+		setPeriodos(data);
 	};
 
 	useEffect(() => {
-		cargarCargos();
+		cargarPeriodos();
 	}, []);
 
 	const handleEliminar = async (id) => {
-		await eliminarCargo(id);
-		setMensaje({ tipo: "success", texto: "Cargo eliminado correctamente" });
-		cargarCargos();
+		await eliminarPeriodo(id);
+		setMensaje({ tipo: "success", texto: "Periodo eliminado correctamente" });
+		cargarPeriodos();
 	};
 
-	const handleEditar = (cargo) => {
-		setFormData(cargo);
+	const handleEditar = (periodo) => {
+		setFormData(periodo);
 		setMostrarFormulario(true);
 	};
 
@@ -37,13 +37,13 @@ export default function ListadoCargo() {
 		setMensaje({ tipo: "success", texto });
 		setFormData(null);
 		setMostrarFormulario(false);
-		cargarCargos();
+		cargarPeriodos();
 	};
 
 	return (
 		<div>
 			<div>
-				<h1>Gestión de Cargos</h1>
+				<h1>Gestión de Periodos</h1>
 				<button onClick={() => navigate("/")} className="menu-button">
 					Volver al Menú
 				</button>
@@ -52,25 +52,28 @@ export default function ListadoCargo() {
 			<Notificacion mensaje={mensaje?.texto} tipo={mensaje?.tipo} />
 			<br />
 			{mostrarFormulario || formData ? (
-				<FormularioCargo onExito={handleExito} initialData={formData} />
+				<FormularioPeriodo onExito={handleExito} initialData={formData} />
 			) : (
 				<button
 					onClick={() => setMostrarFormulario(true)}
 					className="registrar-button"
 				>
-					Registrar nuevo Cargo
+					Registrar nuevo Periodo
 				</button>
 			)}
 			<br />
 			<br />
 			<Tabla
 				columnas={[
-					{ key: "nombre_cargo", label: "Nombre del Cargo" },
+					{ key: "anio", label: "Año" },
+					{ key: "descripcion", label: "Descripción" },
+					{ key: "progreso", label: "Progreso" },
 					{ key: "estado", label: "Estado" },
 				]}
-				datos={cargos}
+				datos={periodos}
 				onEditar={handleEditar}
 				onEliminar={handleEliminar}
+				idKey="id_periodo"
 			/>
 		</div>
 	);

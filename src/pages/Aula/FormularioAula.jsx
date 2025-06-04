@@ -7,7 +7,6 @@ import '../../styles/Notificacion.css';
 export default function FormularioAula({ onExito, initialData }) {
 	const [form, setForm] = useState({
 		numero_aula: "",
-		grado: "",
 		aforo: "",
 		ubicacion: "",
 	});
@@ -28,20 +27,15 @@ export default function FormularioAula({ onExito, initialData }) {
 		e.preventDefault();
 		setError(null);
 
-		const { numero_aula, grado, aforo, ubicacion } = form;
+		const { numero_aula, aforo, ubicacion } = form;
 
-		if (!numero_aula || !grado || !aforo || !ubicacion) {
+		if (!numero_aula || !aforo || !ubicacion) {
 			setError("Todos los campos son obligatorios");
 			return;
 		}
 
 		if (!esNumeroValido(numero_aula)) {
 			setError("Introduce un número válido para el número de aula");
-			return;
-		}
-
-		if (!esNumeroValido(grado)) {
-			setError("Introduce un número válido para el grado");
 			return;
 		}
 
@@ -61,7 +55,6 @@ export default function FormularioAula({ onExito, initialData }) {
 
 			setForm({
 				numero_aula: "",
-				grado: "",
 				aforo: "",
 				ubicacion: "",
 			});
@@ -85,16 +78,6 @@ export default function FormularioAula({ onExito, initialData }) {
 			/>
 
 			<input
-				name="grado"
-				placeholder="Grado"
-				className="input-form"
-				value={form.grado}
-				onChange={handleChange}
-				maxLength={1}
-				inputMode="numeric"
-			/>
-
-			<input
 				name="aforo"
 				placeholder="Aforo"
 				className="input-form"
@@ -104,14 +87,17 @@ export default function FormularioAula({ onExito, initialData }) {
 				inputMode="numeric"
 			/>
 
-			<input
+			<select
 				name="ubicacion"
-				placeholder="Ubicación"
 				className="input-form"
 				value={form.ubicacion}
 				onChange={handleChange}
-				maxLength={20}
-			/>
+			>
+				<option value="" disabled>Ubicación</option>
+				<option value="Primer Piso">Primer Piso</option>
+				<option value="Segundo Piso">Segundo Piso</option>
+				<option value="Tercer Piso">Tercer Piso</option>
+			</select>
 
 			<div className="grid2">
 				<button type="submit" className="aceptar-button">

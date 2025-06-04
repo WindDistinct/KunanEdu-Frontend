@@ -65,13 +65,16 @@ export default function ListadoGrado() {
 			<br />
 			<Tabla
 				columnas={[
-					{ key: "nombre_grado", label: "Nombre del Grado" },
-					{ key: "descripcion_grado", label: "Descripción" },
+					{ key: "nivel", label: "Nivel del Grado" },
+					{ key: "anio", label: "Año" },
+					{ key: "cupos_totales", label: "Cupos Totales" },
+					{ key: "cupos_disponibles", label: "Cupos Disponibles" },
 					{ key: "estado", label: "Estado" },
 				]}
 				datos={grados}
 				onEditar={handleEditar}
 				onEliminar={handleEliminar}
+				idKey="id_grado"
 			/>
 		</div>
 	);

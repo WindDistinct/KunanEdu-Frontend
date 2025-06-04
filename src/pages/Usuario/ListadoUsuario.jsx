@@ -22,8 +22,8 @@ export default function ListadoUsuario() {
 		cargarUsuarios();
 	}, []);
 
-	const handleEliminar = async (id) => {
-		await eliminarUsuario(id);
+	const handleEliminar = async (id_usuario) => {
+		await eliminarUsuario(id_usuario);
 		setMensaje({ tipo: "success", texto: "Usuario eliminado correctamente" });
 		cargarUsuarios();
 	};
@@ -65,12 +65,14 @@ export default function ListadoUsuario() {
 			<br />
 			<Tabla
 				columnas={[
-					{ key: "usuario", label: "Usuario" },
+					{ key: "username", label: "Nombre de Usuario" },
 					{ key: "rol", label: "Rol" },
+					{ key: "estado", label: "Estado" },
 				]}
 				datos={usuarios}
 				onEditar={handleEditar}
 				onEliminar={handleEliminar}
+				idKey="id_usuario"
 			/>
 		</div>
 	);

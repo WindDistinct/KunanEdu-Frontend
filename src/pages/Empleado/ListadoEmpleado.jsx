@@ -65,19 +65,22 @@ export default function ListadoEmpleado() {
 			<br />
 			<Tabla
 				columnas={[
-					{ key: "nombre_empleado", label: "Nombres" },
-					{ key: "apellido_paterno", label: "Apellido" },
+					{ key: "nombre_emp", label: "Nombre" },
+					{ key: "ape_pat_emp", label: "Apellido Paterno" },
+					{ key: "ape_mat_emp", label: "Apellido Materno" },
+					{ key: "fec_nac", label: "Fecha de Nacimiento" },
 					{ key: "dni", label: "DNI" },
+					{ key: "telefono", label: "Teléfono" },
 					{ key: "especialidad", label: "Especialidad" },
 					{ key: "cargo", label: "Cargo" },
+					{ key: "observacion", label: "Observación" },
+					{ key: "usuario", label: "Usuario" },
 					{ key: "estado", label: "Estado" },
 				]}
-				datos={empleados.map((e) => ({
-					...e,
-					nombre: `${e.nombre_empleado} ${e.apellido_paterno} ${e.apellido_materno}`,
-				}))}
+				datos={empleados}
 				onEditar={handleEditar}
 				onEliminar={handleEliminar}
+				idKey="id_emp"
 			/>
 		</div>
 	);

@@ -66,7 +66,6 @@ export default function ListadoAula() {
 			<Tabla
 				columnas={[
 					{ key: "numero_aula", label: "N° Aula" },
-					{ key: "grado", label: "Grado" },
 					{ key: "aforo", label: "Aforo" },
 					{ key: "ubicacion", label: "Ubicación" },
 					{ key: "estado", label: "Estado" },
@@ -74,6 +73,7 @@ export default function ListadoAula() {
 				datos={aulas}
 				onEditar={handleEditar}
 				onEliminar={handleEliminar}
+				idKey="id_aula"
 			/>
 		</div>
 	);

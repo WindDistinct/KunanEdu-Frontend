@@ -6,12 +6,11 @@ import "../../styles/Notificacion.css";
 
 export default function FormularioAlumno({ onExito, initialData }) {
 	const [form, setForm] = useState({
-		nombre_alumno: "",
+		nombre: "",
 		apellido_paterno: "",
 		apellido_materno: "",
-		dni_alumno: "",
+		dni: "",
 		direccion: "",
-		grado: "",
 		telefono: "",
 		fecha_nacimiento: "",
 	});
@@ -32,31 +31,27 @@ export default function FormularioAlumno({ onExito, initialData }) {
 	const esNumeroExacto = (valor, digitos) =>
 		/^\d+$/.test(valor) && valor.length === digitos;
 
-	const esNumero = (valor) => /^\d+$/.test(valor);
-
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 		setError(null);
 
 		const {
-			nombre_alumno,
+			nombre,
 			apellido_paterno,
 			apellido_materno,
-			dni_alumno,
+			dni,
 			direccion,
-			grado,
 			telefono,
 			fecha_nacimiento,
 		} = form;
 
 		// Validaciones obligatorias
 		if (
-			!nombre_alumno ||
+			!nombre ||
 			!apellido_paterno ||
 			!apellido_materno ||
-			!dni_alumno ||
+			!dni ||
 			!direccion ||
-			!grado ||
 			!telefono ||
 			!fecha_nacimiento
 		) {
@@ -65,7 +60,7 @@ export default function FormularioAlumno({ onExito, initialData }) {
 		}
 
 		// Validaciones específicas
-		if (!esTextoValido(nombre_alumno, 5)) {
+		if (!esTextoValido(nombre, 5)) {
 			setError("El nombre debe tener al menos 5 letras y no contener números");
 			return;
 		}
@@ -80,18 +75,13 @@ export default function FormularioAlumno({ onExito, initialData }) {
 			return;
 		}
 
-		if (!esNumeroExacto(dni_alumno, 8)) {
+		if (!esNumeroExacto(dni, 8)) {
 			setError("El DNI debe tener exactamente 8 dígitos numéricos");
 			return;
 		}
 
 		if (direccion.length < 5) {
 			setError("La dirección debe tener al menos 5 caracteres");
-			return;
-		}
-
-		if (!esNumero(grado)) {
-			setError("El grado debe ser un número");
 			return;
 		}
 
@@ -110,12 +100,11 @@ export default function FormularioAlumno({ onExito, initialData }) {
 			}
 
 			setForm({
-				nombre_alumno: "",
+				nombre: "",
 				apellido_paterno: "",
 				apellido_materno: "",
-				dni_alumno: "",
+				dni: "",
 				direccion: "",
-				grado: "",
 				telefono: "",
 				fecha_nacimiento: "",
 			});
@@ -128,10 +117,10 @@ export default function FormularioAlumno({ onExito, initialData }) {
 		<form onSubmit={handleSubmit} className="form">
 			{error && <div className="error grid2">{error}</div>}
 			<input
-				name="nombre_alumno"
+				name="nombre"
 				placeholder="Nombres"
 				className="input-form"
-				value={form.nombre_alumno}
+				value={form.nombre}
 				onChange={handleChange}
 			/>
 			<input
@@ -149,10 +138,10 @@ export default function FormularioAlumno({ onExito, initialData }) {
 				onChange={handleChange}
 			/>
 			<input
-				name="dni_alumno"
+				name="dni"
 				placeholder="DNI"
 				className="input-form"
-				value={form.dni_alumno}
+				value={form.dni}
 				onChange={handleChange}
 				maxLength={8}
 				inputMode="numeric"
@@ -163,14 +152,6 @@ export default function FormularioAlumno({ onExito, initialData }) {
 				className="input-form"
 				value={form.direccion}
 				onChange={handleChange}
-			/>
-			<input
-				name="grado"
-				placeholder="Grado"
-				className="input-form"
-				value={form.grado}
-				onChange={handleChange}
-				inputMode="numeric"
 			/>
 			<input
 				name="telefono"

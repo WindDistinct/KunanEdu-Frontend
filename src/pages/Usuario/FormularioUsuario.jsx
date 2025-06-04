@@ -5,7 +5,7 @@ import "../../styles/inputs.css";
 import "../../styles/Notificacion.css";
 
 export default function FormularioUsuario({ onExito, initialData }) {
-	const [form, setForm] = useState({ usuario: "", password: "", rol: "" });
+	const [form, setForm] = useState({ username: "", password: "", rol: "" });
 	const [error, setError] = useState(null);
 
 	useEffect(() => {
@@ -21,7 +21,7 @@ export default function FormularioUsuario({ onExito, initialData }) {
 		e.preventDefault();
 		setError(null);
 
-		if (!form.usuario || !form.password || !form.rol) {
+		if (!form.username || !form.password || !form.rol) {
 			setError("Todos los campos son obligatorios");
 			return;
 		}
@@ -34,7 +34,7 @@ export default function FormularioUsuario({ onExito, initialData }) {
 				await crearUsuario(form);
 				onExito("Usuario registrado con éxito");
 			}
-			setForm({ usuario: "", password: "", rol: "" });
+			setForm({ username: "", password: "", rol: "" });
 		} catch (err) {
 			setError("Error al guardar. Verifique que el usuario no esté duplicado");
 		}
@@ -44,10 +44,10 @@ export default function FormularioUsuario({ onExito, initialData }) {
 		<form onSubmit={handleSubmit} className="form">
 			{error && <div className="error grid2">{error}</div>}
 			<input
-				name="usuario"
+				name="username"
 				placeholder="Usuario"
 				className="input-form"
-				value={form.usuario}
+				value={form.username}
 				onChange={handleChange}
 			/>
 			<input
@@ -58,13 +58,17 @@ export default function FormularioUsuario({ onExito, initialData }) {
 				value={form.password}
 				onChange={handleChange}
 			/>
-			<input
-				name="rol"
-				placeholder="Rol (admin/director/profesor)"
-				className="input-form"
-				value={form.rol}
-				onChange={handleChange}
-			/>
+			<select
+			name="rol"
+			className="input-form"
+			value={form.rol}
+			onChange={handleChange}
+			required
+			>
+			<option value="" disabled>Seleccione año</option>
+			<option value="administrador">Administrador</option>
+			<option value="usuario">Usuario</option>
+			</select>
 			<div className="grid2">
 				<button type="submit" className="aceptar-button">
 					{form.id_usuario ? "Actualizar" : "Registrar"} Usuario
