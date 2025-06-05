@@ -15,6 +15,11 @@ import ListadoUsuario from "./pages/Usuario/ListadoUsuario";
 import ListadoPeriodo from "./pages/Periodo/ListadoPeriodo";
 
 import AuditoriaAula from './pages/Aula/AuditoriaAula';
+import AuditoriaAlumno from "./pages/Alumno/AuditoriaAlumno";
+import AuditoriaEmpleado from "./pages/Empleado/AuditoriaEmpleado";
+import AuditoriaGrado from "./pages/Grado/AuditoriaGrado";
+import AuditoriaPeriodo from "./pages/Periodo/AuditoriaPeriodo";
+import AuditoriaUsuario from "./pages/Usuario/AuditoriaUsuario";
 
 function App() {
 	const [autenticado, setAutenticado] = useState(false);
@@ -39,8 +44,12 @@ function App() {
 							<Route path="/periodos" element={<ListadoPeriodo />} />
 
 							<Route path="/auditoria/aulas" element={<AuditoriaAula />} />
+							<Route path="/auditoria/alumnos" element={<AuditoriaAlumno />} />
+							<Route path="/auditoria/empleados" element={<AuditoriaEmpleado />} />
+							<Route path="/auditoria/grados" element={<AuditoriaGrado />} />
+							<Route path="/auditoria/periodos" element={<AuditoriaPeriodo />} /> 
+							<Route path="/auditoria/usuarios" element={<AuditoriaUsuario />} />
 							
-
 						</Routes>
 					</Router>
 				) : (
@@ -50,12 +59,5 @@ function App() {
 		</div>
 	);
 }
-/*
-<Route path="/auditoria/alumnos" element={<AuditoriaAlumno />} />
-							<Route path="/auditoria/cursos" element={<AuditoriaCurso />} />
-							<Route path="/auditoria/empleados" element={<AuditoriaEmpleado />} />
-							<Route path="/auditoria/grados" element={<AuditoriaGrado />} />
-							<Route path="/auditoria/usuarios" element={<AuditoriaUsuario />} />
-							<Route path="/auditoria/periodos" element={<AuditoriaPeriodo />} /> 
-							*/
+/* <Route path="/auditoria/cursos" element={<AuditoriaCurso />} />*/
 export default App;

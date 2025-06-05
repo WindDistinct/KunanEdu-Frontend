@@ -19,3 +19,8 @@ export const eliminarEmpleado = async (id) => {
 	const res = await axiosInstance.delete(`/api/empleado/delete/${id}`);
 	return res.data;
 };
+
+export const auditoriaEmpleado = async () => {
+	const res = await axiosInstance.get(`/api/empleado/all-audit`);
+	return res.data;
+};

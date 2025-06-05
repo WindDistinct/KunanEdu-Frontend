@@ -38,13 +38,13 @@ html, body {
 }
 
 .App-main {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex: 1;
-  padding: 30px;
+  margin-top: 60px;
+  padding: 20px;
   background-color: #f7f7f7;
-  position: relative;
+  max-height: calc(100vh - 60px);
+  max-width: calc(200vh);
+  overflow-y: auto;
+  overflow-x: auto;
 }
 
 @keyframes App-logo-spin {

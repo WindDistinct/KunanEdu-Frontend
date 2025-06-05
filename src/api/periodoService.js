@@ -19,3 +19,8 @@ export const eliminarPeriodo = async (id) => {
 	const res = await axiosInstance.delete(`/api/periodo/delete/${id}`);
 	return res.data;
 };
+
+export const auditoriaPeriodo = async () => {
+	const res = await axiosInstance.get(`/api/periodo/all-audit`);
+	return res.data;
+};

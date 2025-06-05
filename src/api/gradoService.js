@@ -19,3 +19,8 @@ export const eliminarGrado = async (id) => {
 	const res = await axiosInstance.delete(`/api/grado/delete/${id}`);
 	return res.data;
 };
+
+export const auditoriaGrado = async () => {
+	const res = await axiosInstance.get(`/api/grado/all-audit`);
+	return res.data;
+};

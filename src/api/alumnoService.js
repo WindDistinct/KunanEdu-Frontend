@@ -19,3 +19,8 @@ export const eliminarAlumno = async (id) => {
 	const res = await axiosInstance.delete(`/api/estudiante/delete/${id}`);
 	return res.data;
 };
+
+export const auditoriaAlumno = async (id) => {
+	const res = await axiosInstance.get(`/api/estudiante/all-audit`);
+	return res.data;
+};

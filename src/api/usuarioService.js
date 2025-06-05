@@ -19,3 +19,8 @@ export const eliminarUsuario = async (id) => {
 	const res = await axiosInstance.delete(`/api/usuario/delete/${id}`);
 	return res.data;
 };
+
+export const auditoriaUsuario = async () => {
+	const res = await axiosInstance.get(`/api/usuario/all-audit`);
+	return res.data;
+};
