@@ -15,7 +15,6 @@ export default function MenuPrincipal() {
 			<Link to="/grados" className="menu-button space-link">Gestionar Grados</Link>
 			<Link to="/usuarios" className="menu-button space-link">Gestionar Usuarios</Link>
 			<Link to="/periodos" className="menu-button space-link">Gestionar Periodos</Link>
-			<Link to="/notas" className="menu-button space-link">Notas</Link>
 		</div>
 	</div>
 	<h1 className="text-2xl font-bold mb-6">Registros de Auditoria</h1>
@@ -28,6 +27,12 @@ export default function MenuPrincipal() {
 			<Link to="/auditoria/grados" className="menu-button2 space-link">Auditoria Grados</Link>
 			<Link to="/auditoria/usuarios" className="menu-button2 space-link">Auditoria Usuarios</Link>
 			<Link to="/auditoria/periodos" className="menu-button2 space-link">Auditoria Periodos</Link>
+		</div>
+	</div>
+	<h1 className="text-2xl font-bold mb-6">Servicios Extras</h1>
+	<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+		<div className="menu-grid">
+			<Link to="/notas" className="menu-button3 space-link">Notas</Link>
 		</div>
 	</div>
 </div>
