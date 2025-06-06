@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { obtenerAulas, eliminarAula } from "../../api/aulaService";
+import { obtenerAulas, obtenerAulasAd, eliminarAula } from "../../api/aulaService";
 import Tabla from "../../components/Tabla";
 import FormularioAula from "./FormularioAula";
 import Notificacion from "../../components/Notificacion";
@@ -13,19 +13,30 @@ export default function ListadoAula() {
 	const [mostrarFormulario, setMostrarFormulario] = useState(false);
 	const navigate = useNavigate();
 
-	const cargarAulas = async () => {
-		const data = await obtenerAulas();
-		setAulas(data);
-	};
+	const [rol] = useState(() => localStorage.getItem("rol"));
+	const puedeAdministrar = rol === "administrador";
+
+	const cargarAulas = useCallback(async () => {
+		try {
+			const data = rol === "administrador" ? await obtenerAulasAd() : await obtenerAulas();
+			setAulas(data);
+		} catch (error) {
+			setMensaje({ tipo: "error", texto: "Error al cargar las aulas" });
+		}
+	}, [rol]);
 
 	useEffect(() => {
 		cargarAulas();
-	}, []);
+	}, [cargarAulas]);
 
 	const handleEliminar = async (id) => {
-		await eliminarAula(id);
-		setMensaje({ tipo: "success", texto: "Aula eliminada correctamente" });
-		cargarAulas();
+		try {
+			await eliminarAula(id);
+			setMensaje({ tipo: "success", texto: "Aula eliminada correctamente" });
+			await cargarAulas();
+		} catch (error) {
+			setMensaje({ tipo: "error", texto: "Error al eliminar el aula" });
+		}
 	};
 
 	const handleEditar = (aula) => {
@@ -33,11 +44,11 @@ export default function ListadoAula() {
 		setMostrarFormulario(true);
 	};
 
-	const handleExito = (texto) => {
+	const handleExito = async (texto) => {
 		setMensaje({ tipo: "success", texto });
 		setFormData(null);
 		setMostrarFormulario(false);
-		cargarAulas();
+		await cargarAulas();
 	};
 
 	return (
@@ -48,32 +59,32 @@ export default function ListadoAula() {
 					Volver al Menú
 				</button>
 			</div>
-			<br></br>
+			<br />
 			<Notificacion mensaje={mensaje?.texto} tipo={mensaje?.tipo} />
-			<br></br>
+			<br />
 			{mostrarFormulario || formData ? (
 				<FormularioAula onExito={handleExito} initialData={formData} />
 			) : (
-				<button
-					onClick={() => setMostrarFormulario(true)}
-					className="registrar-button"
-				>
-					Registrar nueva Aula
-				</button>
+				puedeAdministrar && (
+					<button onClick={() => setMostrarFormulario(true)} className="registrar-button">
+						Registrar nueva Aula
+					</button>
+				)
 			)}
-			<br></br>
-			<br></br>
+			<br />
+			<br />
 			<Tabla
 				columnas={[
 					{ key: "numero_aula", label: "N° Aula" },
 					{ key: "aforo", label: "Aforo" },
 					{ key: "ubicacion", label: "Ubicación" },
-					{ key: "estado", label: "Estado" },
+					...(puedeAdministrar ? [{ key: "estado", label: "Estado" }] : []),
 				]}
 				datos={aulas}
 				onEditar={handleEditar}
 				onEliminar={handleEliminar}
 				idKey="id_aula"
+				mostrarAcciones={puedeAdministrar}
 			/>
 		</div>
 	);

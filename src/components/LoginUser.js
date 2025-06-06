@@ -11,7 +11,8 @@ const handleSubmit = async (e) => {
   e.preventDefault();
   try {
     const data = await loginUsuario({ username: usuario, password });
-    localStorage.setItem("token", data.token); // o el campo que te devuelva el token
+    localStorage.setItem("token", data.token);  
+	localStorage.setItem("rol", data.rol); 
     setMensaje("Bienvenido!");
     onLoginCorrecto();
   } catch (error) {
