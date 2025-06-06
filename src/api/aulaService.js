@@ -1,9 +1,14 @@
 import axiosInstance from "./axiosInstance";
 
-export const obtenerAulas = async () => {
+export const obtenerAulasAd = async () => {
 	const res = await axiosInstance.get(`/api/aula/all-adm`);
 	return res.data;
 };
+export const obtenerAulas = async () => {
+	const res = await axiosInstance.get(`/api/aula/all`);
+	return res.data;
+};
+
 
 export const crearAula = async (data) => {
 	const res = await axiosInstance.post(`/api/aula/create`, data);
