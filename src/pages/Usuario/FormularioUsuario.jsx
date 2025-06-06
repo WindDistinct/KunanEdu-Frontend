@@ -65,9 +65,10 @@ export default function FormularioUsuario({ onExito, initialData }) {
 			onChange={handleChange}
 			required
 			>
-			<option value="" disabled>Seleccione año</option>
+			<option value="" disabled>Seleccione Rol</option>
 			<option value="administrador">Administrador</option>
 			<option value="usuario">Usuario</option>
+			<option value="profesor">Profesor</option>
 			</select>
 			<div className="grid2">
 				<button type="submit" className="aceptar-button">
