@@ -20,6 +20,8 @@ import AuditoriaEmpleado from "./pages/Empleado/AuditoriaEmpleado";
 import AuditoriaGrado from "./pages/Grado/AuditoriaGrado";
 import AuditoriaPeriodo from "./pages/Periodo/AuditoriaPeriodo";
 import AuditoriaUsuario from "./pages/Usuario/AuditoriaUsuario";
+import ListadoNotas from "./pages/Examen/ListadoNotas";
+
 
 function App() {
 	const [autenticado, setAutenticado] = useState(false);
@@ -42,6 +44,8 @@ function App() {
 							<Route path="/grados" element={<ListadoGrado />} />
 							<Route path="/usuarios" element={<ListadoUsuario />} />
 							<Route path="/periodos" element={<ListadoPeriodo />} />
+							<Route path="/notas" element={<ListadoNotas />} />
+
 
 							<Route path="/auditoria/aulas" element={<AuditoriaAula />} />
 							<Route path="/auditoria/alumnos" element={<AuditoriaAlumno />} />
