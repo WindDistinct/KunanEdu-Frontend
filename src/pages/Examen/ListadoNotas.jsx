@@ -64,7 +64,7 @@ const cargarNotas = async (idAlumno) => {
           <option value="">-- Seleccione --</option>
           {alumnos.map((alumno) => (
             <option key={alumno.id_alumno} value={alumno.id_alumno}>
-              {alumno.nombre + " " + alumno.apellido}
+              {alumno.nombre + " " + alumno.apellido_paterno}
             </option>
           ))}
         </select>

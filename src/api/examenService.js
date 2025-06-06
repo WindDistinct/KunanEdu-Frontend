@@ -1,7 +1,7 @@
 // src/services/examenService.js
 import axios from "axios";
 
-const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."; // tu token JWT real
+const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...";
 
 const axiosInstance = axios.create({
 	baseURL: "https://kunanedu-backend.onrender.com",
