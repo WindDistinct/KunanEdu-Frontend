@@ -38,6 +38,8 @@ export default function ListadoAlumno() {
 		cargarAlumnos();
 	}, [cargarAlumnos]);
 
+	 
+
 	const handleEliminar = async (id) => {
 		try {
 			await eliminarAlumno(id);
@@ -64,42 +66,46 @@ export default function ListadoAlumno() {
 		setFormData(null);
 		setMostrarFormulario(false);
 	};
-
+	useEffect(() => {
+		if (mensaje?.texto) {
+			const timer = setTimeout(() => setMensaje(null), 3000);
+			return () => clearTimeout(timer);
+		}
+	}, [mensaje]);
 	return (
-		<div>
-			<div className="container mt-4">
-				<h1 className="mb-4">Gestión de Alumnos</h1>
+		<div className="container mt-4">
+			
+			<h1 className="mb-4">Gestión de Alumnos</h1>
 
-				<button onClick={() => navigate("/")} className="btn btn-secondary mb-3">
-					Volver al Menú
-				</button>
-			</div>
+			<button onClick={() => navigate("/")} className="btn btn-secondary mb-3">
+				Volver al Menú
+			</button> 
 			<br />
 			<Notificacion mensaje={mensaje?.texto} tipo={mensaje?.tipo} />
 			<br />
 			{mostrarFormulario || formData ? (
-  <div>
-    <FormularioAlumno onExito={handleExito} initialData={formData} />
-		<div className="d-flex mt-2">
-			<button
-				onClick={handleCancelar}
-				type="button"
-				className="btn btn-danger me-2"
-			>
-				Cancelar Registro
-			</button> 
-		</div>
-		</div>
-		) : (
-		puedeAdministrar && (
-			<button
-			onClick={() => setMostrarFormulario(true)}
-			className="btn btn-primary mb-3"
-			>
-			Registrar nuevo Alumno
-			</button>
-		)
-		)}
+			<div>
+				<FormularioAlumno onExito={handleExito} initialData={formData} />
+				<div className="d-flex mt-2">
+					<button
+						onClick={handleCancelar}
+						type="button"
+						className="btn btn-danger me-2"
+					>
+						Cancelar Registro
+					</button> 
+				</div>
+			</div>
+			) : (
+			puedeAdministrar && (
+				<button
+				onClick={() => setMostrarFormulario(true)}
+				className="btn btn-primary mb-3"
+				>
+				Registrar nuevo Alumno
+				</button>
+			)
+			)}
 			<br />
 			<br />
 			<Tabla

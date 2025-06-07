@@ -9,13 +9,21 @@ export default function FormularioAula({ onExito, initialData }) {
     numero_aula: "",
     aforo: "",
     ubicacion: "",
-    estado: true,  
+    estado: true,
   });
   const [error, setError] = useState(null);
+  const [mensajeExito, setMensajeExito] = useState(null);
 
   useEffect(() => {
     if (initialData) setForm(initialData);
   }, [initialData]);
+
+  useEffect(() => {
+    if (mensajeExito) {
+      const timer = setTimeout(() => setMensajeExito(null), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [mensajeExito]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -24,7 +32,7 @@ export default function FormularioAula({ onExito, initialData }) {
     if (type === "checkbox") {
       nuevoValor = checked;
     } else if (name === "numero_aula" || name === "aforo") { 
-      nuevoValor = value.replace(/\s+/g, "");
+      nuevoValor = value.replace(/\D/g, "");
     } else { 
       nuevoValor = value.trimStart();
     }
@@ -39,13 +47,12 @@ export default function FormularioAula({ onExito, initialData }) {
     if (!/^\d+$/.test(numero_aula)) {
       return "Introduce un número válido para el número de aula";
     }
-    if (!/^\d+$/.test(String(aforo))) {
-    return "Introduce un número válido para el aforo";
-	}
-
-	if (parseInt(aforo, 10) <= 20) {
-		return "El aforo debe ser mayor a 20";
-	}
+    if (!/^\d+$/.test(aforo)) {
+      return "Introduce un número válido para el aforo";
+    }
+    if (parseInt(aforo, 10) <= 20) {
+      return "El aforo debe ser mayor a 20";
+    }
     return null;
   };
 
@@ -61,21 +68,22 @@ export default function FormularioAula({ onExito, initialData }) {
 
     const datos = {
       ...form,
-      numero_aula: String(form.numero_aula).trim(),
-      aforo: String(form.aforo).trim(),
-      ubicacion: String(form.ubicacion).trim(),
-      estado: form.estado,  
+      numero_aula: String(form.numero_aula ?? "").trim(),
+      aforo: String(form.aforo ?? "").trim(),
+      ubicacion: String(form.ubicacion ?? "").trim(),
+      estado: form.estado,
     };
 
     try {
       if (form.id_aula) {
         await actualizarAula(form.id_aula, datos);
+        setMensajeExito("Aula actualizada con éxito");
         onExito("Aula actualizada con éxito");
       } else {
         await crearAula(datos);
+        setMensajeExito("Aula registrada con éxito");
         onExito("Aula registrada con éxito");
       }
-
       setForm({
         numero_aula: "",
         aforo: "",
@@ -87,69 +95,77 @@ export default function FormularioAula({ onExito, initialData }) {
     }
   };
 
-  const handleCancelar = () => {
-    setForm({
-      numero_aula: "",
-      aforo: "",
-      ubicacion: "",
-      estado: true,
-    });
-    onExito(null);
-  };
-
   return (
-    <form onSubmit={handleSubmit} className="form">
-      {error && <div className="error grid2">{error}</div>}
+    <form onSubmit={handleSubmit} className="row g-3">
+      {error && (
+        <div className="alert alert-danger col-12" role="alert">
+          {error}
+        </div>
+      )}
 
-      <input
-        name="numero_aula"
-        placeholder="Número de Aula"
-        className="input-form"
-        value={form.numero_aula}
-        onChange={handleChange}
-        maxLength={3}
-        inputMode="numeric"
-      />
-
-      <input
-        name="aforo"
-        placeholder="Aforo"
-        className="input-form"
-        value={form.aforo}
-        onChange={handleChange}
-        maxLength={2}
-        inputMode="numeric"
-      />
-
-      <select
-        name="ubicacion"
-        className="input-form"
-        value={form.ubicacion}
-        onChange={handleChange}
-      >
-        <option value="" disabled>Ubicación</option>
-        <option value="Primer Piso">Primer Piso</option>
-        <option value="Segundo Piso">Segundo Piso</option>
-        <option value="Tercer Piso">Tercer Piso</option>
-      </select>
-
-      <label className="checkbox-label">
+      <div className="col-md-6">
         <input
-          type="checkbox"
-          name="estado"
-          checked={!!form.estado}
+          name="numero_aula"
+          placeholder="Número de Aula"
+          className="form-control"
+          value={form.numero_aula}
           onChange={handleChange}
+          maxLength={3} 
+          inputMode="numeric"
+          onKeyDown={(e) => e.key === " " && e.preventDefault()}  
         />
-        Activo
-      </label>
+      </div>
 
-      <div className="grid2">
-        <button type="submit" className="aceptar-button">
+      <div className="col-md-6">
+        <input
+          name="aforo"
+          placeholder="Aforo"
+          className="form-control"
+          value={form.aforo}
+          onChange={handleChange}
+          maxLength={3} 
+          inputMode="numeric"
+          onKeyDown={(e) => e.key === " " && e.preventDefault()}  
+        />
+      </div>
+
+      <div className="col-md-6">
+        <select
+          name="ubicacion"
+          className="form-select"
+          value={form.ubicacion}
+          onChange={handleChange}
+        >
+          <option value="" disabled>
+            Ubicación
+          </option>
+          <option value="Primer Piso">Primer Piso</option>
+          <option value="Segundo Piso">Segundo Piso</option>
+          <option value="Tercer Piso">Tercer Piso</option>
+        </select>
+      </div>
+
+    {initialData && (
+      <div className="col-md-6">
+        <div className="form-check d-flex align-items-center gap-2 mt-2">
+          <input
+            className="form-check-input"
+            type="checkbox"
+            id="estado"
+            name="estado"
+            checked={!!form.estado}
+            onChange={handleChange}
+          />
+          <label className="form-check-label mb-0" htmlFor="estado">
+            Activo
+          </label>
+        </div>
+      </div>
+     )}
+
+      <div className="col-12">
+        <button type="submit" className="btn btn-success me-2">
           {form.id_aula ? "Actualizar" : "Registrar"} Aula
-        </button>
-
-        <button type="button" className="cancelar-button" onClick={handleCancelar}>
-          Cancelar
         </button>
       </div>
     </form>
