@@ -41,10 +41,11 @@ export default function AuditoriaAlumno() {
             { key: "direccion_anterior", label: "Dirección Anterior" },
             { key: "direccion_nuevo", label: "Dirección Nueva" },
             { key: "telefono_anterior", label: "Teléfono Anterior" },
-            { key: "telefono_nuevo", label: "Teléfono Nuevo" },
+            { key: "telefono_nuevo", label: "Teléfono Nuevo" }, 
+           /*
             { key: "fecha_nacimiento_anterior", label: "Fecha Nacimiento Anterior" },
             { key: "fecha_nacimiento_nuevo", label: "Fecha Nacimiento Nueva" },
-           /* { key: "estado_anterior", label: "Estado Anterior" },
+           { key: "estado_anterior", label: "Estado Anterior" },
             { key: "estado_nuevo", label: "Estado Nuevo" },*/
             { key: "operacion", label: "Operación" },
             { key: "fecha_modificacion", label: "Fecha Modificación" },
