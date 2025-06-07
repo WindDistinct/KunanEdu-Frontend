@@ -26,7 +26,7 @@ export default function Tabla({
   return (
     <>
       <table className="table table-bordered table-striped table-hover table-sm">
-        <thead className="table-dark">
+        <thead className="table-warning">
           <tr>
             {columnas.map(({ key, label }) => (
               <th key={key}>{label}</th>
