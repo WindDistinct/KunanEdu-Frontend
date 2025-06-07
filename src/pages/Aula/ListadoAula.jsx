@@ -75,9 +75,9 @@ export default function ListadoAula() {
       <button onClick={() => navigate("/")} className="btn btn-secondary mb-3">
         Volver al Menú
       </button>
- 
+      <br />
       <Notificacion mensaje={mensaje?.texto} tipo={mensaje?.tipo} />
- 
+      <br />
       {mostrarFormulario || formData ? (
         <div>
           <FormularioAula onExito={handleExito} initialData={formData} />
@@ -101,7 +101,8 @@ export default function ListadoAula() {
           </button>
         )
       )}
- 
+      <br />
+			<br />
       <Tabla
         columnas={[
           { key: "numero_aula", label: "N° Aula" },
