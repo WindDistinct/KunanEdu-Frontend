@@ -65,9 +65,10 @@ export default function ListadoAlumno() {
 
 	return (
 		<div>
-			<div>
-				<h1>Gestión de Alumnos</h1>
-				<button onClick={() => navigate("/")} className="menu-button">
+			<div className="container mt-4">
+				<h1 className="mb-4">Gestión de Alumnos</h1>
+
+				<button onClick={() => navigate("/")} className="btn btn-secondary mb-3">
 					Volver al Menú
 				</button>
 			</div>
@@ -75,22 +76,28 @@ export default function ListadoAlumno() {
 			<Notificacion mensaje={mensaje?.texto} tipo={mensaje?.tipo} />
 			<br />
 			{mostrarFormulario || formData ? (
-				<div>
-					<FormularioAlumno onExito={handleExito} initialData={formData} />
-					<button onClick={handleCancelar} className="cancelar-button">
-						Cancelar Registro
-					</button>
-				</div>
-			) : (
-				puedeAdministrar && (
-					<button
-						onClick={() => setMostrarFormulario(true)}
-						className="registrar-button"
-					>
-						Registrar nuevo Alumno
-					</button>
-				)
-			)}
+  <div>
+    <FormularioAlumno onExito={handleExito} initialData={formData} />
+		<div className="d-flex mt-2">
+			<button
+				onClick={handleCancelar}
+				type="button"
+				className="btn btn-danger me-2"
+			>
+				Cancelar Registro
+			</button> 
+		</div>
+		</div>
+		) : (
+		puedeAdministrar && (
+			<button
+			onClick={() => setMostrarFormulario(true)}
+			className="btn btn-primary mb-3"
+			>
+			Registrar nuevo Alumno
+			</button>
+		)
+		)}
 			<br />
 			<br />
 			<Tabla

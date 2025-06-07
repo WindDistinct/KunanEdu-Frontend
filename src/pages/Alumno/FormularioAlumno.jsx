@@ -104,84 +104,98 @@ export default function FormularioAlumno({ onExito, initialData }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="form">
-      {error && <div className="error grid2">{error}</div>}
-
-      <input
-        name="nombre"
-        placeholder="Nombres"
-        className="input-form"
-        value={form.nombre}
-        onChange={handleChange}
-      />
-      <input
-        name="apellido_paterno"
-        placeholder="Apellido Paterno"
-        className="input-form"
-        value={form.apellido_paterno}
-        onChange={handleChange}
-      />
-      <input
-        name="apellido_materno"
-        placeholder="Apellido Materno"
-        className="input-form"
-        value={form.apellido_materno}
-        onChange={handleChange}
-      />
-     <input
-		name="dni"
-		placeholder="DNI"
-		className="input-form"
-		value={form.dni}
-		onChange={handleChange}
-		maxLength={8}
-		inputMode="numeric"
-		onKeyDown={(e) => e.key === " " && e.preventDefault()}
-		/>
-
-		<input
-		name="telefono"
-		placeholder="Teléfono"
-		className="input-form"
-		value={form.telefono}
-		onChange={handleChange}
-		maxLength={9}
-		inputMode="numeric"
-		onKeyDown={(e) => e.key === " " && e.preventDefault()}
-		/>
-      <input
-        name="direccion"
-        placeholder="Dirección"
-        className="input-form"
-        value={form.direccion}
-        onChange={handleChange}
-      />
-      
-      <input
-        name="fecha_nacimiento"
-        type="date"
-        className="input-form"
-        value={form.fecha_nacimiento}
-        onChange={handleChange}
-        max={fechaMaximaNacimiento}
-      />
-
-      <label className="checkbox-label">
-        <input
-          type="checkbox"
-          name="estado"
-          checked={!!form.estado}
-          onChange={handleChange}
-        />
-        Activo
-      </label>
-
-      <div className="grid2">
-        <button type="submit" className="aceptar-button">
-          {form.id_alumno ? "Actualizar" : "Registrar"} Alumno
-        </button>
-     
-      </div>
+   <form onSubmit={handleSubmit} className="row g-3">
+		{error && (
+			<div className="alert alert-danger col-12" role="alert">
+			{error}
+			</div>
+		)} 
+		<div className="col-md-6">
+			<input
+			name="nombre"
+			placeholder="Nombres"
+			className="form-control"
+			value={form.nombre}
+			onChange={handleChange}
+			/>
+		</div>
+	    <div className="col-md-6">
+			<input
+				name="apellido_paterno"
+				placeholder="Apellido Paterno"
+				className="input-form"
+				value={form.apellido_paterno}
+				onChange={handleChange}
+			/> 
+		</div>
+		<div className="col-md-6">
+			<input
+			name="apellido_materno"
+			placeholder="Apellido Materno"
+			className="input-form"
+			value={form.apellido_materno}
+			onChange={handleChange}
+			/>
+		</div>
+		<div className="col-md-6">
+			<input
+			name="dni"
+			placeholder="DNI"
+			className="input-form"
+			value={form.dni}
+			onChange={handleChange}
+			maxLength={8}
+			inputMode="numeric"
+			onKeyDown={(e) => e.key === " " && e.preventDefault()}
+			/>
+		</div>
+		<div className="col-md-6">
+			<input
+				name="telefono"
+				placeholder="Teléfono"
+				className="input-form"
+				value={form.telefono}
+				onChange={handleChange}
+				maxLength={9}
+				inputMode="numeric"
+				onKeyDown={(e) => e.key === " " && e.preventDefault()}
+			/>
+		</div> 
+		<div className="col-md-6">
+			<input
+				name="direccion"
+				placeholder="Dirección"
+				className="input-form"
+				value={form.direccion}
+				onChange={handleChange}
+			/>
+		</div> 
+		<div className="col-md-6">
+			<input
+				name="fecha_nacimiento"
+				type="date"
+				className="input-form"
+				value={form.fecha_nacimiento}
+				onChange={handleChange}
+				max={fechaMaximaNacimiento}
+			/>
+		</div> 
+		<div className="col-md-6">
+			<label className="checkbox-label">
+				<input
+				type="checkbox"
+				name="estado"
+				checked={!!form.estado}
+				onChange={handleChange}
+				/>
+				Activo
+			</label>
+		</div> 
+		<div className="col-12">
+			<button type="submit" className="btn btn-success me-2">
+			{form.id_alumno ? "Actualizar" : "Registrar"} Alumno
+			</button> 
+		</div>
     </form>
   );
 }

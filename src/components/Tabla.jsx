@@ -1,5 +1,4 @@
-import React from "react";
-import "../styles/Tablas.css";
+import React, { useState } from "react";
 
 export default function Tabla({
   columnas,
@@ -7,41 +6,81 @@ export default function Tabla({
   onEditar,
   onEliminar,
   idKey = "id",
-  mostrarAcciones = true,  
+  mostrarAcciones = true,
+  filasPorPagina = 5,
 }) {
+  const [paginaActual, setPaginaActual] = useState(1);
+
+  const totalPaginas = Math.ceil(datos.length / filasPorPagina);
+
+  const datosPaginados = datos.slice(
+    (paginaActual - 1) * filasPorPagina,
+    paginaActual * filasPorPagina
+  );
+
+  const cambiarPagina = (nuevaPagina) => {
+    if (nuevaPagina < 1 || nuevaPagina > totalPaginas) return;
+    setPaginaActual(nuevaPagina);
+  };
+
   return (
-    <table className="tabla">
-      <thead>
-        <tr>
-          {columnas.map(({ key, label }) => (
-            <th key={key} className="encabezado-columna">
-              {label}
-            </th>
-          ))}
-          {mostrarAcciones && <th className="encabezado-columna">Acciones</th>}
-        </tr>
-      </thead>
-      <tbody>
-        {datos.map((item) => (
-          <tr key={item[idKey]}>
-            {columnas.map(({ key }) => (
-              <td key={key} className="celda">
-                {key === "estado" ? (item[key] ? "Activo" : "Inactivo") : item[key]}
-              </td>
+    <>
+      <table className="table table-bordered table-striped table-hover table-sm">
+        <thead>
+          <tr>
+            {columnas.map(({ key, label }) => (
+              <th key={key}>{label}</th>
             ))}
-            {mostrarAcciones && (
-              <td className="celda acciones">
-                <button onClick={() => onEditar(item)} className="btn-editar">
-                  Editar
-                </button>
-                <button onClick={() => onEliminar(item[idKey])} className="btn-eliminar">
-                  Eliminar
-                </button>
-              </td>
-            )}
+            {mostrarAcciones && <th>Acciones</th>}
           </tr>
-        ))}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          {datosPaginados.map((item) => (
+            <tr key={item[idKey]}>
+              {columnas.map(({ key }) => (
+                <td key={key}>
+                  {key === "estado" ? (item[key] ? "Activo" : "Inactivo") : item[key]}
+                </td>
+              ))}
+              {mostrarAcciones && (
+                <td>
+                  <button onClick={() => onEditar(item)} className="btn btn-sm btn-warning me-1">
+                    Editar
+                  </button>
+                  <button onClick={() => onEliminar(item[idKey])} className="btn btn-sm btn-danger">
+                    Eliminar
+                  </button>
+                </td>
+              )}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+ 
+      <nav>
+        <ul className="pagination justify-content-center">
+          <li className={`page-item ${paginaActual === 1 ? "disabled" : ""}`}>
+            <button className="page-link" onClick={() => cambiarPagina(paginaActual - 1)}>
+              Anterior
+            </button>
+          </li>
+          {[...Array(totalPaginas)].map((_, i) => (
+            <li
+              key={i + 1}
+              className={`page-item ${paginaActual === i + 1 ? "active" : ""}`}
+            >
+              <button className="page-link" onClick={() => cambiarPagina(i + 1)}>
+                {i + 1}
+              </button>
+            </li>
+          ))}
+          <li className={`page-item ${paginaActual === totalPaginas ? "disabled" : ""}`}>
+            <button className="page-link" onClick={() => cambiarPagina(paginaActual + 1)}>
+              Siguiente
+            </button>
+          </li>
+        </ul>
+      </nav>
+    </>
   );
 }
