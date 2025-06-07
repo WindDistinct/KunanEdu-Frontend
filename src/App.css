@@ -37,6 +37,7 @@ html, body {
   margin: 0;
 }
 
+/*
 .App-main {
   margin-top: 60px;
   padding: 20px;
@@ -46,6 +47,7 @@ html, body {
   overflow-y: auto;
   overflow-x: auto;
 }
+*/
 
 @keyframes App-logo-spin {
   from {

@@ -19,13 +19,15 @@ export default function ListadoAlumno() {
 	const cargarAlumnos = useCallback(async () => {
 		try {
 			const data = rol === "administrador" ? await obtenerAlumnosAd() : await obtenerAlumnos();
-		    const alumnosFormateados = data.map((alumno) => ({
-			...alumno,
-			fecha_nacimiento: alumno.fecha_nacimiento
+		    const alumnosFormateados = data
+			.map((alumno) => ({
+				...alumno,
+				fecha_nacimiento: alumno.fecha_nacimiento
 				? alumno.fecha_nacimiento.split("T")[0]
 				: "",
-		    }));
-	 
+			}))
+			.sort((a, b) => a.id_alumno - b.id_alumno)
+				
 			setAlumnos(alumnosFormateados);
 		} catch (error) {
 			setMensaje({ tipo: "error", texto: "Error al cargar los alumnos" });
