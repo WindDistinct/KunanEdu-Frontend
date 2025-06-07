@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { obtenerAlumnos, eliminarAlumno } from "../../api/alumnoService";
+import { obtenerAlumnos, eliminarAlumno, obtenerAlumnosAd } from "../../api/alumnoService";
 import Tabla from "../../components/Tabla";
 import FormularioAlumno from "./FormularioAlumno";
 import Notificacion from "../../components/Notificacion";
@@ -12,21 +12,38 @@ export default function ListadoAlumno() {
 	const [mensaje, setMensaje] = useState(null);
 	const [mostrarFormulario, setMostrarFormulario] = useState(false);
 	const navigate = useNavigate();
-
-	const cargarAlumnos = async () => {
-		const data = await obtenerAlumnos();
-		setAlumnos(data);
-		console.log(data);
-	};
+ 
+	const [rol] = useState(() => localStorage.getItem("rol"));
+	const puedeAdministrar = rol === "administrador";
+ 
+	const cargarAlumnos = useCallback(async () => {
+		try {
+			const data = rol === "administrador" ? await obtenerAlumnosAd() : await obtenerAlumnos();
+		    const alumnosFormateados = data.map((alumno) => ({
+			...alumno,
+			fecha_nacimiento: alumno.fecha_nacimiento
+				? alumno.fecha_nacimiento.split("T")[0]
+				: "",
+		    }));
+	 
+			setAlumnos(alumnosFormateados);
+		} catch (error) {
+			setMensaje({ tipo: "error", texto: "Error al cargar los alumnos" });
+		}
+	}, [rol]);
 
 	useEffect(() => {
 		cargarAlumnos();
-	}, []);
+	}, [cargarAlumnos]);
 
 	const handleEliminar = async (id) => {
-		await eliminarAlumno(id);
-		setMensaje({ tipo: "success", texto: "Alumno eliminado correctamente" });
-		cargarAlumnos();
+		try {
+			await eliminarAlumno(id);
+			setMensaje({ tipo: "success", texto: "Alumno eliminado correctamente" });
+			await cargarAlumnos();
+		} catch (error) {
+			setMensaje({ tipo: "error", texto: "Error al eliminar el alumno" });
+		}
 	};
 
 	const handleEditar = (alumno) => {
@@ -34,11 +51,16 @@ export default function ListadoAlumno() {
 		setMostrarFormulario(true);
 	};
 
-	const handleExito = (texto) => {
+	const handleExito = async (texto) => {
 		setMensaje({ tipo: "success", texto });
 		setFormData(null);
 		setMostrarFormulario(false);
-		cargarAlumnos();
+		await cargarAlumnos();
+	};
+
+	const handleCancelar = () => {
+		setFormData(null);
+		setMostrarFormulario(false);
 	};
 
 	return (
@@ -53,14 +75,21 @@ export default function ListadoAlumno() {
 			<Notificacion mensaje={mensaje?.texto} tipo={mensaje?.tipo} />
 			<br />
 			{mostrarFormulario || formData ? (
-				<FormularioAlumno onExito={handleExito} initialData={formData} />
+				<div>
+					<FormularioAlumno onExito={handleExito} initialData={formData} />
+					<button onClick={handleCancelar} className="cancelar-button">
+						Cancelar Registro
+					</button>
+				</div>
 			) : (
-				<button
-					onClick={() => setMostrarFormulario(true)}
-					className="registrar-button"
-				>
-					Registrar nuevo Alumno
-				</button>
+				puedeAdministrar && (
+					<button
+						onClick={() => setMostrarFormulario(true)}
+						className="registrar-button"
+					>
+						Registrar nuevo Alumno
+					</button>
+				)
 			)}
 			<br />
 			<br />
@@ -73,12 +102,13 @@ export default function ListadoAlumno() {
 					{ key: "direccion", label: "Dirección" },
 					{ key: "telefono", label: "Teléfono" },
 					{ key: "fecha_nacimiento", label: "Fecha Nacimiento" },
-					{ key: "estado", label: "Estado" },
+					...(puedeAdministrar ? [{ key: "estado", label: "Estado" }] : []),
 				]}
 				datos={alumnos}
 				onEditar={handleEditar}
 				onEliminar={handleEliminar}
 				idKey="id_alumno"
+				mostrarAcciones={puedeAdministrar}
 			/>
 		</div>
 	);
