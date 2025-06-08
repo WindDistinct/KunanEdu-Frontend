@@ -8,7 +8,10 @@ export const obtenerEmpleados = async () => {
 	const res = await axiosInstance.get(`/api/empleado/all`);
 	return res.data;
 };
-
+export const obtenerDocentes = async () => {
+	const res = await axiosInstance.get(`/api/empleado/all-docente`);
+	return res.data;
+};
 export const crearEmpleado = async (data) => {
 	const res = await axiosInstance.post(`/api/empleado/create`, data);
 	return res.data;

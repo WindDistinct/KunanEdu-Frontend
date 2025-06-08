@@ -68,7 +68,10 @@ export default function ListadoGrado() {
 
   return (
     <div className="container mt-4">
-      <h1 className="mb-4">Gestión de Grados</h1>
+        <h1 className="mb-4">
+        {puedeAdministrar ? "Gestión de Grado" : "Listado de Grado"}
+      </h1>
+
 
       <button onClick={() => navigate("/")} className="btn btn-secondary mb-3">
         Volver al Menú

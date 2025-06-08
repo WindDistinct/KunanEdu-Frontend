@@ -69,7 +69,9 @@ export default function ListadoPeriodo() {
 
   return (
     <div className="container mt-4">
-      <h1 className="mb-4">Gestión de Periodos</h1>
+      <h1 className="mb-4">
+        {puedeAdministrar ? "Gestión de Periodo" : "Listado de Periodo"}
+      </h1>
 
       <button onClick={() => navigate("/")} className="btn btn-secondary mb-3">
         Volver al Menú

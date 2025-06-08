@@ -1,100 +1,146 @@
 import React, { useEffect, useState } from "react";
 import { crearCurso, actualizarCurso } from "../../api/cursoService";
+import { obtenerDocentes } from "../../api/empleadoService";
 import "../../styles/Botones.css";
 import "../../styles/inputs.css";
 import "../../styles/Notificacion.css";
 
 export default function FormularioCurso({ onExito, initialData }) {
-	const [form, setForm] = useState({
-		nombre_curso: "",
-		grado: "",
-		docente: "",
-	});
-	const [error, setError] = useState(null);
+  const [form, setForm] = useState({
+    nombre_curso: "",
+    docente: "",
+  });
+  const [docentes, setDocentes] = useState([]);
+  const [error, setError] = useState(null);
+  const [mensajeExito, setMensajeExito] = useState(null);
 
-	useEffect(() => {
-		if (initialData) setForm(initialData);
-	}, [initialData]);
+  useEffect(() => {
+    if (initialData) {
+      setForm({
+        ...initialData,
+        docente: String(initialData.docente),  
+      });
+    }
+  }, [initialData]);
 
-	const handleChange = (e) => {
-		const { name, value } = e.target;
-		setForm((prev) => ({ ...prev, [name]: value }));
-	};
+  useEffect(() => {
+    const cargarDocentes = async () => {
+      try {
+        const data = await obtenerDocentes();
+        setDocentes(data);
+      } catch (err) {
+        setError("Error al cargar los docentes");
+      }
+    };
+    cargarDocentes();
+  }, []);
 
-	const esTextoValido = (texto) => /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]{3,}$/.test(texto.trim());
-	const esNumeroValido = (numero) => /^\d+$/.test(numero.trim());
+  useEffect(() => {
+    if (mensajeExito) {
+      const timer = setTimeout(() => setMensajeExito(null), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [mensajeExito]);
 
-	const handleSubmit = async (e) => {
-		e.preventDefault();
-		setError(null);
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+  };
 
-		const { nombre_curso, grado, docente } = form;
+  const validarFormulario = () => {
+    const { nombre_curso, docente } = form;
+    if (!nombre_curso || !docente) return "Todos los campos son obligatorios";
 
-		if (!nombre_curso || !grado || !docente) {
-			setError("Todos los campos son obligatorios");
-			return;
-		}
+    if (!/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]{3,}$/.test(nombre_curso.trim())) {
+      return "El nombre del curso debe tener al menos 3 letras y sin números";
+    }
 
-		if (!esTextoValido(nombre_curso)) {
-			setError("El nombre del curso debe contener solo letras y tener al menos 3 caracteres");
-			return;
-		}
+    if (!docente || isNaN(Number(docente))) {
+      return "Debe seleccionar un docente válido";
+    }
 
-		if (!esNumeroValido(grado)) {
-			setError("El grado debe contener solo números");
-			return;
-		}
+    return null;
+  };
 
-		if (!esNumeroValido(docente)) {
-			setError("El docente debe contener solo números");
-			return;
-		}
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError(null);
 
-		try {
-			if (form.id_curso) {
-				await actualizarCurso(form.id_curso, { ...form, estado: 1 });
-				onExito("Curso actualizado con éxito");
-			} else {
-				await crearCurso(form);
-				onExito("Curso registrado con éxito");
-			}
-			setForm({ nombre_curso: "", grado: "", docente: "" });
-		} catch (err) {
-			setError("Error al guardar. Verifique que el nombre del curso no esté duplicado");
-		}
-	};
+    const errorValidacion = validarFormulario();
+    if (errorValidacion) {
+      setError(errorValidacion);
+      return;
+    }
 
-	return (
-		<form onSubmit={handleSubmit} className="form">
-			{error && <div className="error grid2">{error}</div>}
-			<input
-				name="nombre_curso"
-				placeholder="Nombre del Curso"
-				className="input-form"
-				value={form.nombre_curso}
-				onChange={handleChange}
-			/>
-			<input
-				name="grado"
-				placeholder="Grado"
-				className="input-form"
-				value={form.grado}
-				onChange={handleChange}
-				inputMode="numeric"
-			/>
-			<input
-				name="docente"
-				placeholder="Docente (solo números)"
-				className="input-form"
-				value={form.docente}
-				onChange={handleChange}
-				inputMode="numeric"
-			/>
-			<div className="grid2">
-				<button type="submit" className="aceptar-button">
-					{form.id_curso ? "Actualizar" : "Registrar"} Curso
-				</button>
-			</div>
-		</form>
-	);
+    const datos = {
+      nombre_curso: form.nombre_curso.trim(),
+      docente: parseInt(form.docente,10),
+      estado: true,
+    };
+
+    try { 
+      if (form.id_curso) {
+        await actualizarCurso(form.id_curso, datos);
+        setMensajeExito("Curso actualizado con éxito");
+        onExito("Curso actualizado con éxito");
+      } else {
+        await crearCurso(datos);
+        setMensajeExito("Curso registrado con éxito");
+        onExito("Curso registrado con éxito");
+      }
+
+      setForm({ nombre_curso: "", docente: "" });
+    } catch (err) {
+      setError("Error al guardar. Verifique que el nombre no esté duplicado");
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="row g-3">
+      {error && (
+        <div className="alert alert-danger col-12" role="alert">
+          {error}
+        </div>
+      )}
+      {mensajeExito && (
+        <div className="alert alert-success col-12" role="alert">
+          {mensajeExito}
+        </div>
+      )}
+
+      <div className="col-md-6">
+        <input
+          name="nombre_curso"
+          placeholder="Nombre del Curso"
+          className="form-control"
+          value={form.nombre_curso}
+          onChange={handleChange}
+        />
+      </div>
+
+      <div className="col-md-6">
+        <select
+          name="docente"
+          className="form-select"
+          value={form.docente}
+          onChange={handleChange}
+        >
+          <option value="" disabled>
+            Seleccione un docente
+          </option>
+          {docentes.map((d) => (
+            <option key={d.id_emp} value={d.id_emp}>
+              {d.nombre_completo}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div className="col-12">
+        <button type="submit" className="btn btn-success me-2">
+          {form.id_curso ? "Actualizar" : "Registrar"} Curso
+        </button>
+      </div>
+    </form>
+  );
 }

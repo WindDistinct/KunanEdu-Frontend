@@ -74,7 +74,9 @@ export default function ListadoAlumno() {
 	return (
 		<div className="container mt-4">
 			
-			<h1 className="mb-4">Gestión de Alumnos</h1>
+		<h1 className="mb-4">
+		{puedeAdministrar ? "Gestión de Alumno" : "Listado de Alumnos"}
+		</h1>
 
 			<button onClick={() => navigate("/")} className="btn btn-secondary mb-3">
 				Volver al Menú

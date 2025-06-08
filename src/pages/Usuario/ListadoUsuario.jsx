@@ -70,7 +70,9 @@ export default function ListadoUsuario() {
 
   return (
     <div className="container mt-4">
-      <h1 className="mb-4">Gestión de Usuarios</h1>
+     <h1 className="mb-4">
+      {puedeAdministrar ? "Gestión de Usuario" : "Listado de Usuario"}
+    </h1>
 
       <button onClick={() => navigate("/")} className="btn btn-secondary mb-3">
         Volver al Menú

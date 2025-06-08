@@ -21,6 +21,7 @@ import AuditoriaGrado from "./pages/Grado/AuditoriaGrado";
 import AuditoriaPeriodo from "./pages/Periodo/AuditoriaPeriodo";
 import AuditoriaUsuario from "./pages/Usuario/AuditoriaUsuario";
 import ListadoNotas from "./pages/Examen/ListadoNotas";
+import AuditoriaCurso from "./pages/Curso/AuditoriaCurso";
 
 
 function App() {
@@ -53,6 +54,7 @@ function App() {
 							<Route path="/auditoria/grados" element={<AuditoriaGrado />} />
 							<Route path="/auditoria/periodos" element={<AuditoriaPeriodo />} /> 
 							<Route path="/auditoria/usuarios" element={<AuditoriaUsuario />} />
+							<Route path="/auditoria/cursos" element={<AuditoriaCurso />} />
 							
 						</Routes>
 					</Router>
@@ -63,5 +65,5 @@ function App() {
 		</div>
 	);
 }
-/* <Route path="/auditoria/cursos" element={<AuditoriaCurso />} />*/
+ 
 export default App;

@@ -74,7 +74,9 @@ setEmpleados(empleadosFormateados);
 
   return (
     <div className="container mt-4">
-      <h1 className="mb-4">Gestión de Empleados</h1>
+     <h1 className="mb-4">
+        {puedeAdministrar ? "Gestión de Empleado" : "Listado de Empleado"}
+      </h1>
 
       <button onClick={() => navigate("/")} className="btn btn-secondary mb-3">
         Volver al Menú

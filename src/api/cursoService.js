@@ -1,23 +1,30 @@
-import axios from "axios";
+import axiosInstance from "./axiosInstance";
+ 
 
-const API_URL = "http://localhost:4940/api/curso";
-
-export const obtenerCursos = async () => {
-	const res = await axios.get(`${API_URL}/all`);
+export const obtenerCursosAd = async () => {
+	const res = await axiosInstance.get(`/api/curso/all-adm`);
 	return res.data;
 };
-
+export const obtenerCursos = async () => {
+	const res = await axiosInstance.get(`/api/curso/all`);
+	return res.data;
+};
 export const crearCurso = async (data) => {
-	const res = await axios.post(`${API_URL}/create`, data);
+	const res = await axiosInstance.post(`/api/curso/create`,data);
 	return res.data;
 };
 
 export const actualizarCurso = async (id, data) => {
-	const res = await axios.put(`${API_URL}/update/${id}`, data);
+	const res = await axiosInstance.put(`/api/curso/update/${id}`, data);
 	return res.data;
 };
 
 export const eliminarCurso = async (id) => {
-	const res = await axios.delete(`${API_URL}/delete/${id}`);
+	const res = await axiosInstance.delete(`/api/curso/delete/${id}`);
+	return res.data;
+};
+
+export const auditoriaCurso = async () => {
+	const res = await axiosInstance.get(`/api/curso/all-audit`);
 	return res.data;
 };

@@ -1,79 +1,122 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { obtenerCursos, eliminarCurso } from "../../api/cursoService";
+import { obtenerCursos, eliminarCurso, obtenerCursosAd } from "../../api/cursoService";
 import Tabla from "../../components/Tabla";
 import FormularioCurso from "./FormularioCurso";
 import Notificacion from "../../components/Notificacion";
 import "../../styles/Botones.css";
 
 export default function ListadoCurso() {
-	const [cursos, setCursos] = useState([]);
-	const [formData, setFormData] = useState(null);
-	const [mensaje, setMensaje] = useState(null);
-	const [mostrarFormulario, setMostrarFormulario] = useState(false);
-	const navigate = useNavigate();
+  const [cursos, setCursos] = useState([]);
+  const [formData, setFormData] = useState(null);
+  const [mensaje, setMensaje] = useState(null);
+  const [mostrarFormulario, setMostrarFormulario] = useState(false);
+  const navigate = useNavigate();
 
-	const cargarCursos = async () => {
-		const data = await obtenerCursos();
-		setCursos(data);
-	};
+  const [rol] = useState(() => localStorage.getItem("rol"));
+  const puedeAdministrar = rol === "administrador";
 
-	useEffect(() => {
-		cargarCursos();
-	}, []);
+  const cargarCursos = useCallback(async () => {
+    try {
+      const data =
+			rol === "administrador" ? await obtenerCursosAd() : await obtenerCursos();
+	
+	  const cursosOrdenados = data.sort((a, b) => a.id_curso - b.id_curso);
+      setCursos(cursosOrdenados);
+    } catch (error) {
+      setMensaje({ tipo: "error", texto: "Error al cargar los cursos" });
+    }
+  }, [rol]);
 
-	const handleEliminar = async (id) => {
-		await eliminarCurso(id);
-		setMensaje({ tipo: "success", texto: "Curso eliminado correctamente" });
-		cargarCursos();
-	};
+  useEffect(() => {
+    cargarCursos();
+  }, [cargarCursos]);
 
-	const handleEditar = (curso) => {
-		setFormData(curso);
-		setMostrarFormulario(true);
-	};
+  useEffect(() => {
+    if (mensaje) {
+      const timer = setTimeout(() => {
+        setMensaje(null);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [mensaje]);
 
-	const handleExito = (texto) => {
-		setMensaje({ tipo: "success", texto });
-		setFormData(null);
-		setMostrarFormulario(false);
-		cargarCursos();
-	};
+  const handleEliminar = async (id) => {
+    try {
+      await eliminarCurso(id);
+      setMensaje({ tipo: "success", texto: "Curso eliminado correctamente" });
+      await cargarCursos();
+    } catch (error) {
+      setMensaje({ tipo: "error", texto: "Error al eliminar el curso" });
+    }
+  };
 
-	return (
-		<div>
-			<div>
-				<h1>Gestión de Cursos</h1>
-				<button onClick={() => navigate("/")} className="menu-button">
-					Volver al Menú
-				</button>
-			</div>
-			<br />
-			<Notificacion mensaje={mensaje?.texto} tipo={mensaje?.tipo} />
-			<br />
-			{mostrarFormulario || formData ? (
-				<FormularioCurso onExito={handleExito} initialData={formData} />
-			) : (
-				<button
-					onClick={() => setMostrarFormulario(true)}
-					className="registrar-button"
-				>
-					Registrar nuevo Curso
-				</button>
-			)}
-			<br />
-			<br />
-			<Tabla
-				columnas={[
-					{ key: "nombre_curso", label: "Nombre del Curso" },
-					{ key: "grado", label: "Grado" },
-					{ key: "docente", label: "Docente" },
-					{ key: "estado", label: "Estado" },
-				]}
-				datos={cursos}
-				onEditar={handleEditar}
-				onEliminar={handleEliminar}
-			/>
-		</div>
-	);
+  const handleEditar = (curso) => {
+    setFormData(curso);
+    setMostrarFormulario(true);
+  };
+
+  const handleExito = async (texto) => {
+    setMensaje({ tipo: "success", texto });
+    setFormData(null);
+    setMostrarFormulario(false);
+    await cargarCursos();
+  };
+
+  const handleCancelar = () => {
+    setFormData(null);
+    setMostrarFormulario(false);
+  };
+
+  return (
+    <div className="container mt-4">
+       <h1 className="mb-4">
+        {puedeAdministrar ? "Gestión de Curso" : "Listado de Curso"}
+      </h1>
+
+      <button onClick={() => navigate("/")} className="btn btn-secondary mb-3">
+        Volver al Menú
+      </button>
+      <br />
+      <Notificacion mensaje={mensaje?.texto} tipo={mensaje?.tipo} />
+      <br />
+      {mostrarFormulario || formData ? (
+        <div>
+          <FormularioCurso onExito={handleExito} initialData={formData} />
+          <div className="d-flex mt-2">
+            <button
+              onClick={handleCancelar}
+              type="button"
+              className="btn btn-danger me-2"
+            >
+              Cancelar Registro
+            </button>
+          </div>
+        </div>
+      ) : (
+        puedeAdministrar && (
+          <button
+            onClick={() => setMostrarFormulario(true)}
+            className="btn btn-primary mb-3"
+          >
+            Registrar nuevo Curso
+          </button>
+        )
+      )}
+      <br />
+      <br />
+      <Tabla
+        columnas={[
+          { key: "nombre_curso", label: "Nombre del Curso" }, 
+          { key: "docente", label: "Docente Id" },
+          ...(puedeAdministrar ? [{ key: "estado", label: "Estado" }] : []),
+        ]}
+        datos={cursos}
+        onEditar={handleEditar}
+        onEliminar={handleEliminar}
+        idKey="id_curso"
+        mostrarAcciones={puedeAdministrar}
+      />
+    </div>
+  );
 }
