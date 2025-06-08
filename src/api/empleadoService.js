@@ -1,7 +1,11 @@
 import axiosInstance from "./axiosInstance";
 
-export const obtenerEmpleados = async () => {
+export const obtenerEmpleadosAd = async () => {
 	const res = await axiosInstance.get(`/api/empleado/all-adm`);
+	return res.data;
+};
+export const obtenerEmpleados = async () => {
+	const res = await axiosInstance.get(`/api/empleado/all`);
 	return res.data;
 };
 

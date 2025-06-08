@@ -20,11 +20,10 @@ export default function AuditoriaUsuario() {
   return (
     <div className="container mt-4">
        <h1 className="mb-4">Auditoría de Usuarios</h1>
-        <button onClick={() => navigate("/")} className="menu-button">
+        <button onClick={() => navigate("/")} className="btn btn-secondary mb-3">
           Volver al Menú
         </button> 
-      <br />
-        <br />
+      <br /> 
       <Tabla
         columnas={[
             { key: "id_audit_usuario", label: "ID Auditoría" },

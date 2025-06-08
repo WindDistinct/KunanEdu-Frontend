@@ -23,6 +23,19 @@ export default function Tabla({
     setPaginaActual(nuevaPagina);
   };
 
+  const renderValor = (key, valor) => {
+  if (key === "estado") {
+    return valor === true ? "Activo" : "Inactivo";
+  }
+
+  if (typeof valor === "string" && (key.includes("fec") || key.includes("fecha"))) {
+  const [año, mes, dia] = valor.split("-");
+  return `${dia}/${mes}/${año}`;
+  }
+  return valor;
+};
+
+
   return (
     <>
       <table className="table table-bordered table-striped table-hover table-sm">
@@ -39,7 +52,7 @@ export default function Tabla({
             <tr key={item[idKey]}>
               {columnas.map(({ key }) => (
                 <td key={key}>
-                  {key === "estado" ? (item[key] ? "Activo" : "Inactivo") : item[key]}
+                  {renderValor(key, item[key])}
                 </td>
               ))}
               {mostrarAcciones && (

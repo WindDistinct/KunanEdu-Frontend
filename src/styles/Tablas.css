@@ -1,15 +1,14 @@
-.tabla {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.875rem;
-}
+.tabla-auditoria {
+  font-size: 0.85rem;
 
-.encabezado-columna {
-  background-color: #e5e7eb;
-  padding: 0.25rem 0.5rem;
-  text-align: left;
-  border: 1px solid #d1d5db;
 }
+.table-responsive{
+  overflow-x: auto;
+}
+.tabla-auditoria thead{
+  vertical-align: middle;
+}
+ 
 
 .celda {
   border: 1px solid #d1d5db;

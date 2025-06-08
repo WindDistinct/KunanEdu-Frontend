@@ -1,7 +1,11 @@
 import axiosInstance from "./axiosInstance";
 
-export const obtenerPeriodos = async () => {
+export const obtenerPeriodosAd = async () => {
 	const res = await axiosInstance.get(`/api/periodo/all-adm`);
+	return res.data;
+};
+export const obtenerPeriodos = async () => {
+	const res = await axiosInstance.get(`/api/periodo/all`);
 	return res.data;
 };
 

@@ -5,110 +5,187 @@ import "../../styles/inputs.css";
 import "../../styles/Notificacion.css";
 
 export default function FormularioGrado({ onExito, initialData }) {
-	const [form, setForm] = useState({ 
-		nivel: "",
-		anio: "",
-		cupos_totales: "",
-		cupos_disponibles: "",
-	});
-	const [error, setError] = useState(null);
+  const [form, setForm] = useState({
+    nivel: "",
+    anio: "",
+    cupos_totales: "",
+    cupos_disponibles: "",
+    estado: true,
+  });
 
-	useEffect(() => {
-		if (initialData) setForm(initialData);
-	}, [initialData]);
+  const [error, setError] = useState(null);
+  const [mensajeExito, setMensajeExito] = useState(null);
 
-	const handleChange = (e) => {
-		const { name, value } = e.target;
-		setForm((prev) => ({ ...prev, [name]: value }));
-	};
+  useEffect(() => {
+    if (initialData) setForm(initialData);
+  }, [initialData]);
 
-	const handleSubmit = async (e) => {
-		e.preventDefault();
-		setError(null);
+  useEffect(() => {
+    if (mensajeExito) {
+      const timer = setTimeout(() => setMensajeExito(null), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [mensajeExito]);
 
-		if (!form.nivel || !form.anio || !form.cupos_totales || !form.cupos_disponibles) {
-			setError("Todos los campos son obligatorios");
-			return;
-		}
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    let nuevoValor = value;
 
-		try {
-			if (form.id_grado) {
-				await actualizarGrado(form.id_grado, { ...form, estado: 1 });
-				onExito("Grado actualizado con éxito");
-			} else {
-				await crearGrado(form);
-				onExito("Grado registrado con éxito");
-			}
-			setForm({ 
-				nivel: "",
-				anio: "",
-				cupos_totales: "",
-				cupos_disponibles: "" 
-			});
-		} catch (err) {
-			setError(
-				"Error al guardar. Verifique que el nombre del grado no esté duplicado",
-			);
-		}
-	};
+    if (type === "checkbox") {
+      nuevoValor = checked;
+    } else if (name === "cupos_totales" || name === "cupos_disponibles") {
+      nuevoValor = value.replace(/\D/g, "");
+    } else {
+      nuevoValor = value.trimStart();
+    }
 
-	return (
-		<form onSubmit={handleSubmit} className="form">
-			{error && <div className="error grid2">{error}</div>}
-			<select
-			name="nivel"
-			className="input-form"
-			value={form.nivel}
-			onChange={handleChange}
-			required
-			>
-			<option value="" disabled>Seleccione nivel</option>
-			<option value="inicial">Inicial</option>
-			<option value="primaria">Primaria</option>
-			<option value="secundaria">Secundaria</option>
-			</select>
+    setForm((prev) => ({ ...prev, [name]: nuevoValor }));
+  };
 
-			<select
-			name="anio"
-			className="input-form"
-			value={form.anio}
-			onChange={handleChange}
-			required
-			>
-			<option value="" disabled>Seleccione año</option>
-			<option value="1ro">1ro</option>
-			<option value="2do">2do</option>
-			<option value="3ro">3ro</option>
-			<option value="4to">4to</option>
-			<option value="5to">5to</option>
-			<option value="6to">6to</option>
-			</select>
+  const validarFormulario = () => {
+    const { nivel, anio, cupos_totales, cupos_disponibles } = form;
+    if (!nivel || !anio || !cupos_totales || !cupos_disponibles) {
+      return "Todos los campos son obligatorios";
+    }
+    if (!/^\d+$/.test(cupos_totales) || !/^\d+$/.test(cupos_disponibles)) {
+      return "Cupos deben ser números válidos";
+    }
+    if (parseInt(cupos_disponibles) > parseInt(cupos_totales)) {
+      return "Los cupos disponibles no pueden superar a los cupos totales";
+    }
+    return null;
+  };
 
-			<input
-				name="cupos_totales"
-				placeholder="Cupos Totales"
-				className="input-form"
-				value={form.cupos_totales}
-				onChange={handleChange}
-				maxLength={3}
-				inputMode="numeric"
-			/>
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError(null);
 
-			<input
-				name="cupos_disponibles"
-				placeholder="Cupos Disponibles"
-				className="input-form"
-				value={form.cupos_disponibles}
-				onChange={handleChange}
-				maxLength={3}
-				inputMode="numeric"
-			/>
+    const errorValidacion = validarFormulario();
+    if (errorValidacion) {
+      setError(errorValidacion);
+      return;
+    }
 
-			<div className="grid2">
-				<button type="submit" className="aceptar-button">
-					{form.id_grado ? "Actualizar" : "Registrar"} Grado
-				</button>
-			</div>
-		</form>
-	);
+    const datos = {
+      ...form,
+      cupos_totales: String(form.cupos_totales).trim(),
+      cupos_disponibles: String(form.cupos_disponibles).trim(),
+    };
+
+    try {
+      if (form.id_grado) {
+        await actualizarGrado(form.id_grado, datos);
+        setMensajeExito("Grado actualizado con éxito");
+        onExito("Grado actualizado con éxito");
+      } else {
+        await crearGrado(datos);
+        setMensajeExito("Grado registrado con éxito");
+        onExito("Grado registrado con éxito");
+      }
+      setForm({
+        nivel: "",
+        anio: "",
+        cupos_totales: "",
+        cupos_disponibles: "",
+        estado: true,
+      });
+    } catch (err) {
+      setError("Error al guardar. Verifique que el grado no esté duplicado");
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="row g-3">
+      {error && (
+        <div className="alert alert-danger col-12" role="alert">
+          {error}
+        </div>
+      )}
+
+      <div className="col-md-6">
+        <select
+          name="nivel"
+          className="form-select"
+          value={form.nivel}
+          onChange={handleChange}
+        >
+          <option value="" disabled>
+            Seleccione nivel
+          </option>
+          <option value="inicial">Inicial</option>
+          <option value="primaria">Primaria</option>
+          <option value="secundaria">Secundaria</option>
+        </select>
+      </div>
+
+      <div className="col-md-6">
+        <select
+          name="anio"
+          className="form-select"
+          value={form.anio}
+          onChange={handleChange}
+        >
+          <option value="" disabled>
+            Seleccione año
+          </option>
+          <option value="1ro">1ro</option>
+          <option value="2do">2do</option>
+          <option value="3ro">3ro</option>
+          <option value="4to">4to</option>
+          <option value="5to">5to</option>
+          <option value="6to">6to</option>
+        </select>
+      </div>
+
+      <div className="col-md-6">
+        <input
+          name="cupos_totales"
+          placeholder="Cupos Totales"
+          className="form-control"
+          value={form.cupos_totales}
+          onChange={handleChange}
+          maxLength={3}
+          inputMode="numeric"
+          onKeyDown={(e) => e.key === " " && e.preventDefault()}
+        />
+      </div>
+
+      <div className="col-md-6">
+        <input
+          name="cupos_disponibles"
+          placeholder="Cupos Disponibles"
+          className="form-control"
+          value={form.cupos_disponibles}
+          onChange={handleChange}
+          maxLength={3}
+          inputMode="numeric"
+          onKeyDown={(e) => e.key === " " && e.preventDefault()}
+        />
+      </div>
+
+      {initialData && (
+        <div className="col-md-6">
+          <div className="form-check d-flex align-items-center gap-2 mt-2">
+            <input
+              className="form-check-input"
+              type="checkbox"
+              id="estado"
+              name="estado"
+              checked={!!form.estado}
+              onChange={handleChange}
+            />
+            <label className="form-check-label mb-0" htmlFor="estado">
+              Activo
+            </label>
+          </div>
+        </div>
+      )}
+
+      <div className="col-12">
+        <button type="submit" className="btn btn-success me-2">
+          {form.id_grado ? "Actualizar" : "Registrar"} Grado
+        </button>
+      </div>
+    </form>
+  );
 }

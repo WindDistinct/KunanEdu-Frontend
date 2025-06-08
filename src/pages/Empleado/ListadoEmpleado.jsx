@@ -1,87 +1,131 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { obtenerEmpleados, eliminarEmpleado } from "../../api/empleadoService";
+import { obtenerEmpleados, eliminarEmpleado, obtenerEmpleadosAd } from "../../api/empleadoService";
 import Tabla from "../../components/Tabla";
 import FormularioEmpleado from "./FormularioEmpleado";
 import Notificacion from "../../components/Notificacion";
 import "../../styles/Botones.css";
 
 export default function ListadoEmpleado() {
-	const [empleados, setEmpleados] = useState([]);
-	const [formData, setFormData] = useState(null);
-	const [mensaje, setMensaje] = useState(null);
-	const [mostrarFormulario, setMostrarFormulario] = useState(false);
-	const navigate = useNavigate();
+  const [empleados, setEmpleados] = useState([]);
+  const [formData, setFormData] = useState(null);
+  const [mensaje, setMensaje] = useState(null);
+  const [mostrarFormulario, setMostrarFormulario] = useState(false);
+  const navigate = useNavigate();
 
-	const cargarEmpleados = async () => {
-		const data = await obtenerEmpleados();
-		setEmpleados(data);
-	};
+  const [rol] = useState(() => localStorage.getItem("rol"));
+  const puedeAdministrar = rol === "administrador";
 
-	useEffect(() => {
-		cargarEmpleados();
-	}, []);
+  const cargarEmpleados = useCallback(async () => {
+    try {
+     const data =
+	 rol === "administrador" ? await obtenerEmpleadosAd() : await obtenerEmpleados();
+	
+    const empleadosFormateados = data
+  .map((empleado) => ({
+    ...empleado,
+    fec_nac: empleado.fec_nac ? empleado.fec_nac.split("T")[0] : "",
+  }))
+  .sort((a, b) => a.id_emp - b.id_emp);
+console.log(empleadosFormateados)
+setEmpleados(empleadosFormateados);
+    } catch (error) {
+      setMensaje({ tipo: "error", texto: "Error al cargar los empleados" });
+    }
+  }, [rol]);
 
-	const handleEliminar = async (id) => {
-		await eliminarEmpleado(id);
-		setMensaje({ tipo: "success", texto: "Empleado eliminado correctamente" });
-		cargarEmpleados();
-	};
+  useEffect(() => {
+    cargarEmpleados();
+  }, [cargarEmpleados]);
 
-	const handleEditar = (empleado) => {
-		setFormData(empleado);
-		setMostrarFormulario(true);
-	};
+  useEffect(() => {
+    if (mensaje) {
+      const timer = setTimeout(() => setMensaje(null), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [mensaje]);
 
-	const handleExito = (texto) => {
-		setMensaje({ tipo: "success", texto });
-		setFormData(null);
-		setMostrarFormulario(false);
-		cargarEmpleados();
-	};
+  const handleEliminar = async (id) => {
+    try {
+      await eliminarEmpleado(id);
+      setMensaje({ tipo: "success", texto: "Empleado eliminado correctamente" });
+      await cargarEmpleados();
+    } catch (error) {
+      setMensaje({ tipo: "error", texto: "Error al eliminar el empleado" });
+    }
+  };
 
-	return (
-		<div>
-			<div>
-				<h1>Gestión de Empleados</h1>
-				<button onClick={() => navigate("/")} className="menu-button">
-					Volver al Menú
-				</button>
-			</div>
-			<br />
-			<Notificacion mensaje={mensaje?.texto} tipo={mensaje?.tipo} />
-			<br />
-			{mostrarFormulario || formData ? (
-				<FormularioEmpleado onExito={handleExito} initialData={formData} />
-			) : (
-				<button
-					onClick={() => setMostrarFormulario(true)}
-					className="registrar-button"
-				>
-					Registrar nuevo Empleado
-				</button>
-			)}
-			<br />
-			<br />
-			<Tabla
-				columnas={[
-					{ key: "nombre_emp", label: "Nombre" },
-					{ key: "ape_pat_emp", label: "Apellido Paterno" },
-					{ key: "ape_mat_emp", label: "Apellido Materno" },
-					{ key: "fec_nac", label: "Fecha de Nacimiento" },
-					{ key: "dni", label: "DNI" },
-					{ key: "telefono", label: "Teléfono" },
-					{ key: "especialidad", label: "Especialidad" },
-					{ key: "cargo", label: "Cargo" },
-					{ key: "observacion", label: "Observación" },
-					{ key: "usuario", label: "Usuario" },
-					{ key: "estado", label: "Estado" },
-				]}
-				datos={empleados}
-				onEditar={handleEditar}
-				onEliminar={handleEliminar}
-				idKey="id_emp"
-			/>
-		</div>
-	);
+  const handleEditar = (empleado) => {
+    setFormData(empleado);
+    setMostrarFormulario(true);
+  };
+
+  const handleExito = async (texto) => {
+    setMensaje({ tipo: "success", texto });
+    setFormData(null);
+    setMostrarFormulario(false);
+    await cargarEmpleados();
+  };
+
+  const handleCancelar = () => {
+    setFormData(null);
+    setMostrarFormulario(false);
+  };
+
+  return (
+    <div className="container mt-4">
+      <h1 className="mb-4">Gestión de Empleados</h1>
+
+      <button onClick={() => navigate("/")} className="btn btn-secondary mb-3">
+        Volver al Menú
+      </button>
+      <br />
+      <Notificacion mensaje={mensaje?.texto} tipo={mensaje?.tipo} />
+      <br />
+      {mostrarFormulario || formData ? (
+        <div>
+          <FormularioEmpleado onExito={handleExito} initialData={formData} />
+          <div className="d-flex mt-2">
+            <button
+              onClick={handleCancelar}
+              type="button"
+              className="btn btn-danger me-2"
+            >
+              Cancelar Registro
+            </button>
+          </div>
+        </div>
+      ) : (
+        puedeAdministrar && (
+          <button
+            onClick={() => setMostrarFormulario(true)}
+            className="btn btn-primary mb-3"
+          >
+            Registrar nuevo Empleado
+          </button>
+        )
+      )}
+      <br /> 
+      <Tabla
+        columnas={[
+          { key: "nombre_emp", label: "Nombre" },
+          { key: "ape_pat_emp", label: "Apellido Paterno" },
+          { key: "ape_mat_emp", label: "Apellido Materno" },
+          { key: "fec_nac", label: "Fecha de Nacimiento" },
+          { key: "dni", label: "DNI" },
+          { key: "telefono", label: "Teléfono" },
+          { key: "especialidad", label: "Especialidad" },
+          { key: "cargo", label: "Cargo" },
+          { key: "observacion", label: "Observación" },
+           
+          ...(puedeAdministrar ? [{ key: "estado", label: "Estado" }] : []),
+        ]}
+        datos={empleados}
+        onEditar={handleEditar}
+        onEliminar={handleEliminar}
+        idKey="id_emp"
+        mostrarAcciones={puedeAdministrar}
+      />
+    </div>
+  );
 }

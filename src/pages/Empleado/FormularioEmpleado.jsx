@@ -6,242 +6,324 @@ import "../../styles/inputs.css";
 import "../../styles/Notificacion.css";
 
 export default function FormularioEmpleado({ onExito, initialData }) {
-	const [form, setForm] = useState({
-		nombre_emp: "",
-		ape_pat_emp: "",
-		ape_mat_emp: "",
-		fec_nac: "",
-		dni: "",
-		telefono: "",
-		especialidad: "",
-		cargo: "",
-		observacion: "",
-		usuario: "",
-	});
-	const [error, setError] = useState(null);
+  const [form, setForm] = useState({
+    nombre_emp: "",
+    ape_pat_emp: "",
+    ape_mat_emp: "",
+    fec_nac: "",
+    dni: "",
+    telefono: "",
+    especialidad: "",
+    cargo: "",
+    observacion: "",
+    usuario: "",
+    estado: true,
+  });
 
-	const [usuarios, setUsuarios] = useState([]);
+  const [error, setError] = useState(null);
+  const [mensajeExito, setMensajeExito] = useState(null);
+  const [usuarios, setUsuarios] = useState([]);
 
-	useEffect(() => {
-		const cargarUsuarios = async () => {
-			const data = await obtenerUsuarios();
-			setUsuarios(data);
-		};
-		cargarUsuarios();
-	}, []);
+  useEffect(() => {
+    const cargarUsuarios = async () => {
+      const data = await obtenerUsuarios();
+      setUsuarios(data);
+    };
+    cargarUsuarios();
+  }, []);
 
-	useEffect(() => {
-		if (initialData) setForm(initialData);
-	}, [initialData]);
+  useEffect(() => {
+    if (initialData) {
+      const fechaFormateada = initialData.fec_nac
+        ? initialData.fec_nac.split("T")[0]
+        : "";
+      setForm({
+        ...initialData,
+        fec_nac: fechaFormateada,
+      });
+    }
+  }, [initialData]);
 
-	const handleChange = (e) => {
-		const { name, value } = e.target;
-		setForm((prev) => ({ ...prev, [name]: value }));
-	};
+  useEffect(() => {
+    if (mensajeExito) {
+      const timer = setTimeout(() => setMensajeExito(null), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [mensajeExito]);
 
-	const esTextoValido = (texto) => /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/.test(texto.trim());
-	const esNumeroExacto = (numero, longitud) =>
-		new RegExp(`^\\d{${longitud}}$`).test(numero.trim());
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    let nuevoValor = value;
+    if (type === "checkbox") {
+      nuevoValor = checked;
+    }
 
-	const handleSubmit = async (e) => {
-		e.preventDefault();
-		setError(null);
+    if (name === "cargo" && (value === "tutor" || value === "limpieza")) {
+      setForm((prev) => ({
+        ...prev,
+        [name]: nuevoValor,
+        usuario: "", // Limpiar usuario si es tutor o limpieza
+      }));
+    } else {
+      setForm((prev) => ({ ...prev, [name]: nuevoValor }));
+    }
+  };
 
-		const camposObligatorios = [
-			"nombre_emp",
-			"ape_pat_emp",
-			"ape_mat_emp",
-			"fec_nac",
-			"dni",
-			"telefono",
-			"especialidad",
-			"cargo",
-			"observacion",
-			"usuario",
-		];
+  const esTextoValido = (texto) =>
+    /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/.test(texto.trim());
+  const esNumeroExacto = (numero, longitud) =>
+    new RegExp(`^\\d{${longitud}}$`).test(numero.trim());
 
-		if (camposObligatorios.some((campo) => !form[campo])) {
-			setError("Todos los campos obligatorios deben estar completos");
-			return;
-		}
+  const validarFormulario = () => {
+    const camposObligatorios = [
+      "nombre_emp",
+      "ape_pat_emp",
+      "ape_mat_emp",
+      "fec_nac",
+      "dni",
+      "telefono",
+      "especialidad",
+      "cargo",
+      "observacion",
+      ...(form.cargo !== "tutor" && form.cargo !== "limpieza"
+        ? ["usuario"]
+        : []),
+    ];
 
-		if (!esTextoValido(form.nombre_emp)) {
-			setError("El nombre solo debe contener letras y espacios");
-			return;
-		}
-		if (!esTextoValido(form.ape_pat_emp)) {
-			setError("El apellido paterno solo debe contener letras y espacios");
-			return;
-		}
-		if (!esTextoValido(form.ape_mat_emp)) {
-			setError("El apellido materno solo debe contener letras y espacios");
-			return;
-		}
-		if (!esTextoValido(form.especialidad)) {
-			setError("La especialidad solo debe contener letras y espacios");
-			return;
-		}
-		if (!esTextoValido(form.observacion)) {
-			setError("La especialidad solo debe contener letras y espacios");
-			return;
-		}
-		if (!esNumeroExacto(form.dni, 8)) {
-			setError("El DNI debe contener exactamente 8 dígitos numéricos");
-			return;
-		}
-		if (!esNumeroExacto(form.telefono, 9)) {
-			setError("El teléfono debe contener exactamente 9 dígitos numéricos");
-			return;
-		}
+    for (const campo of camposObligatorios) {
+      if (!form[campo]) {
+        return "Todos los campos obligatorios deben estar completos";
+      }
+    }
+    if (!esTextoValido(form.nombre_emp)) {
+      return "El nombre solo debe contener letras y espacios";
+    }
+    if (!esTextoValido(form.ape_pat_emp)) {
+      return "El apellido paterno solo debe contener letras y espacios";
+    }
+    if (!esTextoValido(form.ape_mat_emp)) {
+      return "El apellido materno solo debe contener letras y espacios";
+    }
+    if (!esTextoValido(form.especialidad)) {
+      return "La especialidad solo debe contener letras y espacios";
+    }
+    if (!esTextoValido(form.observacion)) {
+      return "La observación solo debe contener letras y espacios";
+    }
+    if (!esNumeroExacto(form.dni, 8)) {
+      return "El DNI debe contener exactamente 8 dígitos numéricos";
+    }
+    if (!esNumeroExacto(form.telefono, 9)) {
+      return "El teléfono debe contener exactamente 9 dígitos numéricos";
+    }
+    return null;
+  };
 
-		try {
-			if (form.id_emp) {
-				await actualizarEmpleado(form.id_emp, { ...form, estado: 1 });
-				onExito("Empleado actualizado con éxito");
-			} else {
-				await crearEmpleado(form);
-				onExito("Empleado registrado con éxito");
-			}
-			setForm({
-				nombre_emp: "",
-				ape_pat_emp: "",
-				ape_mat_emp: "",
-				fec_nac: "",
-				dni: "",
-				telefono: "",
-				especialidad: "",
-				cargo: "",
-				observacion: "",
-				usuario: "",
-			});
-		} catch (err) {
-	let mensaje = "Error del servidor";
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError(null);
 
-	if (err.response?.data) {
-		if (typeof err.response.data === "string") {
-			mensaje = err.response.data;
-		} else if (err.response.data.message) {
-			mensaje = err.response.data.message;
-		} else {
-			mensaje = JSON.stringify(err.response.data);
-		}
-	} else if (err.message) {
-		mensaje = err.message;
-	}
+    const errorValidacion = validarFormulario();
+    if (errorValidacion) {
+      setError(errorValidacion);
+      return;
+    }
 
-	console.error("Error detallado:", err); 
-	setError(`Error al guardar: ${mensaje}`);
-}
-	};
+    try {
+      if (form.id_emp) {
+        await actualizarEmpleado(form.id_emp, form);
+        setMensajeExito("Empleado actualizado con éxito");
+        onExito && onExito("Empleado actualizado con éxito");
+      } else {
+        await crearEmpleado(form);
+        setMensajeExito("Empleado registrado con éxito");
+        onExito && onExito("Empleado registrado con éxito");
+      }
+      setForm({
+        nombre_emp: "",
+        ape_pat_emp: "",
+        ape_mat_emp: "",
+        fec_nac: "",
+        dni: "",
+        telefono: "",
+        especialidad: "",
+        cargo: "",
+        observacion: "",
+        usuario: "",
+        estado: true,
+      });
+    } catch (err) {
+      setError(
+        "Error al guardar. Verifique que los datos sean correctos y no estén duplicados."
+      );
+    }
+  };
 
-	return (
-		<form onSubmit={handleSubmit} className="form">
-			{error && <div className="error grid2">{error}</div>}
-			<input
-				name="nombre_emp"
-				placeholder="Nombres"
-				className="input-form"
-				value={form.nombre_emp}
-				onChange={handleChange}
-			/>
-			<input
-				name="ape_pat_emp"
-				placeholder="Apellido Paterno"
-				className="input-form"
-				value={form.ape_pat_emp}
-				onChange={handleChange}
-			/>
-			<input
-				name="ape_mat_emp"
-				placeholder="Apellido Materno"
-				className="input-form"
-				value={form.ape_mat_emp}
-				onChange={handleChange}
-			/>
-			<input
-				name="fec_nac"
-				type="date"
-				placeholder="Fecha Nacimiento"
-				className="input-form"
-				value={form.fec_nac}
-				onChange={handleChange}
-			/>
+  return (
+    <form onSubmit={handleSubmit} className="row g-3">
+      {error && (
+        <div className="alert alert-danger col-12" role="alert">
+          {error}
+        </div>
+      )}
+      {mensajeExito && (
+        <div className="alert alert-success col-12" role="alert">
+          {mensajeExito}
+        </div>
+      )}
 
-			<select
-			name="especialidad"
-			className="input-form"
-			value={form.especialidad}
-			onChange={handleChange}
-			required
-			>
-			<option value="" disabled>Seleccione especialidad</option>
-			<option value="ciencias">Ciencias</option>
-			<option value="letras">Letras</option>
-			<option value="matematicas">Matemáticas</option>
-			<option value="mixto">Mixto</option>
-			</select>
+      <div className="col-md-6">
+        <input
+          name="nombre_emp"
+          placeholder="Nombres"
+          className="form-control"
+          value={form.nombre_emp}
+          onChange={handleChange}
+        />
+      </div>
 
-			<input
-				name="dni"
-				placeholder="DNI"
-				className="input-form"
-				value={form.dni}
-				onChange={handleChange}
-				maxLength={8}
-				inputMode="numeric"
-			/>
+      <div className="col-md-6">
+        <input
+          name="ape_pat_emp"
+          placeholder="Apellido Paterno"
+          className="form-control"
+          value={form.ape_pat_emp}
+          onChange={handleChange}
+        />
+      </div>
 
-			<input
-				name="telefono"
-				placeholder="Teléfono"
-				className="input-form"
-				value={form.telefono}
-				onChange={handleChange}
-				maxLength={9}
-				inputMode="numeric"
-			/>
+      <div className="col-md-6">
+        <input
+          name="ape_mat_emp"
+          placeholder="Apellido Materno"
+          className="form-control"
+          value={form.ape_mat_emp}
+          onChange={handleChange}
+        />
+      </div>
 
-			<input
-				name="observacion"
-				placeholder="Observación"
-				className="input-form"
-				value={form.observacion}
-				onChange={handleChange}
-			/>
+      <div className="col-md-6">
+        <input
+          name="fec_nac"
+          type="date"
+          className="form-control"
+          value={form.fec_nac}
+          onChange={handleChange}
+        />
+      </div>
 
-			<select
-			name="cargo"
-			className="input-form"
-			value={form.cargo}
-			onChange={handleChange}
-			required
-			>
-			<option value="" disabled>Seleccione cargo</option>
-			<option value="docente">Docente</option>
-			<option value="tutor">Tutor</option>
-			<option value="director">Director</option>
-			</select>
+      <div className="col-md-6">
+        <select
+          name="especialidad"
+          className="form-select"
+          value={form.especialidad}
+          onChange={handleChange}
+        >
+          <option value="" disabled>
+            Seleccione especialidad
+          </option>
+          <option value="ciencias">Ciencias</option>
+          <option value="letras">Letras</option>
+          <option value="matematicas">Matemáticas</option>
+          <option value="mixto">Mixto</option>
+          <option value="aseo">Aseo</option>
+        </select>
+      </div>
 
-			<select
-				name="usuario"
-				className="input-form"
-				value={form.usuario || ""}
-				onChange={handleChange}
-				required
-			>
-				<option value="" disabled>Seleccione usuario</option>
-				{usuarios.map((usuario) => (
-					<option key={usuario.id_usuario} value={usuario.id_usuario}>
-						{usuario.username}
-					</option>
-				))}
-			</select>
+      <div className="col-md-6">
+        <input
+          name="dni"
+          placeholder="DNI"
+          className="form-control"
+          value={form.dni}
+          onChange={handleChange}
+          maxLength={8}
+          inputMode="numeric"
+        />
+      </div>
 
-			<div className="grid2">
-				<button type="submit" className="aceptar-button">
-					{form.id_empleado ? "Actualizar" : "Registrar"} Empleado
-				</button>
-			</div>
-		</form>
-	);
+      <div className="col-md-6">
+        <input
+          name="telefono"
+          placeholder="Teléfono"
+          className="form-control"
+          value={form.telefono}
+          onChange={handleChange}
+          maxLength={9}
+          inputMode="numeric"
+        />
+      </div>
+
+      <div className="col-md-6">
+        <input
+          name="observacion"
+          placeholder="Observación"
+          className="form-control"
+          value={form.observacion}
+          onChange={handleChange}
+        />
+      </div>
+
+      <div className="col-md-6">
+        <select
+          name="cargo"
+          className="form-select"
+          value={form.cargo}
+          onChange={handleChange}
+        >
+          <option value="" disabled>
+            Seleccione cargo
+          </option>
+          <option value="docente">Docente</option>
+          <option value="tutor">Tutor</option>
+          <option value="director">Director</option>
+          <option value="limpieza">Limpieza</option>
+        </select>
+      </div>
+
+      {form.cargo !== "tutor" && form.cargo !== "limpieza" && (
+        <div className="col-md-6">
+          <select
+            name="usuario"
+            className="form-select"
+            value={form.usuario}
+            onChange={handleChange}
+          >
+            <option value="" disabled>
+              Seleccione usuario
+            </option>
+            {usuarios.map((usuario) => (
+              <option key={usuario.id_usuario} value={usuario.id_usuario}>
+                {usuario.username}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+
+      {initialData && (
+        <div className="col-md-6">
+          <div className="form-check d-flex align-items-center gap-2 mt-2">
+            <input
+              className="form-check-input"
+              type="checkbox"
+              id="estado"
+              name="estado"
+              checked={!!form.estado}
+              onChange={handleChange}
+            />
+            <label className="form-check-label mb-0" htmlFor="estado">
+              Activo
+            </label>
+          </div>
+        </div>
+      )}
+
+      <div className="col-12">
+        <button type="submit" className="btn btn-success me-2">
+          {form.id_emp ? "Actualizar" : "Registrar"} Empleado
+        </button>
+      </div>
+    </form>
+  );
 }

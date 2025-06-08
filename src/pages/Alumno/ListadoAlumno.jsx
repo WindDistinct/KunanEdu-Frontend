@@ -26,8 +26,7 @@ export default function ListadoAlumno() {
 				? alumno.fecha_nacimiento.split("T")[0]
 				: "",
 			}))
-			.sort((a, b) => a.id_alumno - b.id_alumno)
-				
+			.sort((a, b) => a.id_alumno - b.id_alumno) 
 			setAlumnos(alumnosFormateados);
 		} catch (error) {
 			setMensaje({ tipo: "error", texto: "Error al cargar los alumnos" });
