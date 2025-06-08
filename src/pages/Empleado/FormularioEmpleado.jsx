@@ -57,20 +57,31 @@ export default function FormularioEmpleado({ onExito, initialData }) {
     if (type === "checkbox") {
       nuevoValor = checked;
     }
-
+      
+    if (["dni", "telefono"].includes(name)) {
+      nuevoValor = value.replace(/\D/g, "");  
+    }
+    if (["nombre_emp", "ape_pat_emp", "ape_mat_emp"].includes(name)) { 
+        nuevoValor = value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, "");
+    }
     if (name === "cargo" && (value === "tutor" || value === "limpieza")) {
       setForm((prev) => ({
         ...prev,
         [name]: nuevoValor,
-        usuario: "", // Limpiar usuario si es tutor o limpieza
+        usuario: "",  
       }));
     } else {
       setForm((prev) => ({ ...prev, [name]: nuevoValor }));
     }
   };
-
+  const obtenerFechaMaximaNacimiento = () => {
+    const hoy = new Date();
+    hoy.setFullYear(hoy.getFullYear() - 18);  
+    return hoy.toISOString().split("T")[0]; 
+  };
   const esTextoValido = (texto) =>
     /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/.test(texto.trim());
+  
   const esNumeroExacto = (numero, longitud) =>
     new RegExp(`^\\d{${longitud}}$`).test(numero.trim());
 
@@ -130,6 +141,7 @@ export default function FormularioEmpleado({ onExito, initialData }) {
     }
 
     try {
+      console.log(form)
       if (form.id_emp) {
         await actualizarEmpleado(form.id_emp, form);
         setMensajeExito("Empleado actualizado con éxito");
@@ -203,32 +215,38 @@ export default function FormularioEmpleado({ onExito, initialData }) {
       </div>
 
       <div className="col-md-6">
-        <input
-          name="fec_nac"
-          type="date"
-          className="form-control"
-          value={form.fec_nac}
-          onChange={handleChange}
-        />
+       <input
+        name="fec_nac"
+        type="date"
+        placeholder="Fecha Nacimiento"
+        className="form-control"
+        value={form.fec_nac}
+        onChange={handleChange}
+        max={obtenerFechaMaximaNacimiento()}  
+      />
       </div>
 
       <div className="col-md-6">
         <select
-          name="especialidad"
+          name="cargo"
           className="form-select"
-          value={form.especialidad}
+          value={form.cargo}
           onChange={handleChange}
         >
           <option value="" disabled>
-            Seleccione especialidad
+            Seleccione cargo
           </option>
-          <option value="ciencias">Ciencias</option>
-          <option value="letras">Letras</option>
-          <option value="matematicas">Matemáticas</option>
-          <option value="mixto">Mixto</option>
-          <option value="aseo">Aseo</option>
+          <option value="docente">Docente</option>
+          <option value="tutor">Tutor</option>
+          <option value="director">Director</option>
+            <option value="consultor">Consultor</option>
+          <option value="limpieza">Limpieza</option>
         </select>
       </div>
+
+
+ 
+    
 
       <div className="col-md-6">
         <input
@@ -264,30 +282,13 @@ export default function FormularioEmpleado({ onExito, initialData }) {
         />
       </div>
 
-      <div className="col-md-6">
-        <select
-          name="cargo"
-          className="form-select"
-          value={form.cargo}
-          onChange={handleChange}
-        >
-          <option value="" disabled>
-            Seleccione cargo
-          </option>
-          <option value="docente">Docente</option>
-          <option value="tutor">Tutor</option>
-          <option value="director">Director</option>
-          <option value="limpieza">Limpieza</option>
-        </select>
-      </div>
-
-      {form.cargo !== "tutor" && form.cargo !== "limpieza" && (
-        <div className="col-md-6">
+       <div className="col-md-6">
           <select
             name="usuario"
             className="form-select"
             value={form.usuario}
             onChange={handleChange}
+            disabled={form.cargo === "tutor" || form.cargo === "limpieza"} 
           >
             <option value="" disabled>
               Seleccione usuario
@@ -299,7 +300,26 @@ export default function FormularioEmpleado({ onExito, initialData }) {
             ))}
           </select>
         </div>
-      )}
+
+        <div className="col-md-6">
+        <select
+          name="especialidad"
+          className="form-select"
+          value={form.especialidad}
+          onChange={handleChange}
+        >
+          <option value="" disabled>
+            Seleccione especialidad
+          </option>
+          <option value="ciencias">Ciencias</option>
+          <option value="letras">Letras</option>
+          <option value="matematicas">Matemáticas</option>
+          <option value="mixto">Mixto</option>
+          <option value="aseo">Aseo</option>
+          <option value="supervisor">Supervisor</option>
+        </select>
+      </div>
+    
 
       {initialData && (
         <div className="col-md-6">
