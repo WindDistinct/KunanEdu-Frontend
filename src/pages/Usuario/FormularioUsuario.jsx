@@ -67,24 +67,30 @@ export default function FormularioUsuario({ onExito, initialData }) {
 
       <div className="col-md-6">
         <input
-          name="username"
-          placeholder="Usuario"
-          className="form-control"
-          value={form.username}
-          onChange={handleChange}
-        />
+		name="username"
+		placeholder="Usuario"
+		className="input-form"
+		value={form.username}
+		onChange={handleChange}
+		onKeyDown={(e) => {
+			if (/\d/.test(e.key) || e.key === " ") e.preventDefault(); // bloquea números y espacios
+		}}
+		/>
       </div>
 
       {!initialData && (
         <div className="col-md-6">
-          <input
-            name="password"
-            type="password"
-            placeholder="Contraseña"
-            className="form-control"
-            value={form.password}
-            onChange={handleChange}
-          />
+         <input
+			name="password"
+			type="password"
+			placeholder="Contraseña"
+			className="input-form"
+			value={form.password}
+			onChange={handleChange}
+			onKeyDown={(e) => {
+				if (e.key === " ") e.preventDefault();   
+			}}
+		  />
         </div>
       )}
 
@@ -99,6 +105,7 @@ export default function FormularioUsuario({ onExito, initialData }) {
           <option value="administrador">Administrador</option>
           <option value="usuario">Usuario</option>
           <option value="profesor">Profesor</option>
+		  <option value="auditor">Auditor</option>
         </select>
       </div>
 

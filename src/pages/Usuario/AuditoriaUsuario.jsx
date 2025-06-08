@@ -18,14 +18,13 @@ export default function AuditoriaUsuario() {
   }, []);
 
   return (
-    <div>
-      <div>
-        <h1>Auditoría de Usuarios</h1>
+    <div className="container mt-4">
+       <h1 className="mb-4">Auditoría de Usuarios</h1>
         <button onClick={() => navigate("/")} className="menu-button">
           Volver al Menú
-        </button>
-      </div>
+        </button> 
       <br />
+        <br />
       <Tabla
         columnas={[
             { key: "id_audit_usuario", label: "ID Auditoría" },
