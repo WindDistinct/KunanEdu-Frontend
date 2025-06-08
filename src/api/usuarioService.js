@@ -1,7 +1,11 @@
 import axiosInstance from "./axiosInstance";
 
-export const obtenerUsuarios = async () => {
+export const obtenerUsuariosAd = async () => {
 	const res = await axiosInstance.get(`/api/usuario/all-adm`);
+	return res.data;
+};
+export const obtenerUsuarios = async () => {
+	const res = await axiosInstance.get(`/api/usuario/all`);
 	return res.data;
 };
 

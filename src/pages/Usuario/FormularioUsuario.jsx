@@ -5,76 +5,126 @@ import "../../styles/inputs.css";
 import "../../styles/Notificacion.css";
 
 export default function FormularioUsuario({ onExito, initialData }) {
-	const [form, setForm] = useState({ username: "", password: "", rol: "" });
-	const [error, setError] = useState(null);
+  const [form, setForm] = useState({
+    username: "",
+    password: "",
+    rol: "",
+    estado: true,
+  });
+  const [error, setError] = useState(null);
 
-	useEffect(() => {
-		if (initialData) setForm({ ...initialData, password: "" });
-	}, [initialData]);
+  useEffect(() => {
+    if (initialData) {
+      setForm({
+        ...initialData,
+        password: "", 
+      });
+    }
+  }, [initialData]);
 
-	const handleChange = (e) => {
-		const { name, value } = e.target;
-		setForm((prev) => ({ ...prev, [name]: value }));
-	};
+  const handleChange = (e) => {
+    const { name, type, value, checked } = e.target;
+    const newValue = type === "checkbox" ? checked : value;
+    setForm((prev) => ({ ...prev, [name]: newValue }));
+  };
 
-	const handleSubmit = async (e) => {
-		e.preventDefault();
-		setError(null);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError(null);
 
-		if (!form.username || !form.password || !form.rol) {
-			setError("Todos los campos son obligatorios");
-			return;
-		}
+    if (!form.username || !form.rol || (!initialData && !form.password)) {
+      setError("Todos los campos son obligatorios");
+      return;
+    }
 
-		try {
-			if (form.id_usuario) {
-				await actualizarUsuario(form.id_usuario, form);
-				onExito("Usuario actualizado con éxito");
-			} else {
-				await crearUsuario(form);
-				onExito("Usuario registrado con éxito");
-			}
-			setForm({ username: "", password: "", rol: "" });
-		} catch (err) {
-			setError("Error al guardar. Verifique que el usuario no esté duplicado");
-		}
-	};
+    const datos = {
+      username: form.username.trim(),
+      rol: form.rol,
+      estado: form.estado,
+    };
 
-	return (
-		<form onSubmit={handleSubmit} className="form">
-			{error && <div className="error grid2">{error}</div>}
-			<input
-				name="username"
-				placeholder="Usuario"
-				className="input-form"
-				value={form.username}
-				onChange={handleChange}
-			/>
-			<input
-				name="password"
-				type="password"
-				placeholder="Contraseña"
-				className="input-form"
-				value={form.password}
-				onChange={handleChange}
-			/>
-			<select
-			name="rol"
-			className="input-form"
-			value={form.rol}
-			onChange={handleChange}
-			required
-			>
-			<option value="" disabled>Seleccione Rol</option>
-			<option value="administrador">Administrador</option>
-			<option value="usuario">Usuario</option>
-			<option value="profesor">Profesor</option>
-			</select>
-			<div className="grid2">
-				<button type="submit" className="aceptar-button">
-					{form.id_usuario ? "Actualizar" : "Registrar"} Usuario
-				</button>
-			</div>
-		</form>
-	);
+    if (!initialData) {
+      datos.password = form.password;
+    }
+
+    try {
+      if (initialData) { 
+        await actualizarUsuario(initialData.id_usuario, datos);
+        onExito("Usuario actualizado con éxito");
+      } else {
+        await crearUsuario(datos);
+        onExito("Usuario registrado con éxito");
+      }
+      setForm({ username: "", password: "", rol: "", estado: true });
+    } catch (err) {
+      setError("Error al guardar. Verifique que el usuario no esté duplicado");
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="row g-3">
+      {error && <div className="alert alert-danger col-12">{error}</div>}
+
+      <div className="col-md-6">
+        <input
+          name="username"
+          placeholder="Usuario"
+          className="form-control"
+          value={form.username}
+          onChange={handleChange}
+        />
+      </div>
+
+      {!initialData && (
+        <div className="col-md-6">
+          <input
+            name="password"
+            type="password"
+            placeholder="Contraseña"
+            className="form-control"
+            value={form.password}
+            onChange={handleChange}
+          />
+        </div>
+      )}
+
+      <div className="col-md-6">
+        <select
+          name="rol"
+          className="form-select"
+          value={form.rol}
+          onChange={handleChange}
+        >
+          <option value="" disabled>Seleccione Rol</option>
+          <option value="administrador">Administrador</option>
+          <option value="usuario">Usuario</option>
+          <option value="profesor">Profesor</option>
+        </select>
+      </div>
+
+      {initialData && (
+        <div className="col-md-6">
+          <div className="form-check d-flex align-items-center gap-2 mt-2">
+            <input
+              className="form-check-input"
+              type="checkbox"
+              id="estado"
+              name="estado"
+              checked={!!form.estado}
+              onChange={handleChange}
+            />
+            <label className="form-check-label mb-0" htmlFor="estado">
+              Activo
+            </label>
+          </div>
+        </div>
+      )}
+
+      <div className="col-12">
+        <button type="submit" className="btn btn-success">
+          {initialData ? "Actualizar" : "Registrar"} Usuario
+        </button>
+      </div>
+    </form>
+  );
 }
