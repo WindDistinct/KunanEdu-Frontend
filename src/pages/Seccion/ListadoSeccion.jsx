@@ -1,13 +1,13 @@
-import React, { useEffect, useState, useCallback } from "react";
+ import React, {useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { obtenerEmpleados, eliminarEmpleado, obtenerEmpleadosAd } from "../../api/empleadoService";
+import { obtenerSeccion, obtenerSeccionAd, eliminarSeccion } from "../../api/seccionService";
 import Tabla from "../../components/Tabla";
-import FormularioEmpleado from "./FormularioEmpleado";
+import FormularioSeccion from "./FormularioSeccion";
 import Notificacion from "../../components/Notificacion";
 import "../../styles/Botones.css";
 
-export default function ListadoEmpleado() {
-  const [empleados, setEmpleados] = useState([]);
+export default function ListadoSeccion() {
+  const [secciones, setSecciones] = useState([]);
   const [formData, setFormData] = useState(null);
   const [mensaje, setMensaje] = useState(null);
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
@@ -16,26 +16,21 @@ export default function ListadoEmpleado() {
   const [rol] = useState(() => localStorage.getItem("rol"));
   const puedeAdministrar = rol === "administrador";
 
-  const cargarEmpleados = useCallback(async () => {
+  const cargarSecciones = useCallback(async () => {
     try {
-     const data =
-	 rol === "administrador" ? await obtenerEmpleadosAd() : await obtenerEmpleados();
-	
-    const empleadosFormateados = data
-  .map((empleado) => ({
-    ...empleado,
-    fec_nac: empleado.fec_nac ? empleado.fec_nac.split("T")[0] : "",
-  }))
-  .sort((a, b) => a.id_emp - b.id_emp); 
-  setEmpleados(empleadosFormateados);
+       const data =
+              rol === "administrador" ? await obtenerSeccionAd() : await obtenerSeccion();
+      
+      const ordenadas = data.sort((a, b) => a.id_seccion - b.id_seccion);
+      setSecciones(ordenadas);
     } catch (error) {
-      setMensaje({ tipo: "error", texto: "Error al cargar los empleados" });
+      setMensaje({ tipo: "error", texto: "Error al cargar las secciones" });
     }
   }, [rol]);
 
   useEffect(() => {
-    cargarEmpleados();
-  }, [cargarEmpleados]);
+    cargarSecciones();
+  }, [cargarSecciones]);
 
   useEffect(() => {
     if (mensaje) {
@@ -46,16 +41,16 @@ export default function ListadoEmpleado() {
 
   const handleEliminar = async (id) => {
     try {
-      await eliminarEmpleado(id);
-      setMensaje({ tipo: "success", texto: "Empleado eliminado correctamente" });
-      await cargarEmpleados();
+      await eliminarSeccion(id);
+      setMensaje({ tipo: "success", texto: "Sección eliminada correctamente" });
+      await cargarSecciones();
     } catch (error) {
-      setMensaje({ tipo: "error", texto: "Error al eliminar el empleado" });
+      setMensaje({ tipo: "error", texto: "Error al eliminar la sección" });
     }
   };
 
-  const handleEditar = (empleado) => {
-    setFormData(empleado);
+  const handleEditar = (seccion) => {
+    setFormData(seccion);
     setMostrarFormulario(true);
   };
 
@@ -63,7 +58,7 @@ export default function ListadoEmpleado() {
     setMensaje({ tipo: "success", texto });
     setFormData(null);
     setMostrarFormulario(false);
-    await cargarEmpleados();
+    await cargarSecciones();
   };
 
   const handleCancelar = () => {
@@ -73,19 +68,19 @@ export default function ListadoEmpleado() {
 
   return (
     <div className="container mt-4">
-     <h1 className="mb-4">
-        {puedeAdministrar ? "Gestión de Empleado" : "Listado de Empleado"}
+      <h1 className="mb-4">
+        {puedeAdministrar ? "Gestión de Secciones" : "Listado de Secciones"}
       </h1>
 
       <button onClick={() => navigate("/")} className="btn btn-secondary mb-3">
         Volver al Menú
       </button>
-      <br />
+        <br></br>
       <Notificacion mensaje={mensaje?.texto} tipo={mensaje?.tipo} />
-      <br />
+        <br></br>
       {mostrarFormulario || formData ? (
         <div>
-          <FormularioEmpleado onExito={handleExito} initialData={formData} />
+          <FormularioSeccion onExito={handleExito} initialData={formData} />
           <div className="d-flex mt-2">
             <button
               onClick={handleCancelar}
@@ -102,29 +97,23 @@ export default function ListadoEmpleado() {
             onClick={() => setMostrarFormulario(true)}
             className="btn btn-primary mb-3"
           >
-            Registrar nuevo Empleado
+            Registrar nueva Sección
           </button>
         )
       )}
-      <br /> 
+	<br />
       <Tabla
         columnas={[
-          { key: "nombre_emp", label: "Nombre" },
-          { key: "ape_pat_emp", label: "Apellido Paterno" },
-          { key: "ape_mat_emp", label: "Apellido Materno" },
-          { key: "fec_nac", label: "Fecha de Nacimiento" },
-          { key: "dni", label: "DNI" },
-          { key: "telefono", label: "Teléfono" },
-          { key: "especialidad", label: "Especialidad" },
-          { key: "cargo", label: "Cargo" },
-          { key: "observacion", label: "Observación" },
-           
+          { key: "nombre", label: "Nombre" },
+          { key: "grado", label: "Grado" },
+          { key: "aula", label: "Aula" },
+          { key: "periodo", label: "Periodo" },
           ...(puedeAdministrar ? [{ key: "estado", label: "Estado" }] : []),
         ]}
-        datos={empleados}
+        datos={secciones}
         onEditar={handleEditar}
         onEliminar={handleEliminar}
-        idKey="id_emp"
+        idKey="id_seccion"
         mostrarAcciones={puedeAdministrar}
       />
     </div>

@@ -14,6 +14,7 @@ export default function MenuPrincipal() {
 	{ path: "/usuarios", nombre: "Usuarios" },
 	{ path: "/periodos", nombre: "Periodos" },
 	{ path: "/cursos", nombre: "Cursos" },
+	{ path: "/seccion", nombre: "Seccion" },
 	];
 
 	return (

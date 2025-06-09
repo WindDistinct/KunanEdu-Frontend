@@ -64,7 +64,7 @@ export default function FormularioEmpleado({ onExito, initialData }) {
     if (["nombre_emp", "ape_pat_emp", "ape_mat_emp"].includes(name)) { 
         nuevoValor = value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, "");
     }
-    if (name === "cargo" && (value === "tutor" || value === "limpieza")) {
+    if (name === "cargo" && (value === "almacen" || value === "limpieza")) {
       setForm((prev) => ({
         ...prev,
         [name]: nuevoValor,
@@ -96,7 +96,7 @@ export default function FormularioEmpleado({ onExito, initialData }) {
       "especialidad",
       "cargo",
       "observacion",
-      ...(form.cargo !== "tutor" && form.cargo !== "limpieza"
+      ...(form.cargo !== "almacen" && form.cargo !== "limpieza"
         ? ["usuario"]
         : []),
     ];
@@ -141,7 +141,7 @@ export default function FormularioEmpleado({ onExito, initialData }) {
     }
 
     try {
-      console.log(form)
+       
       if (form.id_emp) {
         await actualizarEmpleado(form.id_emp, form);
         setMensajeExito("Empleado actualizado con éxito");
@@ -241,13 +241,11 @@ export default function FormularioEmpleado({ onExito, initialData }) {
           <option value="director">Director</option>
             <option value="consultor">Consultor</option>
           <option value="limpieza">Limpieza</option>
+          <option value="almacen">Almacen</option>
+
         </select>
       </div>
-
-
  
-    
-
       <div className="col-md-6">
         <input
           name="dni"
@@ -288,7 +286,7 @@ export default function FormularioEmpleado({ onExito, initialData }) {
             className="form-select"
             value={form.usuario}
             onChange={handleChange}
-            disabled={form.cargo === "tutor" || form.cargo === "limpieza"} 
+            disabled={form.cargo === "almacen" || form.cargo === "limpieza"} 
           >
             <option value="" disabled>
               Seleccione usuario
