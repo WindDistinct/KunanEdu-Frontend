@@ -29,7 +29,7 @@ export default function FormularioSeccion({ onExito, initialData }) {
           obtenerAulas(),
           obtenerGrados(),
           obtenerPeriodos(),
-        ]); 
+        ]);
         setAulas(aulasData);
         setGrados(gradosData);
         setPeriodos(periodosData);
@@ -174,19 +174,19 @@ export default function FormularioSeccion({ onExito, initialData }) {
 
       {initialData && (
         <div className="col-md-6">
-          <div className="form-check d-flex align-items-center gap-2 mt-2">
-            <input
-              className="form-check-input"
-              type="checkbox"
-              id="estado"
-              name="estado"
-              checked={!!form.estado}
-              onChange={handleChange}
-            />
-            <label className="form-check-label mb-0" htmlFor="estado">
-              Activo
-            </label>
-          </div>
+          <label htmlFor="estado" className="form-label">Estado</label>
+          <select
+            name="estado"
+            id="estado"
+            className="form-select"
+            value={form.estado === true ? "true" : "false"}
+            onChange={(e) =>
+              setForm((prev) => ({ ...prev, estado: e.target.value === "true" }))
+            }
+          >
+            <option value="true">Activo</option>
+            <option value="false">Inactivo</option>
+          </select>
         </div>
       )}
 

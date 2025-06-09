@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { crearCurso, actualizarCurso } from "../../api/cursoService";
-import { obtenerDocentes } from "../../api/empleadoService";
 import "../../styles/Botones.css";
 import "../../styles/inputs.css";
 import "../../styles/Notificacion.css";
@@ -8,32 +7,21 @@ import "../../styles/Notificacion.css";
 export default function FormularioCurso({ onExito, initialData }) {
   const [form, setForm] = useState({
     nombre_curso: "",
-    docente: "",
+    estado: true, // Agregado para soportar edición de estado
   });
-  const [docentes, setDocentes] = useState([]);
+
   const [error, setError] = useState(null);
   const [mensajeExito, setMensajeExito] = useState(null);
 
   useEffect(() => {
     if (initialData) {
       setForm({
-        ...initialData,
-        docente: String(initialData.docente),  
+        nombre_curso: initialData.nombre_curso || "",
+        estado: initialData.estado ?? true,
+        id_curso: initialData.id_curso,
       });
     }
   }, [initialData]);
-
-  useEffect(() => {
-    const cargarDocentes = async () => {
-      try {
-        const data = await obtenerDocentes();
-        setDocentes(data);
-      } catch (err) {
-        setError("Error al cargar los docentes");
-      }
-    };
-    cargarDocentes();
-  }, []);
 
   useEffect(() => {
     if (mensajeExito) {
@@ -44,19 +32,26 @@ export default function FormularioCurso({ onExito, initialData }) {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+    if (name === "estado") {
+      setForm((prev) => ({
+        ...prev,
+        estado: value === "true",
+      }));
+    } else {
+      setForm((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    }
   };
 
   const validarFormulario = () => {
-    const { nombre_curso, docente } = form;
-    if (!nombre_curso || !docente) return "Todos los campos son obligatorios";
+    const { nombre_curso } = form;
+
+    if (!nombre_curso) return "Todos los campos son obligatorios";
 
     if (!/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]{3,}$/.test(nombre_curso.trim())) {
       return "El nombre del curso debe tener al menos 3 letras y sin números";
-    }
-
-    if (!docente || isNaN(Number(docente))) {
-      return "Debe seleccionar un docente válido";
     }
 
     return null;
@@ -74,11 +69,10 @@ export default function FormularioCurso({ onExito, initialData }) {
 
     const datos = {
       nombre_curso: form.nombre_curso.trim(),
-      docente: parseInt(form.docente,10),
-      estado: true,
+      estado: form.estado,
     };
 
-    try { 
+    try {
       if (form.id_curso) {
         await actualizarCurso(form.id_curso, datos);
         setMensajeExito("Curso actualizado con éxito");
@@ -89,7 +83,7 @@ export default function FormularioCurso({ onExito, initialData }) {
         onExito("Curso registrado con éxito");
       }
 
-      setForm({ nombre_curso: "", docente: "" });
+      setForm({ nombre_curso: "", estado: true });
     } catch (err) {
       setError("Error al guardar. Verifique que el nombre no esté duplicado");
     }
@@ -108,7 +102,7 @@ export default function FormularioCurso({ onExito, initialData }) {
         </div>
       )}
 
-      <div className="col-md-6">
+      <div className="col-md-12">
         <input
           name="nombre_curso"
           placeholder="Nombre del Curso"
@@ -118,23 +112,19 @@ export default function FormularioCurso({ onExito, initialData }) {
         />
       </div>
 
-      <div className="col-md-6">
-        <select
-          name="docente"
-          className="form-select"
-          value={form.docente}
-          onChange={handleChange}
-        >
-          <option value="" disabled>
-            Seleccione un docente
-          </option>
-          {docentes.map((d) => (
-            <option key={d.id_emp} value={d.id_emp}>
-              {d.nombre_completo}
-            </option>
-          ))}
-        </select>
-      </div>
+      {form.id_curso && (
+        <div className="col-md-12">
+          <select
+            name="estado"
+            className="form-control"
+            value={form.estado ? "true" : "false"}
+            onChange={handleChange}
+          >
+            <option value="true">Activo</option>
+            <option value="false">Inactivo</option>
+          </select>
+        </div>
+      )}
 
       <div className="col-12">
         <button type="submit" className="btn btn-success me-2">

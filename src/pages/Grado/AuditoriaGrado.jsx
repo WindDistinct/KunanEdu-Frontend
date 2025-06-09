@@ -31,13 +31,7 @@ export default function AuditoriaGrado() {
             { key: "nivel_anterior", label: "Nivel Anterior" },
             { key: "nivel_nuevo", label: "Nivel Nuevo" },
             { key: "anio_anterior", label: "Año Anterior" },
-            { key: "anio_nuevo", label: "Año Nuevo" },
-            { key: "cupos_totales_anterior", label: "Cupos Totales Anterior" },
-            { key: "cupos_totales_nuevo", label: "Cupos Totales Nuevo" },
-            { key: "cupos_disponibles_anterior", label: "Cupos Disponibles Anterior" },
-            { key: "cupos_disponibles_nuevo", label: "Cupos Disponibles Nuevo" },
-            /*{ key: "estado_anterior", label: "Estado Anterior" },
-            { key: "estado_nuevo", label: "Estado Nuevo" },*/
+            { key: "anio_nuevo", label: "Año Nuevo" }, 
             { key: "operacion", label: "Operación" },
             { key: "fecha_modificacion", label: "Fecha Modificación" },
             { key: "usuario_modificador", label: "Usuario Modificador" }

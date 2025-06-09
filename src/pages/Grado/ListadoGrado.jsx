@@ -109,8 +109,6 @@ export default function ListadoGrado() {
         columnas={[
           { key: "nivel", label: "Nivel del Grado" },
           { key: "anio", label: "Año" },
-          { key: "cupos_totales", label: "Cupos Totales" },
-          { key: "cupos_disponibles", label: "Cupos Disponibles" },
           ...(puedeAdministrar
             ? [
                 {
