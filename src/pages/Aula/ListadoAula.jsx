@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { obtenerAulas, obtenerAulasAd, eliminarAula } from "../../api/aulaService";
+import { aulaService } from "../../api/requestApi";
 import Tabla from "../../components/Tabla";
 import FormularioAula from "./FormularioAula";
 import Notificacion from "../../components/Notificacion";
@@ -19,19 +19,19 @@ export default function ListadoAula() {
   const cargarAulas = useCallback(async () => {
     try {
       const data =
-        rol === "administrador" ? await obtenerAulasAd() : await obtenerAulas();
+        rol === "administrador" ? await aulaService.obtenerTodos() : await aulaService.obtener();
 
       const aulasOrdenadas = data.sort((a, b) => a.id_aula - b.id_aula);
       setAulas(aulasOrdenadas);
     } catch (error) {
-      setMensaje({ tipo: "error", texto: "Error al cargar las aulas" });
+      setMensaje({ tipo: "error", texto: "Error al cargar las aulas: " + error });
     }
   }, [rol]);
 
   useEffect(() => {
     cargarAulas();
   }, [cargarAulas]);
- 
+
   useEffect(() => {
     if (mensaje) {
       const timer = setTimeout(() => {
@@ -43,11 +43,11 @@ export default function ListadoAula() {
 
   const handleEliminar = async (id) => {
     try {
-      await eliminarAula(id);
+      await aulaService.eliminar(id);
       setMensaje({ tipo: "success", texto: "Aula eliminada correctamente" });
       await cargarAulas();
     } catch (error) {
-      setMensaje({ tipo: "error", texto: "Error al eliminar el aula" });
+      setMensaje({ tipo: "error", texto: "Error al eliminar el aula: " + error });
     }
   };
 
@@ -71,8 +71,8 @@ export default function ListadoAula() {
   return (
     <div className="container mt-4">
       <h1 className="mb-4">
-      {puedeAdministrar ? "Gestión de Aulas" : "Listado de Aulas"}
-    </h1>
+        {puedeAdministrar ? "Gestión de Aulas" : "Listado de Aulas"}
+      </h1>
       <button onClick={() => navigate("/")} className="btn btn-secondary mb-3">
         Volver al Menú
       </button>
@@ -103,7 +103,7 @@ export default function ListadoAula() {
         )
       )}
       <br />
-			<br />
+      <br />
       <Tabla
         columnas={[
           { key: "numero_aula", label: "N° Aula" },

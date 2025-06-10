@@ -24,16 +24,16 @@ export default function Tabla({
   };
 
   const renderValor = (key, valor) => {
-  if (key === "estado") {
-    return valor === true ? "Activo" : "Inactivo";
-  }
+    if (key === "estado") {
+      return valor === true ? "Activo" : "Inactivo";
+    }
 
-  if (typeof valor === "string" && (key.includes("fec") || key.includes("fecha"))) {
-  const [año, mes, dia] = valor.split("-");
-  return `${dia}/${mes}/${año}`;
-  }
-  return valor;
-};
+    if (typeof valor === "string" && (key.includes("fec") || key.includes("fecha"))) {
+      const [año, mes, dia] = valor.split("-");
+      return `${dia}/${mes}/${año}`;
+    }
+    return valor;
+  };
 
 
   return (
@@ -69,7 +69,7 @@ export default function Tabla({
           ))}
         </tbody>
       </table>
- 
+
       <nav>
         <ul className="pagination justify-content-center">
           <li className={`page-item ${paginaActual === 1 ? "disabled" : ""}`}>

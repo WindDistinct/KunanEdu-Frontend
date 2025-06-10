@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { crearCurso, actualizarCurso } from "../../api/cursoService";
+import { cursoService, empleadoService } from "../../api/requestApi";
 import "../../styles/Botones.css";
 import "../../styles/inputs.css";
 import "../../styles/Notificacion.css";
@@ -74,18 +74,18 @@ export default function FormularioCurso({ onExito, initialData }) {
 
     try {
       if (form.id_curso) {
-        await actualizarCurso(form.id_curso, datos);
+        await cursoService.actualizar(form.id_curso, datos);
         setMensajeExito("Curso actualizado con éxito");
         onExito("Curso actualizado con éxito");
       } else {
-        await crearCurso(datos);
+        await cursoService.crear(datos);
         setMensajeExito("Curso registrado con éxito");
         onExito("Curso registrado con éxito");
       }
 
       setForm({ nombre_curso: "", estado: true });
     } catch (err) {
-      setError("Error al guardar. Verifique que el nombre no esté duplicado");
+      setError("Error al guardar. Verifique que el nombre no esté duplicado: " + err);
     }
   };
 

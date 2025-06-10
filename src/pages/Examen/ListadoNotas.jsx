@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { obtenerAlumnos } from "../../api/alumnoService";
-import { obtenerNotasPorAlumno } from "../../api/examenService";
+import { alumnoService, examenService } from "../../api/requestApi";
 import Tabla from "../../components/TablaAuditoria";
 import "../../styles/Botones.css";
 
@@ -13,21 +12,21 @@ export default function ListadoNotas() {
 
   const cargarAlumnos = async () => {
     try {
-      const data = await obtenerAlumnos();
+      const data = await alumnoService.obtener();
       setAlumnos(data);
     } catch (error) {
       console.error("Error al cargar alumnos:", error);
     }
   };
 
-const cargarNotas = async (idAlumno) => {
-  try {
-    const data = await obtenerNotasPorAlumno(idAlumno);
-    setNotas(data);
-  } catch (error) {
-    console.error("Error al cargar notas:", error);
-  }
-};
+  const cargarNotas = async (idAlumno) => {
+    try {
+      const data = await examenService.obtenerNotasporAlumno(idAlumno);
+      setNotas(data);
+    } catch (error) {
+      console.error("Error al cargar notas:", error);
+    }
+  };
 
 
   const handleSeleccionAlumno = (e) => {

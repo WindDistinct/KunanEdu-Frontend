@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { crearEmpleado, actualizarEmpleado } from "../../api/empleadoService";
-import { obtenerUsuarios } from "../../api/usuarioService";
+import { empleadoService, usuarioService } from "../../api/requestApi";
 import "../../styles/Botones.css";
 import "../../styles/inputs.css";
 import "../../styles/Notificacion.css";
@@ -26,7 +25,7 @@ export default function FormularioEmpleado({ onExito, initialData }) {
 
   useEffect(() => {
     const cargarUsuarios = async () => {
-      const data = await obtenerUsuarios();
+      const data = await usuarioService.obtener();
       setUsuarios(data);
     };
     cargarUsuarios();
@@ -57,18 +56,18 @@ export default function FormularioEmpleado({ onExito, initialData }) {
     if (type === "checkbox") {
       nuevoValor = checked;
     }
-      
+
     if (["dni", "telefono"].includes(name)) {
-      nuevoValor = value.replace(/\D/g, "");  
+      nuevoValor = value.replace(/\D/g, "");
     }
-    if (["nombre_emp", "ape_pat_emp", "ape_mat_emp"].includes(name)) { 
-        nuevoValor = value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, "");
+    if (["nombre_emp", "ape_pat_emp", "ape_mat_emp"].includes(name)) {
+      nuevoValor = value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, "");
     }
     if (name === "cargo" && (value === "almacen" || value === "limpieza")) {
       setForm((prev) => ({
         ...prev,
         [name]: nuevoValor,
-        usuario: "",  
+        usuario: "",
       }));
     } else {
       setForm((prev) => ({ ...prev, [name]: nuevoValor }));
@@ -76,12 +75,12 @@ export default function FormularioEmpleado({ onExito, initialData }) {
   };
   const obtenerFechaMaximaNacimiento = () => {
     const hoy = new Date();
-    hoy.setFullYear(hoy.getFullYear() - 18);  
-    return hoy.toISOString().split("T")[0]; 
+    hoy.setFullYear(hoy.getFullYear() - 18);
+    return hoy.toISOString().split("T")[0];
   };
   const esTextoValido = (texto) =>
     /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/.test(texto.trim());
-  
+
   const esNumeroExacto = (numero, longitud) =>
     new RegExp(`^\\d{${longitud}}$`).test(numero.trim());
 
@@ -141,13 +140,13 @@ export default function FormularioEmpleado({ onExito, initialData }) {
     }
 
     try {
-       
+
       if (form.id_emp) {
-        await actualizarEmpleado(form.id_emp, form);
+        await empleadoService.actualizar(form.id_emp, form);
         setMensajeExito("Empleado actualizado con éxito");
         onExito && onExito("Empleado actualizado con éxito");
       } else {
-        await crearEmpleado(form);
+        await empleadoService.crear(form);
         setMensajeExito("Empleado registrado con éxito");
         onExito && onExito("Empleado registrado con éxito");
       }
@@ -166,7 +165,7 @@ export default function FormularioEmpleado({ onExito, initialData }) {
       });
     } catch (err) {
       setError(
-        "Error al guardar. Verifique que los datos sean correctos y no estén duplicados."
+        err + ": Error al guardar. Verifique que los datos sean correctos y no estén duplicados."
       );
     }
   };
@@ -215,15 +214,15 @@ export default function FormularioEmpleado({ onExito, initialData }) {
       </div>
 
       <div className="col-md-6">
-       <input
-        name="fec_nac"
-        type="date"
-        placeholder="Fecha Nacimiento"
-        className="form-control"
-        value={form.fec_nac}
-        onChange={handleChange}
-        max={obtenerFechaMaximaNacimiento()}  
-      />
+        <input
+          name="fec_nac"
+          type="date"
+          placeholder="Fecha Nacimiento"
+          className="form-control"
+          value={form.fec_nac}
+          onChange={handleChange}
+          max={obtenerFechaMaximaNacimiento()}
+        />
       </div>
 
       <div className="col-md-6">
@@ -239,13 +238,13 @@ export default function FormularioEmpleado({ onExito, initialData }) {
           <option value="docente">Docente</option>
           <option value="tutor">Tutor</option>
           <option value="director">Director</option>
-            <option value="consultor">Consultor</option>
+          <option value="consultor">Consultor</option>
           <option value="limpieza">Limpieza</option>
           <option value="almacen">Almacen</option>
 
         </select>
       </div>
- 
+
       <div className="col-md-6">
         <input
           name="dni"
@@ -280,26 +279,26 @@ export default function FormularioEmpleado({ onExito, initialData }) {
         />
       </div>
 
-       <div className="col-md-6">
-          <select
-            name="usuario"
-            className="form-select"
-            value={form.usuario}
-            onChange={handleChange}
-            disabled={form.cargo === "almacen" || form.cargo === "limpieza"} 
-          >
-            <option value="" disabled>
-              Seleccione usuario
+      <div className="col-md-6">
+        <select
+          name="usuario"
+          className="form-select"
+          value={form.usuario}
+          onChange={handleChange}
+          disabled={form.cargo === "almacen" || form.cargo === "limpieza"}
+        >
+          <option value="" disabled>
+            Seleccione usuario
+          </option>
+          {usuarios.map((usuario) => (
+            <option key={usuario.id_usuario} value={usuario.id_usuario}>
+              {usuario.username}
             </option>
-            {usuarios.map((usuario) => (
-              <option key={usuario.id_usuario} value={usuario.id_usuario}>
-                {usuario.username}
-              </option>
-            ))}
-          </select>
-        </div>
+          ))}
+        </select>
+      </div>
 
-        <div className="col-md-6">
+      <div className="col-md-6">
         <select
           name="especialidad"
           className="form-select"
@@ -317,7 +316,7 @@ export default function FormularioEmpleado({ onExito, initialData }) {
           <option value="supervisor">Supervisor</option>
         </select>
       </div>
-    
+
 
       {initialData && (
         <div className="col-md-6">

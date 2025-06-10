@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { obtenerEmpleados, eliminarEmpleado, obtenerEmpleadosAd } from "../../api/empleadoService";
+import { empleadoService } from "../../api/requestApi";
 import Tabla from "../../components/Tabla";
 import FormularioEmpleado from "./FormularioEmpleado";
 import Notificacion from "../../components/Notificacion";
@@ -18,16 +18,16 @@ export default function ListadoEmpleado() {
 
   const cargarEmpleados = useCallback(async () => {
     try {
-     const data =
-	 rol === "administrador" ? await obtenerEmpleadosAd() : await obtenerEmpleados();
-	
-    const empleadosFormateados = data
-  .map((empleado) => ({
-    ...empleado,
-    fec_nac: empleado.fec_nac ? empleado.fec_nac.split("T")[0] : "",
-  }))
-  .sort((a, b) => a.id_emp - b.id_emp); 
-  setEmpleados(empleadosFormateados);
+      const data =
+        rol === "administrador" ? await empleadoService.obtenerTodos() : await empleadoService.obtener();
+
+      const empleadosFormateados = data
+        .map((empleado) => ({
+          ...empleado,
+          fec_nac: empleado.fec_nac ? empleado.fec_nac.split("T")[0] : "",
+        }))
+        .sort((a, b) => a.id_emp - b.id_emp);
+      setEmpleados(empleadosFormateados);
     } catch (error) {
       setMensaje({ tipo: "error", texto: "Error al cargar los empleados" });
     }
@@ -46,11 +46,11 @@ export default function ListadoEmpleado() {
 
   const handleEliminar = async (id) => {
     try {
-      await eliminarEmpleado(id);
+      await empleadoService.eliminar(id);
       setMensaje({ tipo: "success", texto: "Empleado eliminado correctamente" });
       await cargarEmpleados();
     } catch (error) {
-      setMensaje({ tipo: "error", texto: "Error al eliminar el empleado" });
+      setMensaje({ tipo: "error", texto: error + ": Error al eliminar el empleado" });
     }
   };
 
@@ -73,7 +73,7 @@ export default function ListadoEmpleado() {
 
   return (
     <div className="container mt-4">
-     <h1 className="mb-4">
+      <h1 className="mb-4">
         {puedeAdministrar ? "Gestión de Empleado" : "Listado de Empleado"}
       </h1>
 
@@ -106,7 +106,7 @@ export default function ListadoEmpleado() {
           </button>
         )
       )}
-      <br /> 
+      <br />
       <Tabla
         columnas={[
           { key: "nombre_emp", label: "Nombre" },
@@ -118,7 +118,7 @@ export default function ListadoEmpleado() {
           { key: "especialidad", label: "Especialidad" },
           { key: "cargo", label: "Cargo" },
           { key: "observacion", label: "Observación" },
-           
+
           ...(puedeAdministrar ? [{ key: "estado", label: "Estado" }] : []),
         ]}
         datos={empleados}

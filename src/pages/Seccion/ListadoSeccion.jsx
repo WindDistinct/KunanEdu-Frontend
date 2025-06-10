@@ -1,6 +1,6 @@
- import React, {useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { obtenerSeccion, obtenerSeccionAd, eliminarSeccion } from "../../api/seccionService";
+import { seccionService } from "../../api/requestApi"
 import Tabla from "../../components/Tabla";
 import FormularioSeccion from "./FormularioSeccion";
 import Notificacion from "../../components/Notificacion";
@@ -18,13 +18,13 @@ export default function ListadoSeccion() {
 
   const cargarSecciones = useCallback(async () => {
     try {
-       const data =
-              rol === "administrador" ? await obtenerSeccionAd() : await obtenerSeccion();
-      
+      const data =
+        rol === "administrador" ? await seccionService.obtenerTodos() : await seccionService.obtener();
+
       const ordenadas = data.sort((a, b) => a.id_seccion - b.id_seccion);
       setSecciones(ordenadas);
-    } catch (error) {
-      setMensaje({ tipo: "error", texto: "Error al cargar las secciones" });
+    } catch (err) {
+      setMensaje({ tipo: "error", texto: err + ": Error al cargar las secciones" });
     }
   }, [rol]);
 
@@ -41,21 +41,21 @@ export default function ListadoSeccion() {
 
   const handleEliminar = async (id) => {
     try {
-      await eliminarSeccion(id);
+      await seccionService.eliminar(id);
       setMensaje({ tipo: "success", texto: "Sección eliminada correctamente" });
       await cargarSecciones();
     } catch (error) {
-      setMensaje({ tipo: "error", texto: "Error al eliminar la sección" });
+      setMensaje({ tipo: "error", texto: error + ": Error al eliminar la sección" });
     }
   };
 
   const handleEditar = (seccion) => {
-   const formateado = {
-    ...seccion,
-    aula: seccion.id_aula,
-    grado: seccion.id_grado,
-    periodo: seccion.id_periodo,
-    } ;
+    const formateado = {
+      ...seccion,
+      aula: seccion.id_aula,
+      grado: seccion.id_grado,
+      periodo: seccion.id_periodo,
+    };
     setFormData(formateado);
     setMostrarFormulario(true);
   };
@@ -81,9 +81,9 @@ export default function ListadoSeccion() {
       <button onClick={() => navigate("/")} className="btn btn-secondary mb-3">
         Volver al Menú
       </button>
-        <br></br>
+      <br></br>
       <Notificacion mensaje={mensaje?.texto} tipo={mensaje?.tipo} />
-        <br></br>
+      <br></br>
       {mostrarFormulario || formData ? (
         <div>
           <FormularioSeccion onExito={handleExito} initialData={formData} />
@@ -107,7 +107,7 @@ export default function ListadoSeccion() {
           </button>
         )
       )}
-	<br />
+      <br />
       <Tabla
         columnas={[
           { key: "nombre", label: "Nombre" },

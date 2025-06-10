@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { obtenerCursos, eliminarCurso, obtenerCursosAd } from "../../api/cursoService";
+import { cursoService } from "../../api/requestApi";
 import Tabla from "../../components/Tabla";
 import FormularioCurso from "./FormularioCurso";
 import Notificacion from "../../components/Notificacion";
@@ -19,12 +19,12 @@ export default function ListadoCurso() {
   const cargarCursos = useCallback(async () => {
     try {
       const data =
-			rol === "administrador" ? await obtenerCursosAd() : await obtenerCursos();
-	
-	  const cursosOrdenados = data.sort((a, b) => a.id_curso - b.id_curso);
+        rol === "administrador" ? await cursoService.obtenerTodos() : await cursoService.obtener();
+
+      const cursosOrdenados = data.sort((a, b) => a.id_curso - b.id_curso);
       setCursos(cursosOrdenados);
     } catch (error) {
-      setMensaje({ tipo: "error", texto: "Error al cargar los cursos" });
+      setMensaje({ tipo: "error", texto: "Error al cargar los cursos: " + error });
     }
   }, [rol]);
 
@@ -43,11 +43,11 @@ export default function ListadoCurso() {
 
   const handleEliminar = async (id) => {
     try {
-      await eliminarCurso(id);
+      await cursoService.eliminar(id);
       setMensaje({ tipo: "success", texto: "Curso eliminado correctamente" });
       await cargarCursos();
     } catch (error) {
-      setMensaje({ tipo: "error", texto: "Error al eliminar el curso" });
+      setMensaje({ tipo: "error", texto: "Error al eliminar el curso: " + error });
     }
   };
 
@@ -70,7 +70,7 @@ export default function ListadoCurso() {
 
   return (
     <div className="container mt-4">
-       <h1 className="mb-4">
+      <h1 className="mb-4">
         {puedeAdministrar ? "Gestión de Curso" : "Listado de Curso"}
       </h1>
 
@@ -107,7 +107,7 @@ export default function ListadoCurso() {
       <br />
       <Tabla
         columnas={[
-          { key: "nombre_curso", label: "Nombre del Curso" },  
+          { key: "nombre_curso", label: "Nombre del Curso" },
           ...(puedeAdministrar ? [{ key: "estado", label: "Estado" }] : []),
         ]}
         datos={cursos}

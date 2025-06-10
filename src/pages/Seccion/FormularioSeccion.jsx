@@ -1,8 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { crearSeccion, actualizarSeccion } from "../../api/seccionService";
-import { obtenerAulas } from "../../api/aulaService";
-import { obtenerGrados } from "../../api/gradoService";
-import { obtenerPeriodos } from "../../api/periodoService";
+import { seccionService, periodoService, aulaService, gradoService } from "../../api/requestApi"
 import "../../styles/Botones.css";
 import "../../styles/inputs.css";
 import "../../styles/Notificacion.css";
@@ -26,9 +23,9 @@ export default function FormularioSeccion({ onExito, initialData }) {
     const cargarDatos = async () => {
       try {
         const [aulasData, gradosData, periodosData] = await Promise.all([
-          obtenerAulas(),
-          obtenerGrados(),
-          obtenerPeriodos(),
+          aulaService.obtener(),
+          gradoService.obtener(),
+          periodoService.obtener(),
         ]);
         setAulas(aulasData);
         setGrados(gradosData);
@@ -85,11 +82,11 @@ export default function FormularioSeccion({ onExito, initialData }) {
 
     try {
       if (form.id_seccion) {
-        await actualizarSeccion(form.id_seccion, datos);
+        await seccionService.actualizar(form.id_seccion, datos);
         setMensajeExito("Sección actualizada con éxito");
         onExito("Sección actualizada con éxito");
       } else {
-        await crearSeccion(datos);
+        await seccionService.crear(datos);
         setMensajeExito("Sección registrada con éxito");
         onExito("Sección registrada con éxito");
       }
@@ -102,7 +99,7 @@ export default function FormularioSeccion({ onExito, initialData }) {
         estado: true,
       });
     } catch (err) {
-      setError("Error al guardar. Verifique que no esté duplicado el nombre de la sección");
+      setError(err + ": Error al guardar. Verifique que no esté duplicado el nombre de la sección");
     }
   };
 

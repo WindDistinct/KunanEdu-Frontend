@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from "react";
-import { crearAlumno, actualizarAlumno } from "../../api/alumnoService";
+import React from "react";
+import { useEffect, useState } from "react";
+import { alumnoService } from "../../api/requestApi";
 import "../../styles/Botones.css";
 import "../../styles/inputs.css";
 import "../../styles/Notificacion.css";
@@ -122,14 +123,14 @@ export default function FormularioAlumno({ onExito, initialData }) {
 
     try {
       if (initialData) {
-        await actualizarAlumno(initialData.id_alumno, form);
+        await alumnoService.actualizar(initialData.id_alumno, form);
         setMensajeExito("Alumno actualizado con éxito");
         onExito("Alumno actualizado con éxito");
       } else {
-        await crearAlumno(form);
+        await alumnoService.crear(form);
         setMensajeExito("Alumno registrado con éxito");
         onExito("Alumno registrado con éxito");
-        setForm(inicialForm);  
+        setForm(inicialForm);
       }
     } catch {
       setError("Error al guardar. Verifique que el DNI no esté duplicado");

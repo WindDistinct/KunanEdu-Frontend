@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { obtenerPeriodos, eliminarPeriodo, obtenerPeriodosAd } from "../../api/periodoService";
+import { periodoService, seccionService } from "../../api/requestApi"
 import Tabla from "../../components/Tabla";
 import FormularioPeriodo from "./FormularioPeriodo";
 import Notificacion from "../../components/Notificacion";
@@ -19,11 +19,11 @@ export default function ListadoPeriodo() {
   const cargarPeriodos = useCallback(async () => {
     try {
       const data =
-	  rol === "administrador" ? await obtenerPeriodosAd() : await obtenerPeriodos();
+        rol === "administrador" ? await periodoService.obtenerTodos() : await seccionService.obtener();
       const ordenados = data.sort((a, b) => a.anio - b.anio);
       setPeriodos(ordenados);
     } catch (error) {
-      setMensaje({ tipo: "error", texto: "Error al cargar los periodos" });
+      setMensaje({ tipo: "error", texto: error + ": Error al cargar los periodos" });
     }
   }, [rol]);
 
@@ -42,11 +42,11 @@ export default function ListadoPeriodo() {
 
   const handleEliminar = async (id) => {
     try {
-      await eliminarPeriodo(id);
+      await seccionService.eliminar(id);
       setMensaje({ tipo: "success", texto: "Periodo eliminado correctamente" });
       await cargarPeriodos();
     } catch (error) {
-      setMensaje({ tipo: "error", texto: "Error al eliminar el periodo" });
+      setMensaje({ tipo: "error", texto: error + ": Error al eliminar el periodo" });
     }
   };
 

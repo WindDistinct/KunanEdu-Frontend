@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { crearAula, actualizarAula } from "../../api/aulaService";
+import { aulaService } from "../../api/requestApi";
 import '../../styles/Botones.css';
 import '../../styles/inputs.css';
 import '../../styles/Notificacion.css';
@@ -31,9 +31,9 @@ export default function FormularioAula({ onExito, initialData }) {
 
     if (type === "checkbox") {
       nuevoValor = checked;
-    } else if (name === "numero_aula" || name === "aforo") { 
+    } else if (name === "numero_aula" || name === "aforo") {
       nuevoValor = value.replace(/\D/g, "");
-    } else { 
+    } else {
       nuevoValor = value.trimStart();
     }
     setForm((prev) => ({ ...prev, [name]: nuevoValor }));
@@ -76,11 +76,11 @@ export default function FormularioAula({ onExito, initialData }) {
 
     try {
       if (form.id_aula) {
-        await actualizarAula(form.id_aula, datos);
+        await aulaService.actualizar(form.id_aula, datos);
         setMensajeExito("Aula actualizada con éxito");
         onExito("Aula actualizada con éxito");
       } else {
-        await crearAula(datos);
+        await aulaService.crear(datos);
         setMensajeExito("Aula registrada con éxito");
         onExito("Aula registrada con éxito");
       }
@@ -110,9 +110,9 @@ export default function FormularioAula({ onExito, initialData }) {
           className="form-control"
           value={form.numero_aula}
           onChange={handleChange}
-          maxLength={3} 
+          maxLength={3}
           inputMode="numeric"
-          onKeyDown={(e) => e.key === " " && e.preventDefault()}  
+          onKeyDown={(e) => e.key === " " && e.preventDefault()}
         />
       </div>
 
@@ -123,9 +123,9 @@ export default function FormularioAula({ onExito, initialData }) {
           className="form-control"
           value={form.aforo}
           onChange={handleChange}
-          maxLength={3} 
+          maxLength={3}
           inputMode="numeric"
-          onKeyDown={(e) => e.key === " " && e.preventDefault()}  
+          onKeyDown={(e) => e.key === " " && e.preventDefault()}
         />
       </div>
 
@@ -145,23 +145,23 @@ export default function FormularioAula({ onExito, initialData }) {
         </select>
       </div>
 
-    {initialData && (
-      <div className="col-md-6">
-        <div className="form-check d-flex align-items-center gap-2 mt-2">
-          <input
-            className="form-check-input"
-            type="checkbox"
-            id="estado"
-            name="estado"
-            checked={!!form.estado}
-            onChange={handleChange}
-          />
-          <label className="form-check-label mb-0" htmlFor="estado">
-            Activo
-          </label>
+      {initialData && (
+        <div className="col-md-6">
+          <div className="form-check d-flex align-items-center gap-2 mt-2">
+            <input
+              className="form-check-input"
+              type="checkbox"
+              id="estado"
+              name="estado"
+              checked={!!form.estado}
+              onChange={handleChange}
+            />
+            <label className="form-check-label mb-0" htmlFor="estado">
+              Activo
+            </label>
+          </div>
         </div>
-      </div>
-     )}
+      )}
 
       <div className="col-12">
         <button type="submit" className="btn btn-success me-2">

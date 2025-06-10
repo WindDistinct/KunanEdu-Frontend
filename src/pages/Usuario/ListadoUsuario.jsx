@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { obtenerUsuarios, eliminarUsuario, obtenerUsuariosAd } from "../../api/usuarioService";
+import { usuarioService } from "../../api/requestApi"
 import Tabla from "../../components/Tabla";
 import FormularioUsuario from "./FormularioUsuario";
 import Notificacion from "../../components/Notificacion";
@@ -18,13 +18,13 @@ export default function ListadoUsuario() {
 
   const cargarUsuarios = useCallback(async () => {
     try {
-	  const data =
-	  rol === "administrador" ? await obtenerUsuariosAd() : await obtenerUsuarios();
+      const data =
+        rol === "administrador" ? await usuarioService.obtenerTodos() : await usuarioService.obtener();
 
       const usuariosOrdenados = data.sort((a, b) => a.id_usuario - b.id_usuario);
       setUsuarios(usuariosOrdenados);
     } catch (error) {
-      setMensaje({ tipo: "error", texto: "Error al cargar los usuarios" });
+      setMensaje({ tipo: "error", texto: error + ": Error al cargar los usuarios" });
     }
   }, [rol]);
 
@@ -43,11 +43,11 @@ export default function ListadoUsuario() {
 
   const handleEliminar = async (id_usuario) => {
     try {
-      await eliminarUsuario(id_usuario);
+      await usuarioService.eliminar(id_usuario);
       setMensaje({ tipo: "success", texto: "Usuario eliminado correctamente" });
       await cargarUsuarios();
     } catch (error) {
-      setMensaje({ tipo: "error", texto: "Error al eliminar el usuario" });
+      setMensaje({ tipo: "error", texto: error + ": Error al eliminar el usuario" });
     }
   };
 
@@ -70,9 +70,9 @@ export default function ListadoUsuario() {
 
   return (
     <div className="container mt-4">
-     <h1 className="mb-4">
-      {puedeAdministrar ? "Gestión de Usuario" : "Listado de Usuario"}
-    </h1>
+      <h1 className="mb-4">
+        {puedeAdministrar ? "Gestión de Usuario" : "Listado de Usuario"}
+      </h1>
 
       <button onClick={() => navigate("/")} className="btn btn-secondary mb-3">
         Volver al Menú

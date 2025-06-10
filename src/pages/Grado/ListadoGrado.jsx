@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { obtenerGrados, eliminarGrado, obtenerGradosAd } from "../../api/gradoService";
+import { gradoService } from "../../api/requestApi";
 import Tabla from "../../components/Tabla";
 import FormularioGrado from "./FormularioGrado";
 import Notificacion from "../../components/Notificacion";
@@ -19,12 +19,11 @@ export default function ListadoGrado() {
   const cargarGrados = useCallback(async () => {
     try {
       const data =
-			 rol === "administrador" ? await obtenerGradosAd() : await obtenerGrados();
-	 
-       
+        rol === "administrador" ? await gradoService.obtenerTodos : await gradoService.obtener();
+
       setGrados(data);
     } catch (error) {
-      setMensaje({ tipo: "error", texto: "Error al cargar los grados" });
+      setMensaje({ tipo: "error", texto: error + ": Error al cargar los grados" });
     }
   }, [rol]);
 
@@ -41,11 +40,11 @@ export default function ListadoGrado() {
 
   const handleEliminar = async (id) => {
     try {
-      await eliminarGrado(id);
+      await gradoService.eliminar(id);
       setMensaje({ tipo: "success", texto: "Grado eliminado correctamente" });
       await cargarGrados();
     } catch (error) {
-      setMensaje({ tipo: "error", texto: "Error al eliminar el grado" });
+      setMensaje({ tipo: "error", texto: error + ": Error al eliminar el grado" });
     }
   };
 
@@ -68,7 +67,7 @@ export default function ListadoGrado() {
 
   return (
     <div className="container mt-4">
-        <h1 className="mb-4">
+      <h1 className="mb-4">
         {puedeAdministrar ? "Gestión de Grado" : "Listado de Grado"}
       </h1>
 
@@ -76,7 +75,7 @@ export default function ListadoGrado() {
       <button onClick={() => navigate("/")} className="btn btn-secondary mb-3">
         Volver al Menú
       </button>
- 	  <br />
+      <br />
       <Notificacion mensaje={mensaje?.texto} tipo={mensaje?.tipo} />
       <br />
 
@@ -103,20 +102,20 @@ export default function ListadoGrado() {
           </button>
         )
       )}
-       <br />
-		<br />
+      <br />
+      <br />
       <Tabla
         columnas={[
           { key: "nivel", label: "Nivel del Grado" },
           { key: "anio", label: "Año" },
           ...(puedeAdministrar
             ? [
-                {
-                  key: "estado",
-                  label: "Estado",
-                  render: (valor) => (valor ? "Activo" : "Inactivo"),
-                },
-              ]
+              {
+                key: "estado",
+                label: "Estado",
+                render: (valor) => (valor ? "Activo" : "Inactivo"),
+              },
+            ]
             : []),
         ]}
         datos={grados}

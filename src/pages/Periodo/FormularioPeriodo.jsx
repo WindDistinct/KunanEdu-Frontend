@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { actualizarPeriodo, crearPeriodo } from "../../api/periodoService";
+import { periodoService } from "../../api/requestApi"
 import "../../styles/Botones.css";
 import "../../styles/inputs.css";
 import "../../styles/Notificacion.css";
@@ -9,7 +9,7 @@ export default function FormularioPeriodo({ onExito, initialData }) {
     anio: "",
     descripcion: "",
     progreso: "",
-    estado: true,  
+    estado: true,
   });
   const [error, setError] = useState(null);
   const [mensajeExito, setMensajeExito] = useState(null);
@@ -71,11 +71,11 @@ export default function FormularioPeriodo({ onExito, initialData }) {
 
     try {
       if (form.id_periodo) {
-        await actualizarPeriodo(form.id_periodo, datos);
+        await periodoService.actualizar(form.id_periodo, datos);
         setMensajeExito("Periodo actualizado con éxito");
         onExito("Periodo actualizado con éxito");
       } else {
-        await crearPeriodo(datos);
+        await periodoService.crear(datos);
         setMensajeExito("Periodo registrado con éxito");
         onExito("Periodo registrado con éxito");
       }
@@ -87,7 +87,7 @@ export default function FormularioPeriodo({ onExito, initialData }) {
         estado: true,
       });
     } catch (err) {
-      setError("Error al guardar. Verifique.");
+      setError(err + ": Error al guardar. Verifique.");
     }
   };
 

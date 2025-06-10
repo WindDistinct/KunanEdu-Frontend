@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { crearUsuario, actualizarUsuario } from "../../api/usuarioService";
+import { usuarioService } from "../../api/requestApi"
 import "../../styles/Botones.css";
 import "../../styles/inputs.css";
 import "../../styles/Notificacion.css";
@@ -17,7 +17,7 @@ export default function FormularioUsuario({ onExito, initialData }) {
     if (initialData) {
       setForm({
         ...initialData,
-        password: "", 
+        password: "",
       });
     }
   }, [initialData]);
@@ -48,16 +48,16 @@ export default function FormularioUsuario({ onExito, initialData }) {
     }
 
     try {
-      if (initialData) { 
-        await actualizarUsuario(initialData.id_usuario, datos);
+      if (initialData) {
+        await usuarioService.actualizar(initialData.id_usuario, datos);
         onExito("Usuario actualizado con éxito");
       } else {
-        await crearUsuario(datos);
+        await usuarioService.crear(datos);
         onExito("Usuario registrado con éxito");
       }
       setForm({ username: "", password: "", rol: "", estado: true });
     } catch (err) {
-      setError("Error al guardar. Verifique que el usuario no esté duplicado");
+      setError(err + ": Error al guardar. Verifique que el usuario no esté duplicado");
     }
   };
 
@@ -67,30 +67,30 @@ export default function FormularioUsuario({ onExito, initialData }) {
 
       <div className="col-md-6">
         <input
-		name="username"
-		placeholder="Usuario"
-		className="input-form"
-		value={form.username}
-		onChange={handleChange}
-		onKeyDown={(e) => {
-			if (/\d/.test(e.key) || e.key === " ") e.preventDefault(); // bloquea números y espacios
-		}}
-		/>
+          name="username"
+          placeholder="Usuario"
+          className="input-form"
+          value={form.username}
+          onChange={handleChange}
+          onKeyDown={(e) => {
+            if (/\d/.test(e.key) || e.key === " ") e.preventDefault(); // bloquea números y espacios
+          }}
+        />
       </div>
 
       {!initialData && (
         <div className="col-md-6">
-         <input
-			name="password"
-			type="password"
-			placeholder="Contraseña"
-			className="input-form"
-			value={form.password}
-			onChange={handleChange}
-			onKeyDown={(e) => {
-				if (e.key === " ") e.preventDefault();   
-			}}
-		  />
+          <input
+            name="password"
+            type="password"
+            placeholder="Contraseña"
+            className="input-form"
+            value={form.password}
+            onChange={handleChange}
+            onKeyDown={(e) => {
+              if (e.key === " ") e.preventDefault();
+            }}
+          />
         </div>
       )}
 
@@ -105,7 +105,7 @@ export default function FormularioUsuario({ onExito, initialData }) {
           <option value="administrador">Administrador</option>
           <option value="usuario">Usuario</option>
           <option value="profesor">Profesor</option>
-		  <option value="auditor">Auditor</option>
+          <option value="auditor">Auditor</option>
         </select>
       </div>
 

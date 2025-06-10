@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { loginUsuario } from '../api/authService';
+import { usuarioService } from '../api/requestApi';
 
 export default function LoginUser({ onLoginCorrecto }) {
 	const [usuario, setUsuario] = useState('');
@@ -9,7 +9,7 @@ export default function LoginUser({ onLoginCorrecto }) {
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 		try {
-			const data = await loginUsuario({ username: usuario, password });
+			const data = await usuarioService.login({ username: usuario, password });
 			localStorage.setItem("token", data.token);
 			localStorage.setItem("rol", data.rol);
 			setMensaje("Bienvenido!");

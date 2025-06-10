@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { crearGrado, actualizarGrado } from "../../api/gradoService";
+import { gradoService } from "../../api/requestApi";
 import "../../styles/Botones.css";
 import "../../styles/inputs.css";
 import "../../styles/Notificacion.css";
@@ -63,12 +63,12 @@ export default function FormularioGrado({ onExito, initialData }) {
 
     try {
       if (initialData && initialData.id_grado) {
-        await actualizarGrado(initialData.id_grado, datos);
+        await gradoService.actualizar(initialData.id_grado, datos);
         setMensajeExito("Grado actualizado con éxito");
         onExito("Grado actualizado con éxito");
       } else {
         // Para nuevo registro no envías estado, o lo defines en backend
-        await crearGrado({
+        await gradoService.crear({
           nivel: form.nivel,
           anio: form.anio,
           estado: true, // si quieres que por defecto sea activo
@@ -82,7 +82,7 @@ export default function FormularioGrado({ onExito, initialData }) {
         estado: "activo",
       });
     } catch (err) {
-      setError("Error al guardar. Verifique que el grado no esté duplicado");
+      setError(err + ": Error al guardar. Verifique que el grado no esté duplicado");
     }
   };
 

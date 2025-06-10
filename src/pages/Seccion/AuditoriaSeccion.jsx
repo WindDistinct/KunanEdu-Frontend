@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { auditoriaSeccion } from "../../api/seccionService";
+import { seccionService } from "../../api/requestApi"
 import Tabla from "../../components/TablaAuditoria";
 import "../../styles/Botones.css";
 
@@ -9,7 +9,7 @@ export default function AuditoriaSeccion() {
   const navigate = useNavigate();
 
   const cargarAuditorias = async () => {
-    const data = await auditoriaSeccion();
+    const data = await seccionService.auditar();
     setAuditorias(data);
   };
 
@@ -35,7 +35,7 @@ export default function AuditoriaSeccion() {
           { key: "nombre_anterior", label: "Nombre Anterior" },
           { key: "nombre_nuevo", label: "Nombre Nuevo" },
           { key: "periodo_anterior", label: "Periodo Anterior" },
-          { key: "periodo_nuevo", label: "Periodo Nuevo" }, 
+          { key: "periodo_nuevo", label: "Periodo Nuevo" },
           { key: "operacion", label: "Operación" },
           { key: "fecha_modificacion", label: "Fecha Modificación" },
           { key: "usuario_modificador", label: "Usuario Modificador" },

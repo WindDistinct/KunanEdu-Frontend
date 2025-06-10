@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { auditoriaAula } from "../../api/aulaService";
+import { aulaService } from "../../api/requestApi"
 import Tabla from "../../components/TablaAuditoria";
 import "../../styles/Botones.css";
 
@@ -9,8 +9,8 @@ export default function AuditoriaAula() {
   const navigate = useNavigate();
 
   const cargarAuditorias = async () => {
-      const data = await auditoriaAula();
-      setAuditorias(data);
+    const data = await aulaService.auditar();
+    setAuditorias(data);
   };
 
   useEffect(() => {
@@ -19,10 +19,10 @@ export default function AuditoriaAula() {
 
   return (
     <div className="container mt-4">
-       <h1 className="mb-4">Auditoría de Aulas</h1>
-        <button onClick={() => navigate("/")} className="btn btn-secondary mb-3">
-          Volver al Menú
-        </button> 
+      <h1 className="mb-4">Auditoría de Aulas</h1>
+      <button onClick={() => navigate("/")} className="btn btn-secondary mb-3">
+        Volver al Menú
+      </button>
       <br />
       <Tabla
         columnas={[
@@ -33,7 +33,7 @@ export default function AuditoriaAula() {
           { key: "aforo_anterior", label: "Aforo Anterior" },
           { key: "aforo_nuevo", label: "Aforo Nuevo" },
           { key: "ubicacion_anterior", label: "Ubicación Anterior" },
-          { key: "ubicacion_nuevo", label: "Ubicación Nuevo" }, 
+          { key: "ubicacion_nuevo", label: "Ubicación Nuevo" },
           { key: "operacion", label: "Operación" },
           { key: "fecha_modificacion", label: "Fecha Modificación" },
           { key: "usuario_modificador", label: "Usuario Modificador" },
