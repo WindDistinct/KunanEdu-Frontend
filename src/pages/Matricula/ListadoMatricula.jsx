@@ -20,7 +20,14 @@ export default function ListadoMatricula() {
       const datos = puedeAdministrar
         ? await matriculaService.obtenerTodos()
         : await matriculaService.obtener();
-      const ordenados = datos.sort((a, b) => a.id_matricula - b.id_matricula);
+
+        const ordenados = datos
+        .map((matricula) => ({
+          ...matricula,
+          fecha_matricula: matricula.fecha_matricula ? matricula.fecha_matricula.split("T")[0] : "",
+        }))
+        .sort((a, b) => a.id_matricula - b.id_matricula);
+ 
       setLista(ordenados);
     } catch (error) {
       setMensaje({ tipo: "error", texto: "Error al cargar los datos: " + error });
@@ -116,7 +123,10 @@ export default function ListadoMatricula() {
         columnas={[
           { key: "alumno", label: "Alumno" },
           { key: "seccion", label: "Sección" },
+           { key: "fecha_matricula", label: "Fecha Matricula" },
             { key: "condicion", label: "Condición" },
+          { key: "observacion", label: "Observacion" },
+
           ...(puedeAdministrar ? [{ key: "estado", label: "Estado" }] : []),
         ]}
         datos={lista}

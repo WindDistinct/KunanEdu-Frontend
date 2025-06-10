@@ -28,7 +28,7 @@ export default function Tabla({
       return valor === true ? "Activo" : "Inactivo";
     }
 
-    if (typeof valor === "string" && (key.includes("fec") || key.includes("fecha"))) {
+    if (typeof valor === "string" && (key.includes("fec") || key.includes("fecha") || key.includes("fecha_matricula"))) {
       const [año, mes, dia] = valor.split("-");
       return `${dia}/${mes}/${año}`;
     }

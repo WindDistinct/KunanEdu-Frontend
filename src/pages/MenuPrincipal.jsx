@@ -61,6 +61,16 @@ export default function MenuPrincipal() {
         <section>
            <h1 className="text-4xl font-semibold mb-4">Registros de Auditoría</h1>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+             {menuItemsEstaticos.map(({ path, nombre }) => (
+              <Link
+                key={path}
+                to={`/auditoria${path}`}
+                className="btn btn-secondary btn-outline w-full"
+              >
+                Auditoría {nombre}
+              </Link>
+            ))}
+
             {menuItems.map(({ path, nombre }) => (
               <Link
                 key={path}

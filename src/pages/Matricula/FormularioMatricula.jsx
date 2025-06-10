@@ -1,40 +1,59 @@
 import React, { useEffect, useState } from "react";
-import { alumnoService, seccionService, matriculaService } from "../../api/requestApi";
+import {
+  alumnoService,
+  seccionService,
+  matriculaService,
+  periodoService,
+} from "../../api/requestApi";
 
 export default function FormularioMatricula({ onExito, initialData }) {
   const [form, setForm] = useState({
     alumno: "",
     seccion: "",
-     condicion: "",
+    condicion: "",
+    observacion: "",
     estado: true,
   });
 
   const [alumnos, setAlumnos] = useState([]);
   const [secciones, setSecciones] = useState([]);
+  const [periodos, setPeriodos] = useState([]);
+  const [periodoSeleccionado, setPeriodoSeleccionado] = useState("");
   const [error, setError] = useState(null);
   const [mensajeExito, setMensajeExito] = useState(null);
 
   useEffect(() => {
-    const cargarDatos = async () => {
+    const cargarDatosIniciales = async () => {
       try {
-        const [alumnosData, seccionesData] = await Promise.all([
-          alumnoService.obtener(),
-          seccionService.obtener(),
-        ]);
-        console.log(alumnosData)
-        console.log(seccionesData)
-
+        const alumnosData = await alumnoService.obtener();
+        const periodosData = await periodoService.obtener();
         setAlumnos(alumnosData);
-        setSecciones(seccionesData);
+        setPeriodos(periodosData);
+
+        if (initialData) {
+          setForm(initialData);
+
+          // Encontrar el periodo al que pertenece la sección actual
+          for (const periodo of periodosData) {
+            const seccionesData = await periodoService.obtenerSeccionesPeriodo(
+              periodo.id_periodo
+            );
+            const seccionEncontrada = seccionesData.find(
+              (s) => s.id_seccion === initialData.seccion
+            );
+            if (seccionEncontrada) {
+              setPeriodoSeleccionado(periodo.id_periodo);
+              setSecciones([seccionEncontrada]); // Solo la sección actual
+              break;
+            }
+          }
+        }
       } catch (e) {
-        setError("Error al cargar datos para el formulario");
+        setError("Error al cargar datos del formulario");
       }
     };
-    cargarDatos();
-  }, []);
 
-  useEffect(() => {
-    if (initialData) setForm(initialData);
+    cargarDatosIniciales();
   }, [initialData]);
 
   useEffect(() => {
@@ -50,9 +69,22 @@ export default function FormularioMatricula({ onExito, initialData }) {
     setForm((prev) => ({ ...prev, [name]: nuevoValor }));
   };
 
+  const handlePeriodoChange = async (e) => {
+    const nuevoPeriodo = e.target.value;
+    setPeriodoSeleccionado(nuevoPeriodo);
+    setForm((prev) => ({ ...prev, seccion: "" }));
+
+    try {
+      const nuevasSecciones = await periodoService.obtenerSeccionesPeriodo(nuevoPeriodo);
+      setSecciones(nuevasSecciones);
+    } catch {
+      setError("Error al cargar secciones del periodo");
+    }
+  };
+
   const validarFormulario = () => {
-    const { alumno, seccion ,condicion} = form;
-    if (!alumno || !seccion  || !condicion) {
+    const { alumno, seccion, condicion } = form;
+    if (!alumno || !seccion || !condicion) {
       return "Todos los campos son obligatorios";
     }
     return null;
@@ -70,8 +102,9 @@ export default function FormularioMatricula({ onExito, initialData }) {
 
     const datos = {
       alumno: parseInt(form.alumno),
-      seccion: parseInt(form.seccion),
+      seccion: form.seccion ? parseInt(form.seccion) : null,
       condicion: form.condicion,
+      observacion: form.observacion || null,
       ...(initialData && { estado: form.estado }),
     };
 
@@ -89,8 +122,12 @@ export default function FormularioMatricula({ onExito, initialData }) {
       setForm({
         alumno: "",
         seccion: "",
+        condicion: "",
+        observacion: "",
         estado: true,
       });
+      setPeriodoSeleccionado("");
+      setSecciones([]);
     } catch (err) {
       setError("Error al guardar. Verifique que la matrícula no esté duplicada");
     }
@@ -99,18 +136,45 @@ export default function FormularioMatricula({ onExito, initialData }) {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="col-span-2 h-16 relative">
-        {error && <div className="alert alert-error absolute w-full"><span>{error}</span></div>}
-        {mensajeExito && <div className="alert alert-success absolute w-full"><span>{mensajeExito}</span></div>}
+        {error && (
+          <div className="alert alert-error absolute w-full">
+            <span>{error}</span>
+          </div>
+        )}
+        {mensajeExito && (
+          <div className="alert alert-success absolute w-full">
+            <span>{mensajeExito}</span>
+          </div>
+        )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Selección de periodo visible SIEMPRE */}
+        <select
+          className="select select-bordered w-full"
+          value={periodoSeleccionado}
+          onChange={handlePeriodoChange}
+        >
+          <option value="" disabled>
+            Seleccionar Periodo Escolar
+          </option>
+          {periodos.map((p) => (
+            <option key={p.id_periodo} value={p.id_periodo}>
+              {p.descripcion} {p.anio}
+            </option>
+          ))}
+        </select>
+
+        {/* Alumno */}
         <select
           name="alumno"
           className="select select-bordered w-full"
           value={form.alumno}
           onChange={handleChange}
         >
-          <option value="" disabled>Seleccionar Alumno</option>
+          <option value="" disabled>
+            Seleccionar Alumno
+          </option>
           {alumnos.map((a) => (
             <option key={a.id_alumno} value={a.id_alumno}>
               {a.nombre} {a.apellido_paterno} {a.apellido_materno}
@@ -118,34 +182,41 @@ export default function FormularioMatricula({ onExito, initialData }) {
           ))}
         </select>
 
+        {/* Sección */}
         <select
           name="seccion"
           className="select select-bordered w-full"
           value={form.seccion}
           onChange={handleChange}
         >
-          <option value="" disabled>Seleccionar Sección</option>
+          <option value="" disabled>
+            {secciones.length > 0 ? "Elige una sección" : "No hay secciones disponibles"}
+          </option>
           {secciones.map((s) => (
             <option key={s.id_seccion} value={s.id_seccion}>
-              {s.nombre} {s.grado}
+              {s.nombre} - {s.grado} - {s.aula}
             </option>
           ))}
         </select>
 
+        {/* Condición */}
         <select
-            name="condicion"
-            className="select select-bordered w-full"
-            value={form.condicion}
-            onChange={handleChange}
-            >
-            <option value="" disabled>Seleccionar Condición</option>
-            <option value="Reservado">Reservado</option>
-            <option value="Matriculado">Matriculado</option>
-            <option value="Por cancelar">Por cancelar</option>
-            <option value="Retirado">Retirado</option>
-            <option value="Condicional">Condicional</option>
+          name="condicion"
+          className="select select-bordered w-full"
+          value={form.condicion}
+          onChange={handleChange}
+        >
+          <option value="" disabled>
+            Seleccionar Condición
+          </option>
+          <option value="Reservado">Reservado</option>
+          <option value="Matriculado">Matriculado</option>
+          <option value="Por cancelar">Por cancelar</option>
+          <option value="Retirado">Retirado</option>
+          <option value="Condicional">Condicional</option>
         </select>
 
+        {/* Estado */}
         {initialData && (
           <label className="label cursor-pointer gap-4">
             <span className="label-text">Activo</span>
@@ -160,6 +231,19 @@ export default function FormularioMatricula({ onExito, initialData }) {
         )}
       </div>
 
+      {/* Observación */}
+      <div>
+        <textarea
+          name="observacion"
+          className="textarea textarea-bordered w-full"
+          rows={3}
+          placeholder="Observación (opcional)"
+         value={form.observacion || ""}
+          onChange={handleChange}
+        />
+      </div>
+
+      {/* Botón */}
       <div>
         <button type="submit" className="btn btn-success">
           {form.id_matricula ? "Actualizar" : "Registrar"} Matrícula

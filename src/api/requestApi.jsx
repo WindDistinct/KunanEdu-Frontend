@@ -23,7 +23,10 @@ const usuarioService = {
 };
 const seccionService = createApiService("seccion");
 const gradoService = createApiService("grado");
-const periodoService = createApiService("periodo");
+const periodoService = {
+  ...createApiService("periodo"),
+  obtenerSeccionesPeriodo: (idPeriodo) => axiosInstance.get(`/api/periodo/seccion-periodo/${idPeriodo}`).then(r => r.data)
+}; 
 const empleadoService = {
   ...createApiService("empleado"),
   obtenerDocentes: () => axiosInstance.get(`/api/empleado/all-docente`).then(r => r.data)
