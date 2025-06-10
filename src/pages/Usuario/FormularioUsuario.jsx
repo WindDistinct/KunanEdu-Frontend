@@ -1,8 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { usuarioService } from "../../api/requestApi"
-import "../../styles/Botones.css";
-import "../../styles/inputs.css";
-import "../../styles/Notificacion.css";
+import { usuarioService } from "../../api/requestApi";
 
 export default function FormularioUsuario({ onExito, initialData }) {
   const [form, setForm] = useState({
@@ -12,28 +9,51 @@ export default function FormularioUsuario({ onExito, initialData }) {
     estado: true,
   });
   const [error, setError] = useState(null);
+  const [mensajeExito, setMensajeExito] = useState(null);
 
   useEffect(() => {
     if (initialData) {
-      setForm({
-        ...initialData,
-        password: "",
-      });
+      setForm({ ...initialData, password: "" });
     }
   }, [initialData]);
 
+  useEffect(() => {
+    if (mensajeExito) {
+      const timer = setTimeout(() => setMensajeExito(null), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [mensajeExito]);
+
   const handleChange = (e) => {
-    const { name, type, value, checked } = e.target;
-    const newValue = type === "checkbox" ? checked : value;
-    setForm((prev) => ({ ...prev, [name]: newValue }));
+    const { name, value, type, checked } = e.target;
+    let nuevoValor = value;
+
+    if (type === "checkbox") {
+      nuevoValor = checked;
+    } else {
+      nuevoValor = value.trimStart();
+    }
+
+    setForm((prev) => ({ ...prev, [name]: nuevoValor }));
+  };
+
+  const validarFormulario = () => {
+    if (!form.username || !form.rol || (!initialData && !form.password)) {
+      return "Todos los campos son obligatorios";
+    }
+    if (/\d/.test(form.username)) {
+      return "El nombre de usuario no debe contener números";
+    }
+    return null;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
 
-    if (!form.username || !form.rol || (!initialData && !form.password)) {
-      setError("Todos los campos son obligatorios");
+    const errorValidacion = validarFormulario();
+    if (errorValidacion) {
+      setError(errorValidacion);
       return;
     }
 
@@ -50,84 +70,91 @@ export default function FormularioUsuario({ onExito, initialData }) {
     try {
       if (initialData) {
         await usuarioService.actualizar(initialData.id_usuario, datos);
+        setMensajeExito("Usuario actualizado con éxito");
         onExito("Usuario actualizado con éxito");
       } else {
         await usuarioService.crear(datos);
+        setMensajeExito("Usuario registrado con éxito");
         onExito("Usuario registrado con éxito");
       }
+
       setForm({ username: "", password: "", rol: "", estado: true });
     } catch (err) {
-      setError(err + ": Error al guardar. Verifique que el usuario no esté duplicado");
+      setError("Error al guardar. Verifique que el usuario no esté duplicado");
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="row g-3">
-      {error && <div className="alert alert-danger col-12">{error}</div>}
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="col-span-2 h-16 relative">
+        {error && (
+          <div className="alert alert-error absolute w-full">
+            <span>{error}</span>
+          </div>
+        )}
+        {mensajeExito && (
+          <div className="alert alert-success absolute w-full">
+            <span>{mensajeExito}</span>
+          </div>
+        )}
+      </div>
 
-      <div className="col-md-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <input
           name="username"
           placeholder="Usuario"
-          className="input-form"
+          className="input input-bordered w-full"
           value={form.username}
           onChange={handleChange}
           onKeyDown={(e) => {
-            if (/\d/.test(e.key) || e.key === " ") e.preventDefault(); // bloquea números y espacios
+            if (/\d/.test(e.key) || e.key === " ") e.preventDefault();
           }}
         />
-      </div>
 
-      {!initialData && (
-        <div className="col-md-6">
+        {!initialData && (
           <input
             name="password"
             type="password"
             placeholder="Contraseña"
-            className="input-form"
+            className="input input-bordered w-full"
             value={form.password}
             onChange={handleChange}
             onKeyDown={(e) => {
               if (e.key === " ") e.preventDefault();
             }}
           />
-        </div>
-      )}
+        )}
 
-      <div className="col-md-6">
         <select
           name="rol"
-          className="form-select"
+          className="select select-bordered w-full"
           value={form.rol}
           onChange={handleChange}
         >
-          <option value="" disabled>Seleccione Rol</option>
+          <option value="" disabled>
+            Seleccione Rol
+          </option>
           <option value="administrador">Administrador</option>
           <option value="usuario">Usuario</option>
           <option value="profesor">Profesor</option>
           <option value="auditor">Auditor</option>
         </select>
-      </div>
 
-      {initialData && (
-        <div className="col-md-6">
-          <div className="form-check d-flex align-items-center gap-2 mt-2">
+        {initialData && (
+          <label className="label cursor-pointer gap-4">
+            <span className="label-text">Activo</span>
             <input
-              className="form-check-input"
               type="checkbox"
-              id="estado"
+              className="toggle toggle-success"
               name="estado"
               checked={!!form.estado}
               onChange={handleChange}
             />
-            <label className="form-check-label mb-0" htmlFor="estado">
-              Activo
-            </label>
-          </div>
-        </div>
-      )}
+          </label>
+        )}
+      </div>
 
-      <div className="col-12">
+      <div>
         <button type="submit" className="btn btn-success">
           {initialData ? "Actualizar" : "Registrar"} Usuario
         </button>

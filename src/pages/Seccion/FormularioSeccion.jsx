@@ -1,8 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { seccionService, periodoService, aulaService, gradoService } from "../../api/requestApi"
-import "../../styles/Botones.css";
-import "../../styles/inputs.css";
-import "../../styles/Notificacion.css";
+import { seccionService, periodoService, aulaService, gradoService } from "../../api/requestApi";
 
 export default function FormularioSeccion({ onExito, initialData }) {
   const [form, setForm] = useState({
@@ -50,7 +47,7 @@ export default function FormularioSeccion({ onExito, initialData }) {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    let nuevoValor = type === "checkbox" ? checked : value;
+    const nuevoValor = type === "checkbox" ? checked : value.trimStart();
     setForm((prev) => ({ ...prev, [name]: nuevoValor }));
   };
 
@@ -99,96 +96,99 @@ export default function FormularioSeccion({ onExito, initialData }) {
         estado: true,
       });
     } catch (err) {
-      setError(err + ": Error al guardar. Verifique que no esté duplicado el nombre de la sección");
+      setError("Error al guardar. Verifique que no esté duplicado el nombre de la sección o aula duplicada");
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="row g-3">
-      {error && (
-        <div className="alert alert-danger col-12" role="alert">
-          {error}
-        </div>
-      )}
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="col-span-2 h-16 relative">
+        {error && (
+          <div className="alert alert-error absolute w-full">
+            <span>{error}</span>
+          </div>
+        )}
+        {mensajeExito && (
+          <div className="alert alert-success absolute w-full">
+            <span>{mensajeExito}</span>
+          </div>
+        )}
+      </div>
 
-      <div className="col-md-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <input
           name="nombre"
           placeholder="Nombre de la sección"
-          className="form-control"
+          className="input input-bordered w-full"
           value={form.nombre}
           onChange={handleChange}
+          onKeyDown={(e) => e.key === " " && e.target.selectionStart === 0 && e.preventDefault()}
         />
-      </div>
 
-      <div className="col-md-6">
         <select
           name="aula"
-          className="form-select"
+          className="select select-bordered w-full"
           value={form.aula}
           onChange={handleChange}
         >
-          <option value="">Seleccionar Aula</option>
-          {aulas.map((aula) => (
-            <option key={aula.id_aula} value={aula.id_aula}>
-              Aula {aula.numero_aula}
+          <option value="" disabled>
+            Seleccionar Aula
+          </option>
+          {aulas.map((a) => (
+            <option key={a.id_aula} value={a.id_aula}>
+              Aula {a.numero_aula}
             </option>
           ))}
         </select>
-      </div>
 
-      <div className="col-md-6">
         <select
           name="grado"
-          className="form-select"
+          className="select select-bordered w-full"
           value={form.grado}
           onChange={handleChange}
         >
-          <option value="">Seleccionar Grado</option>
-          {grados.map((grado) => (
-            <option key={grado.id_grado} value={grado.id_grado}>
-              {grado.nivel} - {grado.anio}
+          <option value="" disabled>
+            Seleccionar Grado
+          </option>
+          {grados.map((g) => (
+            <option key={g.id_grado} value={g.id_grado}>
+              {g.nivel} - {g.anio}
             </option>
           ))}
         </select>
-      </div>
 
-      <div className="col-md-6">
         <select
           name="periodo"
-          className="form-select"
+          className="select select-bordered w-full"
           value={form.periodo}
           onChange={handleChange}
         >
-          <option value="">Seleccionar Periodo</option>
+          <option value="" disabled>
+            Seleccionar Periodo
+          </option>
           {periodos.map((p) => (
             <option key={p.id_periodo} value={p.id_periodo}>
               {p.anio} - {p.descripcion}
             </option>
           ))}
         </select>
+
+        {initialData && (
+          <label className="label cursor-pointer gap-4">
+            <span className="label-text">Activo</span>
+            <input
+              type="checkbox"
+              className="toggle toggle-success"
+              name="estado"
+              checked={!!form.estado}
+              onChange={handleChange}
+            />
+          </label>
+        )}
       </div>
 
-      {initialData && (
-        <div className="col-md-6">
-          <label htmlFor="estado" className="form-label">Estado</label>
-          <select
-            name="estado"
-            id="estado"
-            className="form-select"
-            value={form.estado === true ? "true" : "false"}
-            onChange={(e) =>
-              setForm((prev) => ({ ...prev, estado: e.target.value === "true" }))
-            }
-          >
-            <option value="true">Activo</option>
-            <option value="false">Inactivo</option>
-          </select>
-        </div>
-      )}
-
-      <div className="col-12">
-        <button type="submit" className="btn btn-success me-2">
+      <div>
+        <button type="submit" className="btn btn-success">
           {form.id_seccion ? "Actualizar" : "Registrar"} Sección
         </button>
       </div>

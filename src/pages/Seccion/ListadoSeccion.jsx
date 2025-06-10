@@ -1,10 +1,9 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { seccionService } from "../../api/requestApi"
+import { seccionService } from "../../api/requestApi";
 import Tabla from "../../components/Tabla";
 import FormularioSeccion from "./FormularioSeccion";
 import Notificacion from "../../components/Notificacion";
-import "../../styles/Botones.css";
 
 export default function ListadoSeccion() {
   const [secciones, setSecciones] = useState([]);
@@ -19,12 +18,14 @@ export default function ListadoSeccion() {
   const cargarSecciones = useCallback(async () => {
     try {
       const data =
-        rol === "administrador" ? await seccionService.obtenerTodos() : await seccionService.obtener();
+        rol === "administrador"
+          ? await seccionService.obtenerTodos()
+          : await seccionService.obtener();
 
       const ordenadas = data.sort((a, b) => a.id_seccion - b.id_seccion);
       setSecciones(ordenadas);
     } catch (err) {
-      setMensaje({ tipo: "error", texto: err + ": Error al cargar las secciones" });
+      setMensaje({ tipo: "error", texto: "Error al cargar las secciones: " + err });
     }
   }, [rol]);
 
@@ -45,7 +46,7 @@ export default function ListadoSeccion() {
       setMensaje({ tipo: "success", texto: "Sección eliminada correctamente" });
       await cargarSecciones();
     } catch (error) {
-      setMensaje({ tipo: "error", texto: error + ": Error al eliminar la sección" });
+      setMensaje({ tipo: "error", texto: "Error al eliminar la sección: " + error });
     }
   };
 
@@ -73,41 +74,48 @@ export default function ListadoSeccion() {
   };
 
   return (
-    <div className="container mt-4">
-      <h1 className="mb-4">
+    <div className="p-4">
+      <h1 className="text-4xl font-semibold mb-4">
         {puedeAdministrar ? "Gestión de Secciones" : "Listado de Secciones"}
       </h1>
 
-      <button onClick={() => navigate("/")} className="btn btn-secondary mb-3">
-        Volver al Menú
+      <button onClick={() => navigate("/")} className="btn btn-secondary mb-4">
+        ← Volver al Menú
       </button>
-      <br></br>
-      <Notificacion mensaje={mensaje?.texto} tipo={mensaje?.tipo} />
-      <br></br>
-      {mostrarFormulario || formData ? (
-        <div>
-          <FormularioSeccion onExito={handleExito} initialData={formData} />
-          <div className="d-flex mt-2">
-            <button
-              onClick={handleCancelar}
-              type="button"
-              className="btn btn-danger me-2"
-            >
-              Cancelar Registro
-            </button>
-          </div>
-        </div>
-      ) : (
-        puedeAdministrar && (
-          <button
-            onClick={() => setMostrarFormulario(true)}
-            className="btn btn-primary mb-3"
-          >
-            Registrar nueva Sección
-          </button>
-        )
+
+      {puedeAdministrar && (
+        <button
+          onClick={() => setMostrarFormulario(true)}
+          className="btn btn-primary mb-4"
+        >
+          ➕ Registrar nueva Sección
+        </button>
       )}
-      <br />
+
+      {mostrarFormulario && (
+        <dialog id="modalSeccion" className="modal modal-open">
+          <div className="modal-box w-11/12 max-w-3xl">
+            <h3 className="font-bold text-lg mb-4">
+              {formData ? "Editar Sección" : "Registrar Nueva Sección"}
+            </h3>
+            <FormularioSeccion onExito={handleExito} initialData={formData} />
+
+            <div className="modal-action">
+              <button className="btn btn-error" onClick={handleCancelar}>
+                Cancelar
+              </button>
+            </div>
+          </div>
+          <form method="dialog" className="modal-backdrop">
+            <button onClick={handleCancelar}>Cerrar</button>
+          </form>
+        </dialog>
+      )}
+
+      <div className="h-12 mb-4">
+        <Notificacion mensaje={mensaje?.texto} tipo={mensaje?.tipo} />
+      </div>
+
       <Tabla
         columnas={[
           { key: "nombre", label: "Nombre" },

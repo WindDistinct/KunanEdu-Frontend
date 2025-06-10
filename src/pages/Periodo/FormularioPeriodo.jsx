@@ -1,8 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { periodoService } from "../../api/requestApi"
-import "../../styles/Botones.css";
-import "../../styles/inputs.css";
-import "../../styles/Notificacion.css";
+import { periodoService } from "../../api/requestApi";
 
 export default function FormularioPeriodo({ onExito, initialData }) {
   const [form, setForm] = useState({
@@ -87,87 +84,79 @@ export default function FormularioPeriodo({ onExito, initialData }) {
         estado: true,
       });
     } catch (err) {
-      setError(err + ": Error al guardar. Verifique.");
+      setError("Error al guardar. Verifique que el año no esté duplicado.");
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="row g-3">
-      {error && (
-        <div className="alert alert-danger col-12" role="alert">
-          {error}
-        </div>
-      )}
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="col-span-2 h-16 relative">
+        {error && (
+          <div className="alert alert-error absolute w-full">
+            <span>{error}</span>
+          </div>
+        )}
+        {mensajeExito && (
+          <div className="alert alert-success absolute w-full">
+            <span>{mensajeExito}</span>
+          </div>
+        )}
+      </div>
 
-      {mensajeExito && (
-        <div className="alert alert-success col-12" role="alert">
-          {mensajeExito}
-        </div>
-      )}
-
-      <div className="col-md-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <input
           name="anio"
           placeholder="Año"
-          className="form-control"
+          className="input input-bordered w-full"
           value={form.anio}
           onChange={handleChange}
           maxLength={4}
           inputMode="numeric"
           onKeyDown={(e) => e.key === " " && e.preventDefault()}
         />
-      </div>
 
-      <div className="col-md-6">
         <select
           name="descripcion"
-          className="form-select"
+          className="select select-bordered w-full"
           value={form.descripcion}
           onChange={handleChange}
         >
           <option value="" disabled>
-            Seleccione descripción
+            Descripción
           </option>
           <option value="Año escolar">Año Escolar</option>
           <option value="Vacacional">Vacacional</option>
         </select>
-      </div>
 
-      <div className="col-md-6">
         <select
           name="progreso"
-          className="form-select"
+          className="select select-bordered w-full"
           value={form.progreso}
           onChange={handleChange}
         >
           <option value="" disabled>
-            Seleccione progreso
+            Progreso
           </option>
           <option value="En curso">En Curso</option>
           <option value="Finalizado">Finalizado</option>
         </select>
-      </div>
 
-      {initialData && (
-        <div className="col-md-6">
-          <div className="form-check d-flex align-items-center gap-2 mt-2">
+        {initialData && (
+          <label className="label cursor-pointer gap-4">
+            <span className="label-text">Activo</span>
             <input
-              className="form-check-input"
               type="checkbox"
-              id="estado"
+              className="toggle toggle-success"
               name="estado"
               checked={!!form.estado}
               onChange={handleChange}
             />
-            <label className="form-check-label mb-0" htmlFor="estado">
-              Activo
-            </label>
-          </div>
-        </div>
-      )}
+          </label>
+        )}
+      </div>
 
-      <div className="col-12">
-        <button type="submit" className="btn btn-success me-2">
+      <div>
+        <button type="submit" className="btn btn-success">
           {form.id_periodo ? "Actualizar" : "Registrar"} Periodo
         </button>
       </div>

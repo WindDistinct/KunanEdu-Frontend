@@ -18,8 +18,8 @@ export default function AuditoriaPeriodo() {
   }, []);
 
   return (
-    <div className="container mt-4">
-      <h1 className="mb-4">Auditoría de Periodos</h1>
+     <div className="container mt-4">
+    <h1 className="text-4xl font-semibold mb-4">Auditoría de Periodos</h1>
       <button onClick={() => navigate("/")} className="btn btn-secondary mb-3">
         Volver al Menú
       </button>

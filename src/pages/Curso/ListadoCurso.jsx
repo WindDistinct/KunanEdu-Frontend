@@ -4,7 +4,6 @@ import { cursoService } from "../../api/requestApi";
 import Tabla from "../../components/Tabla";
 import FormularioCurso from "./FormularioCurso";
 import Notificacion from "../../components/Notificacion";
-import "../../styles/Botones.css";
 
 export default function ListadoCurso() {
   const [cursos, setCursos] = useState([]);
@@ -19,7 +18,9 @@ export default function ListadoCurso() {
   const cargarCursos = useCallback(async () => {
     try {
       const data =
-        rol === "administrador" ? await cursoService.obtenerTodos() : await cursoService.obtener();
+        rol === "administrador"
+          ? await cursoService.obtenerTodos()
+          : await cursoService.obtener();
 
       const cursosOrdenados = data.sort((a, b) => a.id_curso - b.id_curso);
       setCursos(cursosOrdenados);
@@ -69,42 +70,48 @@ export default function ListadoCurso() {
   };
 
   return (
-    <div className="container mt-4">
-      <h1 className="mb-4">
-        {puedeAdministrar ? "Gestión de Curso" : "Listado de Curso"}
+    <div className="p-4">
+      <h1 className="text-4xl font-semibold mb-4">
+        {puedeAdministrar ? "Gestión de Cursos" : "Listado de Cursos"}
       </h1>
 
-      <button onClick={() => navigate("/")} className="btn btn-secondary mb-3">
-        Volver al Menú
+      <button onClick={() => navigate("/")} className="btn btn-secondary mb-4">
+        ← Volver al Menú
       </button>
-      <br />
-      <Notificacion mensaje={mensaje?.texto} tipo={mensaje?.tipo} />
-      <br />
-      {mostrarFormulario || formData ? (
-        <div>
-          <FormularioCurso onExito={handleExito} initialData={formData} />
-          <div className="d-flex mt-2">
-            <button
-              onClick={handleCancelar}
-              type="button"
-              className="btn btn-danger me-2"
-            >
-              Cancelar Registro
-            </button>
-          </div>
-        </div>
-      ) : (
-        puedeAdministrar && (
-          <button
-            onClick={() => setMostrarFormulario(true)}
-            className="btn btn-primary mb-3"
-          >
-            Registrar nuevo Curso
-          </button>
-        )
+
+      {puedeAdministrar && (
+        <button
+          onClick={() => setMostrarFormulario(true)}
+          className="btn btn-primary mb-4"
+        >
+          ➕ Registrar nuevo Curso
+        </button>
       )}
-      <br />
-      <br />
+
+      {mostrarFormulario && (
+        <dialog id="modalCurso" className="modal modal-open">
+          <div className="modal-box w-11/12 max-w-3xl">
+            <h3 className="font-bold text-lg mb-4">
+              {formData ? "Editar Curso" : "Registrar Nuevo Curso"}
+            </h3>
+            <FormularioCurso onExito={handleExito} initialData={formData} />
+
+            <div className="modal-action">
+              <button className="btn btn-error" onClick={handleCancelar}>
+                Cancelar
+              </button>
+            </div>
+          </div>
+          <form method="dialog" className="modal-backdrop">
+            <button onClick={handleCancelar}>Cerrar</button>
+          </form>
+        </dialog>
+      )}
+
+      <div className="h-12 mb-4">
+        <Notificacion mensaje={mensaje?.texto} tipo={mensaje?.tipo} />
+      </div>
+
       <Tabla
         columnas={[
           { key: "nombre_curso", label: "Nombre del Curso" },

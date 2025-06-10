@@ -1,10 +1,9 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { periodoService, seccionService } from "../../api/requestApi"
+import { periodoService } from "../../api/requestApi";
 import Tabla from "../../components/Tabla";
 import FormularioPeriodo from "./FormularioPeriodo";
 import Notificacion from "../../components/Notificacion";
-import "../../styles/Botones.css";
 
 export default function ListadoPeriodo() {
   const [periodos, setPeriodos] = useState([]);
@@ -18,14 +17,19 @@ export default function ListadoPeriodo() {
 
   const cargarPeriodos = useCallback(async () => {
     try {
-      const data =
-        rol === "administrador" ? await periodoService.obtenerTodos() : await seccionService.obtener();
+      const data = puedeAdministrar
+        ? await periodoService.obtenerTodos()
+        : await periodoService.obtener();
+
       const ordenados = data.sort((a, b) => a.anio - b.anio);
       setPeriodos(ordenados);
     } catch (error) {
-      setMensaje({ tipo: "error", texto: error + ": Error al cargar los periodos" });
+      setMensaje({
+        tipo: "error",
+        texto: "Error al cargar los periodos: " + error,
+      });
     }
-  }, [rol]);
+  }, [puedeAdministrar]);
 
   useEffect(() => {
     cargarPeriodos();
@@ -33,20 +37,22 @@ export default function ListadoPeriodo() {
 
   useEffect(() => {
     if (mensaje) {
-      const timer = setTimeout(() => {
-        setMensaje(null);
-      }, 3000);
+      const timer = setTimeout(() => setMensaje(null), 3000);
       return () => clearTimeout(timer);
     }
   }, [mensaje]);
 
   const handleEliminar = async (id) => {
     try {
-      await seccionService.eliminar(id);
+      console.log(id)
+      await periodoService.eliminar(id);
       setMensaje({ tipo: "success", texto: "Periodo eliminado correctamente" });
       await cargarPeriodos();
     } catch (error) {
-      setMensaje({ tipo: "error", texto: error + ": Error al eliminar el periodo" });
+      setMensaje({
+        tipo: "error",
+        texto: "Error al eliminar el periodo: " + error,
+      });
     }
   };
 
@@ -68,42 +74,48 @@ export default function ListadoPeriodo() {
   };
 
   return (
-    <div className="container mt-4">
-      <h1 className="mb-4">
-        {puedeAdministrar ? "Gestión de Periodo" : "Listado de Periodo"}
+    <div className="p-4">
+      <h1 className="text-4xl font-semibold mb-4">
+        {puedeAdministrar ? "Gestión de Periodos" : "Listado de Periodos"}
       </h1>
 
-      <button onClick={() => navigate("/")} className="btn btn-secondary mb-3">
-        Volver al Menú
+      <button onClick={() => navigate("/")} className="btn btn-secondary mb-4">
+        ← Volver al Menú
       </button>
-      <br />
-      <Notificacion mensaje={mensaje?.texto} tipo={mensaje?.tipo} />
-      <br />
-      {mostrarFormulario || formData ? (
-        <div>
-          <FormularioPeriodo onExito={handleExito} initialData={formData} />
-          <div className="d-flex mt-2">
-            <button
-              onClick={handleCancelar}
-              type="button"
-              className="btn btn-danger me-2"
-            >
-              Cancelar Registro
-            </button>
-          </div>
-        </div>
-      ) : (
-        puedeAdministrar && (
-          <button
-            onClick={() => setMostrarFormulario(true)}
-            className="btn btn-primary mb-3"
-          >
-            Registrar nuevo Periodo
-          </button>
-        )
+
+      {puedeAdministrar && (
+        <button
+          onClick={() => setMostrarFormulario(true)}
+          className="btn btn-primary mb-4"
+        >
+          ➕ Registrar nuevo Periodo
+        </button>
       )}
-      <br />
-      <br />
+
+      {mostrarFormulario && (
+        <dialog id="modalPeriodo" className="modal modal-open">
+          <div className="modal-box w-11/12 max-w-3xl">
+            <h3 className="font-bold text-lg mb-4">
+              {formData ? "Editar Periodo" : "Registrar Nuevo Periodo"}
+            </h3>
+            <FormularioPeriodo onExito={handleExito} initialData={formData} />
+
+            <div className="modal-action">
+              <button className="btn btn-error" onClick={handleCancelar}>
+                Cancelar
+              </button>
+            </div>
+          </div>
+          <form method="dialog" className="modal-backdrop">
+            <button onClick={handleCancelar}>Cerrar</button>
+          </form>
+        </dialog>
+      )}
+
+      <div className="h-12 mb-4">
+        <Notificacion mensaje={mensaje?.texto} tipo={mensaje?.tipo} />
+      </div>
+
       <Tabla
         columnas={[
           { key: "anio", label: "Año" },

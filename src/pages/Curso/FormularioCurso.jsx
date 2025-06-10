@@ -1,26 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { cursoService, empleadoService } from "../../api/requestApi";
-import "../../styles/Botones.css";
-import "../../styles/inputs.css";
-import "../../styles/Notificacion.css";
+import { cursoService } from "../../api/requestApi";
 
 export default function FormularioCurso({ onExito, initialData }) {
   const [form, setForm] = useState({
     nombre_curso: "",
-    estado: true, // Agregado para soportar edición de estado
+    estado: true,
   });
 
   const [error, setError] = useState(null);
   const [mensajeExito, setMensajeExito] = useState(null);
 
   useEffect(() => {
-    if (initialData) {
-      setForm({
-        nombre_curso: initialData.nombre_curso || "",
-        estado: initialData.estado ?? true,
-        id_curso: initialData.id_curso,
-      });
-    }
+    if (initialData) setForm(initialData);
   }, [initialData]);
 
   useEffect(() => {
@@ -31,18 +22,16 @@ export default function FormularioCurso({ onExito, initialData }) {
   }, [mensajeExito]);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    if (name === "estado") {
-      setForm((prev) => ({
-        ...prev,
-        estado: value === "true",
-      }));
+    const { name, value, type, checked } = e.target;
+    let nuevoValor = value;
+
+    if (type === "checkbox") {
+      nuevoValor = checked;
     } else {
-      setForm((prev) => ({
-        ...prev,
-        [name]: value,
-      }));
+      nuevoValor = value.trimStart();
     }
+
+    setForm((prev) => ({ ...prev, [name]: nuevoValor }));
   };
 
   const validarFormulario = () => {
@@ -85,49 +74,52 @@ export default function FormularioCurso({ onExito, initialData }) {
 
       setForm({ nombre_curso: "", estado: true });
     } catch (err) {
-      setError("Error al guardar. Verifique que el nombre no esté duplicado: " + err);
+      setError("Error al guardar. Verifique que el nombre no esté duplicado");
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="row g-3">
-      {error && (
-        <div className="alert alert-danger col-12" role="alert">
-          {error}
-        </div>
-      )}
-      {mensajeExito && (
-        <div className="alert alert-success col-12" role="alert">
-          {mensajeExito}
-        </div>
-      )}
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="col-span-2 h-16 relative">
+        {error && (
+          <div className="alert alert-error absolute w-full">
+            <span>{error}</span>
+          </div>
+        )}
+        {mensajeExito && (
+          <div className="alert alert-success absolute w-full">
+            <span>{mensajeExito}</span>
+          </div>
+        )}
+      </div>
 
-      <div className="col-md-12">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <input
           name="nombre_curso"
           placeholder="Nombre del Curso"
-          className="form-control"
+          className="input input-bordered w-full"
           value={form.nombre_curso}
           onChange={handleChange}
+          maxLength={50}
+          onKeyDown={(e) => e.key === " " && e.target.selectionStart === 0 && e.preventDefault()}
         />
+
+        {initialData && (
+          <label className="label cursor-pointer gap-4">
+            <span className="label-text">Activo</span>
+            <input
+              type="checkbox"
+              className="toggle toggle-success"
+              name="estado"
+              checked={!!form.estado}
+              onChange={handleChange}
+            />
+          </label>
+        )}
       </div>
 
-      {form.id_curso && (
-        <div className="col-md-12">
-          <select
-            name="estado"
-            className="form-control"
-            value={form.estado ? "true" : "false"}
-            onChange={handleChange}
-          >
-            <option value="true">Activo</option>
-            <option value="false">Inactivo</option>
-          </select>
-        </div>
-      )}
-
-      <div className="col-12">
-        <button type="submit" className="btn btn-success me-2">
+      <div>
+        <button type="submit" className="btn btn-success">
           {form.id_curso ? "Actualizar" : "Registrar"} Curso
         </button>
       </div>
