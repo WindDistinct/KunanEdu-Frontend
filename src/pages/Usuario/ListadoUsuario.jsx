@@ -1,10 +1,9 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { usuarioService } from "../../api/requestApi"
+import { usuarioService } from "../../api/requestApi";
 import Tabla from "../../components/Tabla";
 import FormularioUsuario from "./FormularioUsuario";
 import Notificacion from "../../components/Notificacion";
-import "../../styles/Botones.css";
 
 export default function ListadoUsuario() {
   const [usuarios, setUsuarios] = useState([]);
@@ -19,12 +18,14 @@ export default function ListadoUsuario() {
   const cargarUsuarios = useCallback(async () => {
     try {
       const data =
-        rol === "administrador" ? await usuarioService.obtenerTodos() : await usuarioService.obtener();
+        rol === "administrador"
+          ? await usuarioService.obtenerTodos()
+          : await usuarioService.obtener();
 
       const usuariosOrdenados = data.sort((a, b) => a.id_usuario - b.id_usuario);
       setUsuarios(usuariosOrdenados);
     } catch (error) {
-      setMensaje({ tipo: "error", texto: error + ": Error al cargar los usuarios" });
+      setMensaje({ tipo: "error", texto: "Error al cargar los usuarios: " + error });
     }
   }, [rol]);
 
@@ -34,20 +35,18 @@ export default function ListadoUsuario() {
 
   useEffect(() => {
     if (mensaje) {
-      const timer = setTimeout(() => {
-        setMensaje(null);
-      }, 3000);
+      const timer = setTimeout(() => setMensaje(null), 3000);
       return () => clearTimeout(timer);
     }
   }, [mensaje]);
 
-  const handleEliminar = async (id_usuario) => {
+  const handleEliminar = async (id) => {
     try {
-      await usuarioService.eliminar(id_usuario);
+      await usuarioService.eliminar(id);
       setMensaje({ tipo: "success", texto: "Usuario eliminado correctamente" });
       await cargarUsuarios();
     } catch (error) {
-      setMensaje({ tipo: "error", texto: error + ": Error al eliminar el usuario" });
+      setMensaje({ tipo: "error", texto: "Error al eliminar el usuario: " + error });
     }
   };
 
@@ -69,42 +68,48 @@ export default function ListadoUsuario() {
   };
 
   return (
-    <div className="container mt-4">
-      <h1 className="mb-4">
-        {puedeAdministrar ? "Gestión de Usuario" : "Listado de Usuario"}
+    <div className="p-4">
+      <h1 className="text-4xl font-semibold mb-4">
+        {puedeAdministrar ? "Gestión de Usuarios" : "Listado de Usuarios"}
       </h1>
 
-      <button onClick={() => navigate("/")} className="btn btn-secondary mb-3">
-        Volver al Menú
+      <button onClick={() => navigate("/")} className="btn btn-secondary mb-4">
+        ← Volver al Menú
       </button>
-      <br />
-      <Notificacion mensaje={mensaje?.texto} tipo={mensaje?.tipo} />
-      <br />
-      {mostrarFormulario || formData ? (
-        <div>
-          <FormularioUsuario onExito={handleExito} initialData={formData} />
-          <div className="d-flex mt-2">
-            <button
-              onClick={handleCancelar}
-              type="button"
-              className="btn btn-danger me-2"
-            >
-              Cancelar Registro
-            </button>
-          </div>
-        </div>
-      ) : (
-        puedeAdministrar && (
-          <button
-            onClick={() => setMostrarFormulario(true)}
-            className="btn btn-primary mb-3"
-          >
-            Registrar nuevo Usuario
-          </button>
-        )
+
+      {puedeAdministrar && (
+        <button
+          onClick={() => setMostrarFormulario(true)}
+          className="btn btn-primary mb-4"
+        >
+          ➕ Registrar nuevo Usuario
+        </button>
       )}
-      <br />
-      <br />
+
+      {mostrarFormulario && (
+        <dialog id="modalUsuario" className="modal modal-open">
+          <div className="modal-box w-11/12 max-w-3xl">
+            <h3 className="font-bold text-lg mb-4">
+              {formData ? "Editar Usuario" : "Registrar Nuevo Usuario"}
+            </h3>
+            <FormularioUsuario onExito={handleExito} initialData={formData} />
+
+            <div className="modal-action">
+              <button className="btn btn-error" onClick={handleCancelar}>
+                Cancelar
+              </button>
+            </div>
+          </div>
+          <form method="dialog" className="modal-backdrop">
+            <button onClick={handleCancelar}>Cerrar</button>
+          </form>
+        </dialog>
+      )}
+
+      <div className="h-12 mb-4">
+        <Notificacion mensaje={mensaje?.texto} tipo={mensaje?.tipo} />
+      </div>
+
       <Tabla
         columnas={[
           { key: "username", label: "Nombre de Usuario" },

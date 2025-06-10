@@ -4,7 +4,6 @@ import { aulaService } from "../../api/requestApi";
 import Tabla from "../../components/Tabla";
 import FormularioAula from "./FormularioAula";
 import Notificacion from "../../components/Notificacion";
-import "../../styles/Botones.css";
 
 export default function ListadoAula() {
   const [aulas, setAulas] = useState([]);
@@ -19,7 +18,9 @@ export default function ListadoAula() {
   const cargarAulas = useCallback(async () => {
     try {
       const data =
-        rol === "administrador" ? await aulaService.obtenerTodos() : await aulaService.obtener();
+        rol === "administrador"
+          ? await aulaService.obtenerTodos()
+          : await aulaService.obtener();
 
       const aulasOrdenadas = data.sort((a, b) => a.id_aula - b.id_aula);
       setAulas(aulasOrdenadas);
@@ -69,41 +70,48 @@ export default function ListadoAula() {
   };
 
   return (
-    <div className="container mt-4">
-      <h1 className="mb-4">
+    <div className="p-4">
+      <h1 className="text-4xl font-semibold mb-4">
         {puedeAdministrar ? "Gestión de Aulas" : "Listado de Aulas"}
       </h1>
-      <button onClick={() => navigate("/")} className="btn btn-secondary mb-3">
-        Volver al Menú
+
+      <button onClick={() => navigate("/")} className="btn btn-secondary mb-4">
+        ← Volver al Menú
       </button>
-      <br />
-      <Notificacion mensaje={mensaje?.texto} tipo={mensaje?.tipo} />
-      <br />
-      {mostrarFormulario || formData ? (
-        <div>
-          <FormularioAula onExito={handleExito} initialData={formData} />
-          <div className="d-flex mt-2">
-            <button
-              onClick={handleCancelar}
-              type="button"
-              className="btn btn-danger me-2"
-            >
-              Cancelar Registro
-            </button>
-          </div>
-        </div>
-      ) : (
-        puedeAdministrar && (
-          <button
-            onClick={() => setMostrarFormulario(true)}
-            className="btn btn-primary mb-3"
-          >
-            Registrar nueva Aula
-          </button>
-        )
+
+      {puedeAdministrar && (
+        <button
+          onClick={() => setMostrarFormulario(true)}
+          className="btn btn-primary mb-4"
+        >
+          ➕ Registrar nueva Aula
+        </button>
       )}
-      <br />
-      <br />
+
+      {mostrarFormulario && (
+        <dialog id="modalAula" className="modal modal-open">
+          <div className="modal-box w-11/12 max-w-3xl">
+            <h3 className="font-bold text-lg mb-4">
+              {formData ? "Editar Aula" : "Registrar Nueva Aula"}
+            </h3>
+            <FormularioAula onExito={handleExito} initialData={formData} />
+
+            <div className="modal-action">
+              <button className="btn btn-error" onClick={handleCancelar}>
+                Cancelar
+              </button>
+            </div>
+          </div>
+          <form method="dialog" className="modal-backdrop">
+            <button onClick={handleCancelar}>Cerrar</button>
+          </form>
+        </dialog>
+      )}
+
+      <div className="h-12 mb-4">
+        <Notificacion mensaje={mensaje?.texto} tipo={mensaje?.tipo} />
+      </div>
+
       <Tabla
         columnas={[
           { key: "numero_aula", label: "N° Aula" },

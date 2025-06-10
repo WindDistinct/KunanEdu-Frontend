@@ -1,28 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { gradoService } from "../../api/requestApi";
-import "../../styles/Botones.css";
-import "../../styles/inputs.css";
-import "../../styles/Notificacion.css";
 
 export default function FormularioGrado({ onExito, initialData }) {
   const [form, setForm] = useState({
     nivel: "",
     anio: "",
-    estado: "activo",
+    estado: true,
   });
-
   const [error, setError] = useState(null);
   const [mensajeExito, setMensajeExito] = useState(null);
 
   useEffect(() => {
-    if (initialData) {
-      const estadoStr = initialData.estado ? "activo" : "inactivo";
-      setForm({
-        nivel: initialData.nivel || "",
-        anio: initialData.anio || "",
-        estado: estadoStr,
-      });
-    }
+    if (initialData) setForm(initialData);
   }, [initialData]);
 
   useEffect(() => {
@@ -33,8 +22,10 @@ export default function FormularioGrado({ onExito, initialData }) {
   }, [mensajeExito]);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+    const { name, value, type, checked } = e.target;
+    const nuevoValor = type === "checkbox" ? checked : value.trimStart();
+
+    setForm((prev) => ({ ...prev, [name]: nuevoValor }));
   };
 
   const validarFormulario = () => {
@@ -56,70 +47,69 @@ export default function FormularioGrado({ onExito, initialData }) {
     }
 
     const datos = {
-      nivel: form.nivel,
-      anio: form.anio,
-      estado: form.estado === "activo",
+      ...form,
+      nivel: String(form.nivel ?? "").trim(),
+      anio: String(form.anio ?? "").trim(),
+      estado: form.estado,
     };
 
     try {
-      if (initialData && initialData.id_grado) {
-        await gradoService.actualizar(initialData.id_grado, datos);
+      if (form.id_grado) {
+        console.log(datos)
+        await gradoService.actualizar(form.id_grado, datos);
         setMensajeExito("Grado actualizado con éxito");
         onExito("Grado actualizado con éxito");
       } else {
-        // Para nuevo registro no envías estado, o lo defines en backend
-        await gradoService.crear({
-          nivel: form.nivel,
-          anio: form.anio,
-          estado: true, // si quieres que por defecto sea activo
-        });
+        await gradoService.crear(datos);
         setMensajeExito("Grado registrado con éxito");
         onExito("Grado registrado con éxito");
       }
+
       setForm({
         nivel: "",
         anio: "",
-        estado: "activo",
+        estado: true,
       });
     } catch (err) {
-      setError(err + ": Error al guardar. Verifique que el grado no esté duplicado");
+      setError("Error al guardar. Verifique que el grado no esté duplicado");
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="row g-3">
-      {error && (
-        <div className="alert alert-danger col-12" role="alert">
-          {error}
-        </div>
-      )}
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="col-span-2 h-16 relative">
+        {error && (
+          <div className="alert alert-error absolute w-full">
+            <span>{error}</span>
+          </div>
+        )}
+        {mensajeExito && (
+          <div className="alert alert-success absolute w-full">
+            <span>{mensajeExito}</span>
+          </div>
+        )}
+      </div>
 
-      <div className="col-md-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <select
           name="nivel"
-          className="form-select"
+          className="select select-bordered w-full"
           value={form.nivel}
           onChange={handleChange}
         >
-          <option value="" disabled>
-            Seleccione nivel
-          </option>
+          <option value="" disabled>Seleccione Nivel</option>
           <option value="inicial">Inicial</option>
           <option value="primaria">Primaria</option>
           <option value="secundaria">Secundaria</option>
         </select>
-      </div>
 
-      <div className="col-md-6">
         <select
           name="anio"
-          className="form-select"
+          className="select select-bordered w-full"
           value={form.anio}
           onChange={handleChange}
         >
-          <option value="" disabled>
-            Seleccione año
-          </option>
+          <option value="" disabled>Seleccione Año</option>
           <option value="1ro">1ro</option>
           <option value="2do">2do</option>
           <option value="3ro">3ro</option>
@@ -127,25 +117,24 @@ export default function FormularioGrado({ onExito, initialData }) {
           <option value="5to">5to</option>
           <option value="6to">6to</option>
         </select>
+
+        {initialData && (
+          <label className="label cursor-pointer gap-4">
+            <span className="label-text">Activo</span>
+            <input
+              type="checkbox"
+              className="toggle toggle-success"
+              name="estado"
+              checked={!!form.estado}
+              onChange={handleChange}
+            />
+          </label>
+        )}
       </div>
 
-      {initialData && (
-        <div className="col-md-6">
-          <select
-            name="estado"
-            className="form-select"
-            value={form.estado}
-            onChange={handleChange}
-          >
-            <option value="activo">Activo</option>
-            <option value="inactivo">Inactivo</option>
-          </select>
-        </div>
-      )}
-
-      <div className="col-12">
-        <button type="submit" className="btn btn-success me-2">
-          {initialData && initialData.id_grado ? "Actualizar" : "Registrar"} Grado
+      <div>
+        <button type="submit" className="btn btn-success">
+          {form.id_grado ? "Actualizar" : "Registrar"} Grado
         </button>
       </div>
     </form>

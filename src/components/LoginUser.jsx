@@ -20,36 +20,42 @@ export default function LoginUser({ onLoginCorrecto }) {
 	};
 
 	return (
-		<div className="container d-flex justify-content-center align-items-center min-vh-100">
-			<div className="card p-4 shadow" style={{ width: '100%', maxWidth: '400px' }}>
-				<h3 className="text-center mb-4">Iniciar Sesión</h3>
-				<form onSubmit={handleSubmit}>
-					<div className="mb-3">
-						<label htmlFor="usuario" className="form-label">Usuario</label>
+		<div className="flex justify-center items-center min-h-screen ">
+			<div className="card w-full max-w-sm bg-base-100 shadow-xl p-6">
+				<h3 className="text-2xl font-bold text-center mb-4">Iniciar Sesión</h3>
+				<form onSubmit={handleSubmit} className="space-y-4">
+					<div className="form-control">
+						<label htmlFor="usuario" className="label">
+							<span className="label-text">Usuario</span>
+						</label>
 						<input
 							type="text"
 							id="usuario"
-							className="form-control"
+							className="input input-bordered"
 							value={usuario}
 							onChange={e => setUsuario(e.target.value)}
 							required
 						/>
 					</div>
-					<div className="mb-3">
-						<label htmlFor="password" className="form-label">Contraseña</label>
+					<div className="form-control">
+						<label htmlFor="password" className="label">
+							<span className="label-text">Contraseña</span>
+						</label>
 						<input
 							type="password"
 							id="password"
-							className="form-control"
+							className="input input-bordered"
 							value={password}
 							onChange={e => setPassword(e.target.value)}
 							required
 						/>
 					</div>
-					<button type="submit" className="btn btn-primary w-100">Ingresar</button>
+					<div className="form-control mt-4">
+						<button type="submit" className="btn btn-primary w-full">Ingresar</button>
+					</div>
 				</form>
 				{mensaje && (
-					<div className="alert alert-info mt-3 text-center" role="alert">
+					<div className="alert alert-info mt-4 text-sm text-center">
 						{mensaje}
 					</div>
 				)}

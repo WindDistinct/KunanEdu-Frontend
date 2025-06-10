@@ -18,8 +18,8 @@ export default function AuditoriaEmpleado() {
   }, []);
 
   return (
-    <div className="container mt-4">
-      <h1 className="mb-4">Auditoría de Empleados</h1>
+      <div className="p-4">
+      <h1 className="text-3xl font-bold mb-6 text-primary">Auditoría de Empleados</h1>
       <button onClick={() => navigate("/")} className="btn btn-secondary mb-3">
         Volver al Menú
       </button>

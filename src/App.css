@@ -1,5 +1,7 @@
 @import "tailwindcss";
-@plugin "daisyui";
+ @plugin "daisyui" {
+   themes: caramellatte --default
+ }
 
 body {
     margin: 0;
@@ -7,7 +9,8 @@ body {
         'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
         sans-serif;
     -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+    -moz-osx-font-smoothing: grayscale; 
+    
 }
 
 code {
@@ -35,8 +38,7 @@ body {
 }
 
 
-.App-header {
-    background-color: #dd910d;
+.App-header { 
     height: 60px;
     width: 100%;
     display: flex;
@@ -45,18 +47,17 @@ body {
     position: fixed;
     top: 0;
     left: 0;
-    z-index: 1000;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 1000; 
 }
 
 .App-title {
     font-size: 1.5rem;
-    color: white;
+    color: Black;
     margin: 0;
 }
 
 .App-main {
-    padding: 6rem 3rem 5rem 3rem;
+    padding: 10rem 3rem 5rem 3rem;
 }
 
 /*

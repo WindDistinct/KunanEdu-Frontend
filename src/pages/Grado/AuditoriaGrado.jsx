@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { gradoService } from "../../api/requestApi";
 import Tabla from "../../components/TablaAuditoria";
-import "../../styles/Botones.css";
 
 export default function AuditoriaGrado() {
   const [auditorias, setAuditorias] = useState([]);
@@ -19,11 +18,14 @@ export default function AuditoriaGrado() {
 
   return (
     <div className="container mt-4">
-      <h1 className="mb-4">Auditoría de Grados</h1>
+      <h1 className="text-4xl font-semibold mb-4">Auditoría de Grados</h1>
+
       <button onClick={() => navigate("/")} className="btn btn-secondary mb-3">
         Volver al Menú
       </button>
       <br />
+      <br />
+
       <Tabla
         columnas={[
           { key: "id_audit_grado", label: "ID Auditoría" },

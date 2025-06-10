@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { aulaService } from "../../api/requestApi"
-import Tabla from "../../components/TablaAuditoria";
-import "../../styles/Botones.css";
+import Tabla from "../../components/TablaAuditoria";   
 
 export default function AuditoriaAula() {
   const [auditorias, setAuditorias] = useState([]);
@@ -19,11 +18,12 @@ export default function AuditoriaAula() {
 
   return (
     <div className="container mt-4">
-      <h1 className="mb-4">Auditoría de Aulas</h1>
+    <h1 className="text-4xl font-semibold mb-4">Auditoría de Aulas</h1>
       <button onClick={() => navigate("/")} className="btn btn-secondary mb-3">
         Volver al Menú
       </button>
       <br />
+       <br />
       <Tabla
         columnas={[
           { key: "id_audit_aula", label: "ID Auditoría" },

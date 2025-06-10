@@ -1,10 +1,9 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { empleadoService } from "../../api/requestApi";
-import Tabla from "../../components/Tabla";
+import Tabla from "../../components/Tabla"; // asegúrate de que use estilos DaisyUI también
 import FormularioEmpleado from "./FormularioEmpleado";
 import Notificacion from "../../components/Notificacion";
-import "../../styles/Botones.css";
 
 export default function ListadoEmpleado() {
   const [empleados, setEmpleados] = useState([]);
@@ -19,7 +18,9 @@ export default function ListadoEmpleado() {
   const cargarEmpleados = useCallback(async () => {
     try {
       const data =
-        rol === "administrador" ? await empleadoService.obtenerTodos() : await empleadoService.obtener();
+        rol === "administrador"
+          ? await empleadoService.obtenerTodos()
+          : await empleadoService.obtener();
 
       const empleadosFormateados = data
         .map((empleado) => ({
@@ -27,6 +28,7 @@ export default function ListadoEmpleado() {
           fec_nac: empleado.fec_nac ? empleado.fec_nac.split("T")[0] : "",
         }))
         .sort((a, b) => a.id_emp - b.id_emp);
+
       setEmpleados(empleadosFormateados);
     } catch (error) {
       setMensaje({ tipo: "error", texto: "Error al cargar los empleados" });
@@ -50,7 +52,7 @@ export default function ListadoEmpleado() {
       setMensaje({ tipo: "success", texto: "Empleado eliminado correctamente" });
       await cargarEmpleados();
     } catch (error) {
-      setMensaje({ tipo: "error", texto: error + ": Error al eliminar el empleado" });
+      setMensaje({ tipo: "error", texto: "Error al eliminar el empleado" });
     }
   };
 
@@ -72,41 +74,48 @@ export default function ListadoEmpleado() {
   };
 
   return (
-    <div className="container mt-4">
-      <h1 className="mb-4">
+    <div className="p-4">
+    <h1 className="text-4xl font-semibold mb-4">
         {puedeAdministrar ? "Gestión de Empleado" : "Listado de Empleado"}
       </h1>
 
-      <button onClick={() => navigate("/")} className="btn btn-secondary mb-3">
-        Volver al Menú
+      <button onClick={() => navigate("/")} className="btn btn-secondary mb-4">
+        ← Volver al Menú
       </button>
-      <br />
+  {puedeAdministrar && (
+  <button
+    onClick={() => setMostrarFormulario(true)}
+    className="btn btn-primary mb-4"
+  >
+    ➕ Registrar nuevo Empleado
+  </button>
+)}
+
+{mostrarFormulario && (
+  <dialog id="modalEmpleado" className="modal modal-open">
+    <div className="modal-box w-11/12 max-w-3xl">
+      <h3 className="font-bold text-lg mb-4">
+        {formData ? "Editar Empleado" : "Registrar Nuevo Empleado"}
+      </h3>
+      <FormularioEmpleado onExito={handleExito} initialData={formData} />
+
+      <div className="modal-action">
+        <button
+          className="btn btn-error"
+          onClick={handleCancelar}
+        >
+          Cancelar
+        </button>
+      </div>
+    </div>
+    <form method="dialog" className="modal-backdrop">
+      <button onClick={handleCancelar}>Cerrar</button>
+    </form>
+  </dialog>
+)}
+    <div className="h-12 mb-4">
       <Notificacion mensaje={mensaje?.texto} tipo={mensaje?.tipo} />
-      <br />
-      {mostrarFormulario || formData ? (
-        <div>
-          <FormularioEmpleado onExito={handleExito} initialData={formData} />
-          <div className="d-flex mt-2">
-            <button
-              onClick={handleCancelar}
-              type="button"
-              className="btn btn-danger me-2"
-            >
-              Cancelar Registro
-            </button>
-          </div>
-        </div>
-      ) : (
-        puedeAdministrar && (
-          <button
-            onClick={() => setMostrarFormulario(true)}
-            className="btn btn-primary mb-3"
-          >
-            Registrar nuevo Empleado
-          </button>
-        )
-      )}
-      <br />
+    </div>
       <Tabla
         columnas={[
           { key: "nombre_emp", label: "Nombre" },
@@ -118,7 +127,6 @@ export default function ListadoEmpleado() {
           { key: "especialidad", label: "Especialidad" },
           { key: "cargo", label: "Cargo" },
           { key: "observacion", label: "Observación" },
-
           ...(puedeAdministrar ? [{ key: "estado", label: "Estado" }] : []),
         ]}
         datos={empleados}

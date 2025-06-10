@@ -35,65 +35,76 @@ export default function Tabla({
     return valor;
   };
 
-
   return (
     <>
-      <table className="table table-bordered table-striped table-hover table-sm">
-        <thead className="table-warning">
-          <tr>
-            {columnas.map(({ key, label }) => (
-              <th key={key}>{label}</th>
-            ))}
-            {mostrarAcciones && <th>Acciones</th>}
-          </tr>
-        </thead>
-        <tbody>
-          {datosPaginados.map((item) => (
-            <tr key={item[idKey]}>
-              {columnas.map(({ key }) => (
-                <td key={key}>
-                  {renderValor(key, item[key])}
-                </td>
+      <div   className="overflow-x-auto">
+        <table className="table table-zebra table-sm w-full">
+          <thead className="bg-base-200">
+            <tr>
+              {columnas.map(({ key, label }) => (
+                <th key={key}>{label}</th>
               ))}
-              {mostrarAcciones && (
-                <td>
-                  <button onClick={() => onEditar(item)} className="btn btn-sm btn-warning me-1">
-                    Editar
-                  </button>
-                  <button onClick={() => onEliminar(item[idKey])} className="btn btn-sm btn-danger">
-                    Eliminar
-                  </button>
-                </td>
-              )}
+              {mostrarAcciones && <th>Acciones</th>}
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {datosPaginados.map((item) => (
+              <tr key={item[idKey]}>
+                {columnas.map(({ key }) => (
+                  <td key={key}>{renderValor(key, item[key])}</td>
+                ))}
+                {mostrarAcciones && (
+                  <td className="flex gap-1">
+                    <button
+                      onClick={() => onEditar(item)}
+                      className="btn btn-warning btn-xs"
+                    >
+                      Editar
+                    </button>
+                    <button
+                      onClick={() => onEliminar(item[idKey])}
+                      className="btn btn-error btn-xs"
+                    >
+                      Eliminar
+                    </button>
+                  </td>
+                )}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
-      <nav>
-        <ul className="pagination justify-content-center">
-          <li className={`page-item ${paginaActual === 1 ? "disabled" : ""}`}>
-            <button className="page-link" onClick={() => cambiarPagina(paginaActual - 1)}>
-              Anterior
-            </button>
-          </li>
+      {/* Paginación DaisyUI */}
+      <div className="flex justify-center mt-4">
+        <div className="join">
+          <button
+            className="join-item btn btn-sm"
+            disabled={paginaActual === 1}
+            onClick={() => cambiarPagina(paginaActual - 1)}
+          >
+            «
+          </button>
+
           {[...Array(totalPaginas)].map((_, i) => (
-            <li
+            <button
               key={i + 1}
-              className={`page-item ${paginaActual === i + 1 ? "active" : ""}`}
+              className={`join-item btn btn-sm ${paginaActual === i + 1 ? "btn-active" : ""}`}
+              onClick={() => cambiarPagina(i + 1)}
             >
-              <button className="page-link" onClick={() => cambiarPagina(i + 1)}>
-                {i + 1}
-              </button>
-            </li>
-          ))}
-          <li className={`page-item ${paginaActual === totalPaginas ? "disabled" : ""}`}>
-            <button className="page-link" onClick={() => cambiarPagina(paginaActual + 1)}>
-              Siguiente
+              {i + 1}
             </button>
-          </li>
-        </ul>
-      </nav>
+          ))}
+
+          <button
+            className="join-item btn btn-sm"
+            disabled={paginaActual === totalPaginas}
+            onClick={() => cambiarPagina(paginaActual + 1)}
+          >
+            »
+          </button>
+        </div>
+      </div>
     </>
   );
 }

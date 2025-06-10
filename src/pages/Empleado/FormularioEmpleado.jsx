@@ -1,8 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { empleadoService, usuarioService } from "../../api/requestApi";
-import "../../styles/Botones.css";
-import "../../styles/inputs.css";
-import "../../styles/Notificacion.css";
 
 export default function FormularioEmpleado({ onExito, initialData }) {
   const [form, setForm] = useState({
@@ -49,35 +46,36 @@ export default function FormularioEmpleado({ onExito, initialData }) {
       return () => clearTimeout(timer);
     }
   }, [mensajeExito]);
-
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    let nuevoValor = value;
-    if (type === "checkbox") {
-      nuevoValor = checked;
-    }
+    let nuevoValor = type === "checkbox" ? checked : value;
 
     if (["dni", "telefono"].includes(name)) {
       nuevoValor = value.replace(/\D/g, "");
     }
+
     if (["nombre_emp", "ape_pat_emp", "ape_mat_emp"].includes(name)) {
       nuevoValor = value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, "");
     }
-    if (name === "cargo" && (value === "almacen" || value === "limpieza")) {
+
+    if (name === "cargo") {
+      const sinUsuario = ["almacen", "limpieza"];
       setForm((prev) => ({
         ...prev,
         [name]: nuevoValor,
-        usuario: "",
+        usuario: sinUsuario.includes(nuevoValor) ? "" : "",
       }));
     } else {
       setForm((prev) => ({ ...prev, [name]: nuevoValor }));
     }
   };
+
   const obtenerFechaMaximaNacimiento = () => {
     const hoy = new Date();
     hoy.setFullYear(hoy.getFullYear() - 18);
     return hoy.toISOString().split("T")[0];
   };
+
   const esTextoValido = (texto) =>
     /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/.test(texto.trim());
 
@@ -140,8 +138,8 @@ export default function FormularioEmpleado({ onExito, initialData }) {
     }
 
     try {
-
       if (form.id_emp) {
+        console.log(form)
         await empleadoService.actualizar(form.id_emp, form);
         setMensajeExito("Empleado actualizado con éxito");
         onExito && onExito("Empleado actualizado con éxito");
@@ -164,180 +162,140 @@ export default function FormularioEmpleado({ onExito, initialData }) {
         estado: true,
       });
     } catch (err) {
-      setError(
-        err + ": Error al guardar. Verifique que los datos sean correctos y no estén duplicados."
-      );
+      setError("Error al guardar. Verifique que los datos sean correctos y no estén duplicados.");
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="row g-3">
-      {error && (
-        <div className="alert alert-danger col-12" role="alert">
-          {error}
-        </div>
-      )}
-      {mensajeExito && (
-        <div className="alert alert-success col-12" role="alert">
-          {mensajeExito}
-        </div>
-      )}
-
-      <div className="col-md-6">
-        <input
-          name="nombre_emp"
-          placeholder="Nombres"
-          className="form-control"
-          value={form.nombre_emp}
-          onChange={handleChange}
-        />
+    <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="col-span-2 h-16 relative">
+        {error && (
+          <div className="alert alert-error absolute w-full">
+            <span>{error}</span>
+          </div>
+        )}
+        {mensajeExito && (
+          <div className="alert alert-success absolute w-full">
+            <span>{mensajeExito}</span>
+          </div>
+        )}
       </div>
 
-      <div className="col-md-6">
-        <input
-          name="ape_pat_emp"
-          placeholder="Apellido Paterno"
-          className="form-control"
-          value={form.ape_pat_emp}
-          onChange={handleChange}
-        />
-      </div>
+      <input
+        name="nombre_emp"
+        placeholder="Nombres"
+        className="input input-bordered w-full"
+        value={form.nombre_emp}
+        onChange={handleChange}
+      />
 
-      <div className="col-md-6">
-        <input
-          name="ape_mat_emp"
-          placeholder="Apellido Materno"
-          className="form-control"
-          value={form.ape_mat_emp}
-          onChange={handleChange}
-        />
-      </div>
+      <input
+        name="ape_pat_emp"
+        placeholder="Apellido Paterno"
+        className="input input-bordered w-full"
+        value={form.ape_pat_emp}
+        onChange={handleChange}
+      />
 
-      <div className="col-md-6">
-        <input
-          name="fec_nac"
-          type="date"
-          placeholder="Fecha Nacimiento"
-          className="form-control"
-          value={form.fec_nac}
-          onChange={handleChange}
-          max={obtenerFechaMaximaNacimiento()}
-        />
-      </div>
+      <input
+        name="ape_mat_emp"
+        placeholder="Apellido Materno"
+        className="input input-bordered w-full"
+        value={form.ape_mat_emp}
+        onChange={handleChange}
+      />
 
-      <div className="col-md-6">
-        <select
-          name="cargo"
-          className="form-select"
-          value={form.cargo}
-          onChange={handleChange}
-        >
-          <option value="" disabled>
-            Seleccione cargo
-          </option>
-          <option value="docente">Docente</option>
-          <option value="tutor">Tutor</option>
-          <option value="director">Director</option>
-          <option value="consultor">Consultor</option>
-          <option value="limpieza">Limpieza</option>
-          <option value="almacen">Almacen</option>
+      <input
+        name="fec_nac"
+        type="date"
+        className="input input-bordered w-full"
+        value={form.fec_nac}
+        onChange={handleChange}
+        max={obtenerFechaMaximaNacimiento()}
+      />
 
-        </select>
-      </div>
+      <input
+        name="dni"
+        placeholder="DNI"
+        className="input input-bordered w-full"
+        maxLength={8}
+        value={form.dni}
+        onChange={handleChange}
+        inputMode="numeric"
+      />
 
-      <div className="col-md-6">
-        <input
-          name="dni"
-          placeholder="DNI"
-          className="form-control"
-          value={form.dni}
-          onChange={handleChange}
-          maxLength={8}
-          inputMode="numeric"
-        />
-      </div>
+      <input
+        name="telefono"
+        placeholder="Teléfono"
+        className="input input-bordered w-full"
+        maxLength={9}
+        value={form.telefono}
+        onChange={handleChange}
+        inputMode="numeric"
+      />
 
-      <div className="col-md-6">
-        <input
-          name="telefono"
-          placeholder="Teléfono"
-          className="form-control"
-          value={form.telefono}
-          onChange={handleChange}
-          maxLength={9}
-          inputMode="numeric"
-        />
-      </div>
+      <input
+        name="especialidad"
+        placeholder="Especialidad"
+        className="input input-bordered w-full"
+        value={form.especialidad}
+        onChange={handleChange}
+      />
 
-      <div className="col-md-6">
-        <input
-          name="observacion"
-          placeholder="Observación"
-          className="form-control"
-          value={form.observacion}
-          onChange={handleChange}
-        />
-      </div>
+      <select
+        name="cargo"
+        className="select select-bordered w-full"
+        value={form.cargo}
+        onChange={handleChange}
+      >
+        <option value="" disabled>Seleccione cargo</option>
+        <option value="docente">Docente</option>
+        <option value="tutor">Tutor</option>
+        <option value="director">Director</option>
+        <option value="consultor">Consultor</option>
+        <option value="almacen">Almacén</option>
+        <option value="limpieza">Limpieza</option>
+      </select>
 
-      <div className="col-md-6">
+      {(form.cargo !== "almacen" && form.cargo !== "limpieza") && (
         <select
           name="usuario"
-          className="form-select"
+          className="select select-bordered w-full"
           value={form.usuario}
           onChange={handleChange}
-          disabled={form.cargo === "almacen" || form.cargo === "limpieza"}
         >
-          <option value="" disabled>
-            Seleccione usuario
-          </option>
-          {usuarios.map((usuario) => (
-            <option key={usuario.id_usuario} value={usuario.id_usuario}>
-              {usuario.username}
+          <option value="" disabled>Seleccione usuario</option>
+          {usuarios.map((u) => (
+            <option key={u.id_usuario} value={u.id_usuario}>
+              {u.username}
             </option>
           ))}
         </select>
-      </div>
-
-      <div className="col-md-6">
-        <select
-          name="especialidad"
-          className="form-select"
-          value={form.especialidad}
-          onChange={handleChange}
-        >
-          <option value="" disabled>
-            Seleccione especialidad
-          </option>
-          <option value="ciencias">Ciencias</option>
-          <option value="letras">Letras</option>
-          <option value="matematicas">Matemáticas</option>
-          <option value="mixto">Mixto</option>
-          <option value="aseo">Aseo</option>
-          <option value="supervisor">Supervisor</option>
-        </select>
-      </div>
-
-
-      {initialData && (
-        <div className="col-md-6">
-          <div className="form-check d-flex align-items-center gap-2 mt-2">
-            <input
-              className="form-check-input"
-              type="checkbox"
-              id="estado"
-              name="estado"
-              checked={!!form.estado}
-              onChange={handleChange}
-            />
-            <label className="form-check-label mb-0" htmlFor="estado">
-              Activo
-            </label>
-          </div>
-        </div>
       )}
 
-      <div className="col-12">
-        <button type="submit" className="btn btn-success me-2">
+      <input
+        name="observacion"
+        placeholder="Observación"
+        className="input input-bordered w-full"
+        value={form.observacion}
+        onChange={handleChange}
+      />
+
+      {initialData && (
+        <label className="label cursor-pointer gap-4">
+          <span className="label-text">Activo</span>
+          <input
+            type="checkbox"
+            className="toggle toggle-success"
+            name="estado"
+            checked={!!form.estado}
+            onChange={handleChange}
+          />
+        </label>
+      )}
+
+      <div className="col-span-2">
+        <button type="submit" className="btn btn-success">
           {form.id_emp ? "Actualizar" : "Registrar"} Empleado
         </button>
       </div>

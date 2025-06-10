@@ -1,9 +1,5 @@
-import React from "react";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { alumnoService } from "../../api/requestApi";
-import "../../styles/Botones.css";
-import "../../styles/inputs.css";
-import "../../styles/Notificacion.css";
 
 const fechaMaximaNacimiento = (() => {
   const fecha = new Date();
@@ -138,110 +134,98 @@ export default function FormularioAlumno({ onExito, initialData }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="row g-3">
-      {error && (
-        <div className="alert alert-danger col-12" role="alert">
-          {error}
-        </div>
-      )}
-
-      <div className="col-md-6">
-        <input
-          name="nombre"
-          placeholder="Nombres"
-          className="form-control"
-          value={form.nombre}
-          onChange={handleChange}
-        />
+    <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div className="col-span-2 h-16 relative">
+        {error && (
+          <div className="alert alert-error absolute w-full">
+            <span>{error}</span>
+          </div>
+        )}
+        {mensajeExito && (
+          <div className="alert alert-success absolute w-full">
+            <span>{mensajeExito}</span>
+          </div>
+        )}
       </div>
 
-      <div className="col-md-6">
-        <input
-          name="apellido_paterno"
-          placeholder="Apellido Paterno"
-          className="form-control"
-          value={form.apellido_paterno}
-          onChange={handleChange}
-        />
-      </div>
+      <input
+        name="nombre"
+        placeholder="Nombres"
+        className="input input-bordered w-full"
+        value={form.nombre}
+        onChange={handleChange}
+      />
 
-      <div className="col-md-6">
-        <input
-          name="apellido_materno"
-          placeholder="Apellido Materno"
-          className="form-control"
-          value={form.apellido_materno}
-          onChange={handleChange}
-        />
-      </div>
+      <input
+        name="apellido_paterno"
+        placeholder="Apellido Paterno"
+        className="input input-bordered w-full"
+        value={form.apellido_paterno}
+        onChange={handleChange}
+      />
 
-      <div className="col-md-6">
-        <input
-          name="dni"
-          placeholder="DNI"
-          className="form-control"
-          value={form.dni}
-          onChange={handleChange}
-          maxLength={8}
-          inputMode="numeric"
-          onKeyDown={(e) => e.key === " " && e.preventDefault()}
-        />
-      </div>
+      <input
+        name="apellido_materno"
+        placeholder="Apellido Materno"
+        className="input input-bordered w-full"
+        value={form.apellido_materno}
+        onChange={handleChange}
+      />
 
-      <div className="col-md-6">
-        <input
-          name="telefono"
-          placeholder="Teléfono"
-          className="form-control"
-          value={form.telefono}
-          onChange={handleChange}
-          maxLength={9}
-          inputMode="numeric"
-          onKeyDown={(e) => e.key === " " && e.preventDefault()}
-        />
-      </div>
+      <input
+        name="dni"
+        placeholder="DNI"
+        className="input input-bordered w-full"
+        value={form.dni}
+        onChange={handleChange}
+        maxLength={8}
+        inputMode="numeric"
+        onKeyDown={(e) => e.key === " " && e.preventDefault()}
+      />
 
-      <div className="col-md-6">
-        <input
-          name="direccion"
-          placeholder="Dirección"
-          className="form-control"
-          value={form.direccion}
-          onChange={handleChange}
-        />
-      </div>
+      <input
+        name="telefono"
+        placeholder="Teléfono"
+        className="input input-bordered w-full"
+        value={form.telefono}
+        onChange={handleChange}
+        maxLength={9}
+        inputMode="numeric"
+        onKeyDown={(e) => e.key === " " && e.preventDefault()}
+      />
 
-      <div className="col-md-6">
-        <input
-          name="fecha_nacimiento"
-          type="date"
-          className="form-control"
-          value={form.fecha_nacimiento}
-          onChange={handleChange}
-          max={fechaMaximaNacimiento}
-        />
-      </div>
+      <input
+        name="direccion"
+        placeholder="Dirección"
+        className="input input-bordered w-full"
+        value={form.direccion}
+        onChange={handleChange}
+      />
+
+      <input
+        name="fecha_nacimiento"
+        type="date"
+        className="input input-bordered w-full"
+        value={form.fecha_nacimiento}
+        onChange={handleChange}
+        max={fechaMaximaNacimiento}
+      />
 
       {initialData && (
-        <div className="col-md-6">
-          <div className="form-check d-flex align-items-center gap-2 mt-2">
-            <input
-              className="form-check-input"
-              type="checkbox"
-              id="estado"
-              name="estado"
-              checked={!!form.estado}
-              onChange={handleChange}
-            />
-            <label className="form-check-label mb-0" htmlFor="estado">
-              Activo
-            </label>
-          </div>
-        </div>
+        <label className="label cursor-pointer w-full mt-1">
+          <span className="label-text">Activo</span>
+          <input
+            type="checkbox"
+            name="estado"
+            className="toggle toggle-success"
+            checked={!!form.estado}
+            onChange={handleChange}
+          />
+        </label>
       )}
 
-      <div className="col-12">
-        <button type="submit" className="btn btn-success me-2">
+      <div className="col-span-2 mt-2">
+        <button type="submit" className="btn btn-success">
           {initialData ? "Actualizar" : "Registrar"} Alumno
         </button>
       </div>

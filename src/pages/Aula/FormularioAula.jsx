@@ -1,8 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { aulaService } from "../../api/requestApi";
-import '../../styles/Botones.css';
-import '../../styles/inputs.css';
-import '../../styles/Notificacion.css';
 
 export default function FormularioAula({ onExito, initialData }) {
   const [form, setForm] = useState({
@@ -96,43 +93,46 @@ export default function FormularioAula({ onExito, initialData }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="row g-3">
-      {error && (
-        <div className="alert alert-danger col-12" role="alert">
-          {error}
-        </div>
-      )}
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="col-span-2 h-16 relative">
+        {error && (
+          <div className="alert alert-error absolute w-full">
+            <span>{error}</span>
+          </div>
+        )}
+        {mensajeExito && (
+          <div className="alert alert-success absolute w-full">
+            <span>{mensajeExito}</span>
+          </div>
+        )}
+      </div>
 
-      <div className="col-md-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <input
           name="numero_aula"
           placeholder="Número de Aula"
-          className="form-control"
+          className="input input-bordered w-full"
           value={form.numero_aula}
           onChange={handleChange}
           maxLength={3}
           inputMode="numeric"
           onKeyDown={(e) => e.key === " " && e.preventDefault()}
         />
-      </div>
 
-      <div className="col-md-6">
         <input
           name="aforo"
           placeholder="Aforo"
-          className="form-control"
+          className="input input-bordered w-full"
           value={form.aforo}
           onChange={handleChange}
           maxLength={3}
           inputMode="numeric"
           onKeyDown={(e) => e.key === " " && e.preventDefault()}
         />
-      </div>
 
-      <div className="col-md-6">
         <select
           name="ubicacion"
-          className="form-select"
+          className="select select-bordered w-full"
           value={form.ubicacion}
           onChange={handleChange}
         >
@@ -143,28 +143,23 @@ export default function FormularioAula({ onExito, initialData }) {
           <option value="Segundo Piso">Segundo Piso</option>
           <option value="Tercer Piso">Tercer Piso</option>
         </select>
-      </div>
 
-      {initialData && (
-        <div className="col-md-6">
-          <div className="form-check d-flex align-items-center gap-2 mt-2">
+        {initialData && (
+          <label className="label cursor-pointer gap-4">
+            <span className="label-text">Activo</span>
             <input
-              className="form-check-input"
               type="checkbox"
-              id="estado"
+              className="toggle toggle-success"
               name="estado"
               checked={!!form.estado}
               onChange={handleChange}
             />
-            <label className="form-check-label mb-0" htmlFor="estado">
-              Activo
-            </label>
-          </div>
-        </div>
-      )}
+          </label>
+        )}
+      </div>
 
-      <div className="col-12">
-        <button type="submit" className="btn btn-success me-2">
+      <div>
+        <button type="submit" className="btn btn-success">
           {form.id_aula ? "Actualizar" : "Registrar"} Aula
         </button>
       </div>
