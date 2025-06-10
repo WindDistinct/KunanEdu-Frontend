@@ -15,6 +15,8 @@ export default function MenuPrincipal() {
     { path: "/periodos", nombre: "Periodos" },
     { path: "/cursos", nombre: "Cursos" },
     { path: "/seccion", nombre: "Sección" },
+    { path: "/curso_grado", nombre: "CursoGrado" },
+
   ];
 
   return (
