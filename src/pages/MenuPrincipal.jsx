@@ -6,24 +6,43 @@ export default function MenuPrincipal() {
   const puedeVerAuditoria = rol === "auditor";
   const puedeVerMantenimientos = ["usuario", "administrador", "profesor"].includes(rol);
 
-  const menuItems = [
+  const menuItemsEstaticos=[
+    { path: "/usuarios", nombre: "Usuarios" }, 
     { path: "/aulas", nombre: "Aulas" },
-    { path: "/alumnos", nombre: "Alumnos" },
-    { path: "/empleados", nombre: "Empleados" },
     { path: "/grados", nombre: "Grados" },
-    { path: "/usuarios", nombre: "Usuarios" },
+    { path: "/cursos", nombre: "Cursos" },  
     { path: "/periodos", nombre: "Periodos" },
-    { path: "/cursos", nombre: "Cursos" },
-    { path: "/seccion", nombre: "Sección" },
+     { path: "/alumnos", nombre: "Alumnos" },
+  ]
+  const menuItems = [ 
     { path: "/curso_grado", nombre: "CursoGrado" },
+    { path: "/empleados", nombre: "Empleados" }, 
+    { path: "/seccion", nombre: "Sección" },
+    { path: "/matricula", nombre: "Matricula" },
 
   ];
 
   return (
     <div className="p-8 max-w-4xl mx-auto space-y-6">
+       {puedeVerMantenimientos && (
+        <section>
+         <h1 className="text-4xl font-semibold mb-4">  Entidades Simples</h1>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            {menuItemsEstaticos.map(({ path, nombre }) => (
+              <Link
+                key={path}
+                to={path}
+                className="btn btn-secondary btn-outline w-full"
+              >
+                {rol === "administrador" ? `Gestionar ${nombre}` : `Listar ${nombre}`}
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
       {puedeVerMantenimientos && (
         <section>
-         <h1 className="text-4xl font-semibold mb-4">  Entidades</h1>
+         <h1 className="text-4xl font-semibold mb-4">  Entidades Compuestas</h1>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             {menuItems.map(({ path, nombre }) => (
               <Link

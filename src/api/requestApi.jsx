@@ -31,9 +31,11 @@ const empleadoService = {
 const cursoService = createApiService("curso");
 const aulaService = createApiService("aula");
 const cursoGradoService  = createApiService("curso_grado");
+const matriculaService  = createApiService("matricula");
+
 
 const examenService = {
   obtenerNotasporAlumno: (id) => axiosInstance.get(`/api/examen/notas-alum/${idAlumno}`).then(r => r.data)
 }
 
-export { examenService, aulaService, cursoGradoService,usuarioService, alumnoService, seccionService, gradoService, periodoService, empleadoService, cursoService };
+export { examenService, aulaService,matriculaService, cursoGradoService,usuarioService, alumnoService, seccionService, gradoService, periodoService, empleadoService, cursoService };

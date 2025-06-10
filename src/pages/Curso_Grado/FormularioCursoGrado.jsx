@@ -72,6 +72,7 @@ export default function FormularioCursoGrado({ onExito, initialData }) {
 
     try {
       if (form.id_curso_grado) { 
+        console.log(datos)
         await cursoGradoService.actualizar(form.id_curso_grado, datos);
         setMensajeExito("Curso-Grado actualizado con éxito");
         onExito("Curso-Grado actualizado con éxito");
