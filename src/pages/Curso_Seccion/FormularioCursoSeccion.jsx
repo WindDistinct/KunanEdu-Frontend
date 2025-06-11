@@ -1,102 +1,93 @@
 import React, { useEffect, useState } from "react";
 import {
+  cursoGradoService,
   cursoSeccionService,
-  cursoService,
-  seccionService,
   empleadoService,
   periodoService,
 } from "../../api/requestApi";
 
-export default function FormularioCursoSeccion({ onExito, initialData }) {
-  const [form, setForm] = useState({
-    curso: "",
-    seccion: "",
-    docente: "",
-    estado: true,
-  });
-
-  const [cursos, setCursos] = useState([]);
-  const [docentes, setDocentes] = useState([]);
+export default function FormularioCursoSeccion({ onExito }) {
   const [periodos, setPeriodos] = useState([]);
   const [secciones, setSecciones] = useState([]);
-  const [periodoSeleccionado, setPeriodoSeleccionado] = useState("");
+  const [docentes, setDocentes] = useState([]);
+  const [cursosDelGrado, setCursosDelGrado] = useState([]);
 
-  const [error, setError] = useState(null);
+  const [periodoSeleccionado, setPeriodoSeleccionado] = useState("");
+  const [seccionSeleccionada, setSeccionSeleccionada] = useState("");
+  const [gradoSeccion, setGradoSeccion] = useState("");
+
+  const [seleccionDocentes, setSeleccionDocentes] = useState({});
   const [mensajeExito, setMensajeExito] = useState(null);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-     
-    const cargarDatosIniciales = async () => {
+    const cargarIniciales = async () => {
       try {
-        const [cursosData, docentesData, periodosData] = await Promise.all([
-          cursoService.obtener(),
-          empleadoService.obtenerDocentes(),
+        const [periodosData, docentesData] = await Promise.all([
           periodoService.obtener(),
+          empleadoService.obtenerDocentes(),
         ]);
-
-        setCursos(cursosData);
-        setDocentes(docentesData);
         setPeriodos(periodosData);
-
-        if (initialData) {
-             console.log("initialData recibido:", initialData);
-          setForm({
-            curso: initialData.curso,
-            seccion: initialData.seccion,
-            docente: initialData.docente,
-            estado: initialData.estado,
-          });
-
-          for (const periodo of periodosData) {
-            const seccionesData = await periodoService.obtenerSeccionesPeriodo(periodo.id_periodo);
-            const seccionEncontrada = seccionesData.find(
-              (s) => s.id_seccion === initialData.seccion
-            );
-            if (seccionEncontrada) {
-              setPeriodoSeleccionado(periodo.id_periodo);
-              setSecciones(seccionesData);
-              break;
-            }
-          }
-        }
+        setDocentes(docentesData);
       } catch {
-        setError("Error al cargar los datos iniciales");
+        setError("Error al cargar datos iniciales.");
       }
     };
-
-    cargarDatosIniciales();
-  }, [initialData]);
-
-  useEffect(() => {
-    if (mensajeExito) {
-      const timer = setTimeout(() => setMensajeExito(null), 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [mensajeExito]);
+    cargarIniciales();
+  }, []);
 
   const handlePeriodoChange = async (e) => {
-    const nuevoPeriodo = e.target.value;
-    setPeriodoSeleccionado(nuevoPeriodo);
-    setForm((prev) => ({ ...prev, seccion: "" }));
-
+    const idPeriodo = e.target.value;
+    setPeriodoSeleccionado(idPeriodo);
+    setSeccionSeleccionada("");
+    setCursosDelGrado([]);
+    setSeleccionDocentes({});
     try {
-      const nuevasSecciones = await periodoService.obtenerSeccionesPeriodo(nuevoPeriodo);
-      setSecciones(nuevasSecciones);
+      const seccionesData = await periodoService.obtenerSeccionesPeriodo(idPeriodo);
+      setSecciones(seccionesData);
     } catch {
-      setError("Error al cargar las secciones del período");
+      setError("Error al cargar secciones del periodo.");
     }
   };
 
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    const nuevoValor = type === "checkbox" ? checked : value;
-    setForm((prev) => ({ ...prev, [name]: nuevoValor }));
+  const handleSeccionChange = async (e) => {
+    const idSeccion = e.target.value;
+    setError("");
+    setSeccionSeleccionada(idSeccion);
+    setSeleccionDocentes({});
+    try {
+      const seccion = secciones.find((s) => s.id_seccion === parseInt(idSeccion));
+      setGradoSeccion(seccion.id_grado); 
+      const cursosData = await cursoGradoService.obtenerCursosPorGrado(seccion.id_grado); // debe ser tu método para traer cursos de un grado
+      if (!cursosData.length) {
+        setCursosDelGrado([]);
+        setSeleccionDocentes({});
+        return setError("No hay cursos asignados al grado al que pertenece esta sección.");
+      }   
+    setCursosDelGrado(cursosData); 
+      // inicializamos el estado de selección de docentes
+      const inicialDocentes = {};
+      cursosData.forEach((c) => {
+        inicialDocentes[c.id_curso] = "";
+      });
+      setSeleccionDocentes(inicialDocentes);
+    } catch {
+      setError("Error al obtener cursos por grado.");
+    }
+  };
+
+  const handleDocenteChange = (idCurso, idDocente) => {
+    setSeleccionDocentes((prev) => ({
+      ...prev,
+      [idCurso]: idDocente,
+    }));
   };
 
   const validarFormulario = () => {
-    const { curso, seccion, docente } = form;
-    if (!curso || !seccion || !docente) {
-      return "Todos los campos son obligatorios";
+    for (const idCurso of Object.keys(seleccionDocentes)) {
+      if (!seleccionDocentes[idCurso]) {
+        return "Debe seleccionar un docente para cada curso.";
+      }
     }
     return null;
   };
@@ -111,136 +102,88 @@ export default function FormularioCursoSeccion({ onExito, initialData }) {
       return;
     }
 
-    const datos = {
-      curso: parseInt(form.curso),
-      seccion: parseInt(form.seccion),
-      docente: parseInt(form.docente),
-      ...(initialData && { estado: form.estado }),
-    }; 
-    try {
-      if (initialData?.id_curso_seccion) {
-        await cursoSeccionService.actualizar(initialData.id_curso_seccion, datos);
-        setMensajeExito("Relación actualizada correctamente");
-        onExito("Relación actualizada correctamente");
-      } else {
-        await cursoSeccionService.crear(datos);
-        setMensajeExito("Relación registrada correctamente");
-        onExito("Relación registrada correctamente");
-      }
+    const payload = Object.entries(seleccionDocentes).map(([idCurso, idDocente]) => ({
+      curso: parseInt(idCurso),
+      seccion: parseInt(seccionSeleccionada),
+      docente: parseInt(idDocente),
+    }));
 
-      setForm({
-        curso: "",
-        seccion: "",
-        docente: "",
-        estado: true,
-      });
-      setPeriodoSeleccionado("");
-      setSecciones([]);
-    } catch (err) {
-      setError("Error al guardar. Verifique si ya existe esta relación.");
+    try {
+      console.log(payload)
+      await cursoSeccionService.envioListaCursosYdocentes(payload);
+      setMensajeExito("Cursos asignados correctamente.");
+      setSeleccionDocentes({});
+      setCursosDelGrado([]);
+      setSeccionSeleccionada("");
+    } catch {
+      setError("Error al registrar las asignaciones. Verifique duplicados.");
     }
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="col-span-2 h-16 relative">
-        {error && (
-          <div className="alert alert-error absolute w-full">
-            <span>{error}</span>
-          </div>
-        )}
-        {mensajeExito && (
-          <div className="alert alert-success absolute w-full">
-            <span>{mensajeExito}</span>
-          </div>
-        )}
-      </div>
+      {error && <div className="alert alert-error">{error}</div>}
+      {mensajeExito && <div className="alert alert-success">{mensajeExito}</div>}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        
-        <select
-          className="select select-bordered w-full"
-          value={periodoSeleccionado}
-          onChange={handlePeriodoChange}
-        >
-          <option value="" disabled>
-            Seleccionar Periodo Escolar
+      {/* Periodo */}
+      <select
+        className="select select-bordered w-full"
+        value={periodoSeleccionado}
+        onChange={handlePeriodoChange}
+      >
+        <option value="" disabled>Seleccionar Periodo Escolar</option>
+        {periodos.map((p) => (
+          <option key={p.id_periodo} value={p.id_periodo}>
+            {p.descripcion} {p.anio}
           </option>
-          {periodos.map((p) => (
-            <option key={p.id_periodo} value={p.id_periodo}>
-              {p.descripcion} {p.anio}
-            </option>
-          ))}
-        </select>
- 
-        <select
-          name="curso"
-          className="select select-bordered w-full"
-          value={form.curso}
-          onChange={handleChange}
-        >
-          <option value="" disabled>
-            Seleccionar Curso
-          </option>
-          {cursos.map((c) => (
-            <option key={c.id_curso} value={c.id_curso}>
-              {c.nombre_curso}
-            </option>
-          ))}
-        </select>
+        ))}
+      </select>
 
-        {/* Sección */}
-        <select
-          name="seccion"
-          className="select select-bordered w-full"
-          value={form.seccion}
-          onChange={handleChange}
-        >
-          <option value="" disabled>
-            {secciones.length > 0 ? "Seleccionar Sección" : "No hay secciones disponibles"}
+      {/* Sección */}
+      <select
+        className="select select-bordered w-full"
+        value={seccionSeleccionada}
+        onChange={handleSeccionChange}
+        disabled={!periodoSeleccionado}
+      >
+        <option value="" disabled>Seleccionar Sección</option>
+        {secciones.map((s) => (
+          <option key={s.id_seccion} value={s.id_seccion}>
+            {s.nombre} - {s.grado} - {s.aula}
           </option>
-          {secciones.map((s) => (
-            <option key={s.id_seccion} value={s.id_seccion}>
-              {s.nombre} - {s.grado} - {s.aula}
-            </option>
-          ))}
-        </select>
- 
-        <select
-          name="docente"
-          className="select select-bordered w-full"
-          value={form.docente}
-          onChange={handleChange}
-        >
-          <option value="" disabled>
-            Seleccionar Docente
-          </option>
-          {docentes.map((d) => (
-            <option key={d.id_emp} value={d.id_emp}>
-              {d.nombre_completo} - {d.especialidad}
-            </option>
-          ))}
-        </select>
- 
-        {initialData && (
-          <label className="label cursor-pointer gap-4">
-            <span className="label-text">Activo</span>
-            <input
-              type="checkbox"
-              className="toggle toggle-success"
-              name="estado"
-              checked={!!form.estado}
-              onChange={handleChange}
-            />
-          </label>
-        )}
-      </div>
+        ))}
+      </select>
 
-      <div>
-        <button type="submit" className="btn btn-success">
-          {initialData ? "Actualizar" : "Registrar"} Curso Sección
-        </button>
-      </div>
+      {/* Cursos del grado con select de docentes */}
+      {cursosDelGrado.length > 0 && (
+        <div className="grid gap-4">
+          {cursosDelGrado.map((curso) => (
+            <div key={curso.id_curso} className="flex items-center gap-4">
+              <span className="w-1/2">{curso.curso}</span>
+              <select
+                className="select select-bordered w-1/2"
+                value={seleccionDocentes[curso.id_curso] || ""}
+                onChange={(e) => handleDocenteChange(curso.id_curso, e.target.value)}
+              >
+                <option value="">Seleccionar Docente</option>
+                {docentes.map((d) => (
+                  <option key={d.id_emp} value={d.id_emp}>
+                    {d.nombre_completo} - {d.especialidad}
+                  </option>
+                ))}
+              </select>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <button
+        type="submit"
+        className="btn btn-success mt-4"
+        disabled={cursosDelGrado.length === 0}
+      >
+        Registrar Asignación
+      </button>
     </form>
   );
 }

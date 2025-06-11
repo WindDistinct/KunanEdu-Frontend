@@ -32,9 +32,16 @@ const empleadoService = {
   obtenerDocentes: () => axiosInstance.get(`/api/empleado/all-docente`).then(r => r.data)
 };
 const cursoService = createApiService("curso");
-const aulaService = createApiService("aula");
-const cursoGradoService  = createApiService("curso_grado");
-const cursoSeccionService  = createApiService("curso_seccion");
+const aulaService = createApiService("aula"); 
+const cursoGradoService = {
+  ...createApiService("curso_grado"),
+  obtenerCursosPorGrado: (idGrado) => axiosInstance.get(`/api/curso_grado/cursos/${idGrado}`).then(r => r.data)
+}; 
+ 
+const cursoSeccionService = {
+  ...createApiService("curso_seccion"),
+  envioListaCursosYdocentes: (data) => axiosInstance.post(`/api/curso_seccion/multiple`,data).then(r => r.data)
+}; 
 const matriculaService  = createApiService("matricula");
 
 
