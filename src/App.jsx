@@ -28,6 +28,8 @@ import ListadoCursoGrado from "./pages/Curso_Grado/ListadoCursoGrado";
 import AuditoriaCursoGrado from "./pages/Curso_Grado/AuditoriaCursoGrado";
 import ListadoMatricula from "./pages/Matricula/ListadoMatricula";
 import AuditoriaMatricula from "./pages/Matricula/AuditoriaMatricula";
+import ListadoCursoSeccion from "./pages/Curso_Seccion/ListadoCursoSeccion";
+import AuditoriaCursoSeccion from "./pages/Curso_Seccion/AuditoriaCursoSeccion";
 
 
 function App() {
@@ -55,6 +57,8 @@ function App() {
               <Route path="/seccion" element={<ListadoSeccion />} />
               <Route path="/curso_grado" element={<ListadoCursoGrado />} />
               <Route path="/matricula" element={<ListadoMatricula />} />
+              <Route path="/curso_seccion" element={<ListadoCursoSeccion />} />
+
 
 
               <Route path="/auditoria/aulas" element={<AuditoriaAula />} />
@@ -67,6 +71,8 @@ function App() {
               <Route path="/auditoria/seccion" element={<AuditoriaSeccion />} />
               <Route path="/auditoria/curso_grado" element={<AuditoriaCursoGrado />} />
               <Route path="/auditoria/matricula" element={<AuditoriaMatricula />} />
+              <Route path="/auditoria/curso_seccion" element={<AuditoriaCursoSeccion />} />
+
  
 
             </Routes>

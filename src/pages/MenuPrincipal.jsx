@@ -19,6 +19,7 @@ export default function MenuPrincipal() {
     { path: "/empleados", nombre: "Empleados" }, 
     { path: "/seccion", nombre: "Sección" },
     { path: "/matricula", nombre: "Matricula" },
+    { path: "/curso_seccion", nombre: "CursoSeccion" },
 
   ];
 

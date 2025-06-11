@@ -1,55 +1,66 @@
 import React, { useEffect, useState } from "react";
 import {
-  alumnoService,
+  cursoSeccionService,
+  cursoService,
   seccionService,
-  matriculaService,
+  empleadoService,
   periodoService,
 } from "../../api/requestApi";
 
-export default function FormularioMatricula({ onExito, initialData }) {
+export default function FormularioCursoSeccion({ onExito, initialData }) {
   const [form, setForm] = useState({
-    alumno: "",
+    curso: "",
     seccion: "",
-    condicion: "",
-    observacion: "",
+    docente: "",
     estado: true,
   });
 
-  const [alumnos, setAlumnos] = useState([]);
-  const [secciones, setSecciones] = useState([]);
+  const [cursos, setCursos] = useState([]);
+  const [docentes, setDocentes] = useState([]);
   const [periodos, setPeriodos] = useState([]);
+  const [secciones, setSecciones] = useState([]);
   const [periodoSeleccionado, setPeriodoSeleccionado] = useState("");
+
   const [error, setError] = useState(null);
   const [mensajeExito, setMensajeExito] = useState(null);
 
   useEffect(() => {
+     
     const cargarDatosIniciales = async () => {
       try {
-        const alumnosData = await alumnoService.obtener();
-        const periodosData = await periodoService.obtener();
-        setAlumnos(alumnosData);
+        const [cursosData, docentesData, periodosData] = await Promise.all([
+          cursoService.obtener(),
+          empleadoService.obtenerDocentes(),
+          periodoService.obtener(),
+        ]);
+
+        setCursos(cursosData);
+        setDocentes(docentesData);
         setPeriodos(periodosData);
 
         if (initialData) {
-          setForm(initialData);
+             console.log("initialData recibido:", initialData);
+          setForm({
+            curso: initialData.curso,
+            seccion: initialData.seccion,
+            docente: initialData.docente,
+            estado: initialData.estado,
+          });
 
-          // Encontrar el periodo al que pertenece la sección actual
           for (const periodo of periodosData) {
-            const seccionesData = await periodoService.obtenerSeccionesPeriodo(
-              periodo.id_periodo
-            );
+            const seccionesData = await periodoService.obtenerSeccionesPeriodo(periodo.id_periodo);
             const seccionEncontrada = seccionesData.find(
               (s) => s.id_seccion === initialData.seccion
             );
             if (seccionEncontrada) {
               setPeriodoSeleccionado(periodo.id_periodo);
-              setSecciones([seccionEncontrada]); // Solo la sección actual
+              setSecciones(seccionesData);
               break;
             }
           }
         }
-      } catch (e) {
-        setError("Error al cargar datos del formulario");
+      } catch {
+        setError("Error al cargar los datos iniciales");
       }
     };
 
@@ -63,12 +74,6 @@ export default function FormularioMatricula({ onExito, initialData }) {
     }
   }, [mensajeExito]);
 
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    const nuevoValor = type === "checkbox" ? checked : value.trimStart();
-    setForm((prev) => ({ ...prev, [name]: nuevoValor }));
-  };
-
   const handlePeriodoChange = async (e) => {
     const nuevoPeriodo = e.target.value;
     setPeriodoSeleccionado(nuevoPeriodo);
@@ -78,13 +83,19 @@ export default function FormularioMatricula({ onExito, initialData }) {
       const nuevasSecciones = await periodoService.obtenerSeccionesPeriodo(nuevoPeriodo);
       setSecciones(nuevasSecciones);
     } catch {
-      setError("Error al cargar secciones del periodo");
+      setError("Error al cargar las secciones del período");
     }
   };
 
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    const nuevoValor = type === "checkbox" ? checked : value;
+    setForm((prev) => ({ ...prev, [name]: nuevoValor }));
+  };
+
   const validarFormulario = () => {
-    const { alumno, seccion, condicion } = form;
-    if (!alumno || !seccion || !condicion) {
+    const { curso, seccion, docente } = form;
+    if (!curso || !seccion || !docente) {
       return "Todos los campos son obligatorios";
     }
     return null;
@@ -101,35 +112,32 @@ export default function FormularioMatricula({ onExito, initialData }) {
     }
 
     const datos = {
-      alumno: parseInt(form.alumno),
-      seccion: form.seccion ? parseInt(form.seccion) : null,
-      condicion: form.condicion,
-      observacion: form.observacion || null,
+      curso: parseInt(form.curso),
+      seccion: parseInt(form.seccion),
+      docente: parseInt(form.docente),
       ...(initialData && { estado: form.estado }),
-    };
-
+    }; 
     try {
-      if (form.id_matricula) {
-        await matriculaService.actualizar(form.id_matricula, datos);
-        setMensajeExito("Matrícula actualizada con éxito");
-        onExito("Matrícula actualizada con éxito");
+      if (initialData?.id_curso_seccion) {
+        await cursoSeccionService.actualizar(initialData.id_curso_seccion, datos);
+        setMensajeExito("Relación actualizada correctamente");
+        onExito("Relación actualizada correctamente");
       } else {
-        await matriculaService.crear(datos);
-        setMensajeExito("Matrícula registrada con éxito");
-        onExito("Matrícula registrada con éxito");
+        await cursoSeccionService.crear(datos);
+        setMensajeExito("Relación registrada correctamente");
+        onExito("Relación registrada correctamente");
       }
 
       setForm({
-        alumno: "",
+        curso: "",
         seccion: "",
-        condicion: "",
-        observacion: "",
+        docente: "",
         estado: true,
       });
       setPeriodoSeleccionado("");
       setSecciones([]);
     } catch (err) {
-      setError("Error al guardar. Verifique que el alumno no este matriculado en la misma seccion o en el mismo periodo");
+      setError("Error al guardar. Verifique si ya existe esta relación.");
     }
   };
 
@@ -149,7 +157,7 @@ export default function FormularioMatricula({ onExito, initialData }) {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Selección de periodo visible SIEMPRE */}
+        
         <select
           className="select select-bordered w-full"
           value={periodoSeleccionado}
@@ -164,20 +172,19 @@ export default function FormularioMatricula({ onExito, initialData }) {
             </option>
           ))}
         </select>
-
-        {/* Alumno */}
+ 
         <select
-          name="alumno"
+          name="curso"
           className="select select-bordered w-full"
-          value={form.alumno}
+          value={form.curso}
           onChange={handleChange}
         >
           <option value="" disabled>
-            Seleccionar Alumno
+            Seleccionar Curso
           </option>
-          {alumnos.map((a) => (
-            <option key={a.id_alumno} value={a.id_alumno}>
-              {a.nombre} {a.apellido_paterno} {a.apellido_materno}
+          {cursos.map((c) => (
+            <option key={c.id_curso} value={c.id_curso}>
+              {c.nombre_curso}
             </option>
           ))}
         </select>
@@ -190,7 +197,7 @@ export default function FormularioMatricula({ onExito, initialData }) {
           onChange={handleChange}
         >
           <option value="" disabled>
-            {secciones.length > 0 ? "Elige una sección" : "No hay secciones disponibles"}
+            {secciones.length > 0 ? "Seleccionar Sección" : "No hay secciones disponibles"}
           </option>
           {secciones.map((s) => (
             <option key={s.id_seccion} value={s.id_seccion}>
@@ -198,25 +205,23 @@ export default function FormularioMatricula({ onExito, initialData }) {
             </option>
           ))}
         </select>
-
-        {/* Condición */}
+ 
         <select
-          name="condicion"
+          name="docente"
           className="select select-bordered w-full"
-          value={form.condicion}
+          value={form.docente}
           onChange={handleChange}
         >
           <option value="" disabled>
-            Seleccionar Condición
+            Seleccionar Docente
           </option>
-          <option value="Reservado">Reservado</option>
-          <option value="Matriculado">Matriculado</option>
-          <option value="Por cancelar">Por cancelar</option>
-          <option value="Retirado">Retirado</option>
-          <option value="Condicional">Condicional</option>
+          {docentes.map((d) => (
+            <option key={d.id_emp} value={d.id_emp}>
+              {d.nombre_completo} - {d.especialidad}
+            </option>
+          ))}
         </select>
-
-        {/* Estado */}
+ 
         {initialData && (
           <label className="label cursor-pointer gap-4">
             <span className="label-text">Activo</span>
@@ -231,22 +236,9 @@ export default function FormularioMatricula({ onExito, initialData }) {
         )}
       </div>
 
-      {/* Observación */}
-      <div>
-        <textarea
-          name="observacion"
-          className="textarea textarea-bordered w-full"
-          rows={3}
-          placeholder="Observación (opcional)"
-         value={form.observacion || ""}
-          onChange={handleChange}
-        />
-      </div>
-
-      {/* Botón */}
       <div>
         <button type="submit" className="btn btn-success">
-          {form.id_matricula ? "Actualizar" : "Registrar"} Matrícula
+          {initialData ? "Actualizar" : "Registrar"} Curso Sección
         </button>
       </div>
     </form>
