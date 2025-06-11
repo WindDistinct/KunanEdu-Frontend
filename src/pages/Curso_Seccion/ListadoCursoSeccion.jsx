@@ -123,7 +123,7 @@ export default function ListadoCursoSeccion() {
           ...(puedeAdministrar ? [{ key: "estado", label: "Estado" }] : []),
         ]}
         datos={lista}
-        onEditar={handleEditar}
+        //onEditar={handleEditar}
         onEliminar={handleEliminar}
         idKey="id_curso_seccion"
         mostrarAcciones={puedeAdministrar}

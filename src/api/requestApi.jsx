@@ -40,6 +40,7 @@ const cursoGradoService = {
  
 const cursoSeccionService = {
   ...createApiService("curso_seccion"),
+  verificarCursosAsignados: (id) => axiosInstance.get(`/api/curso_seccion/verificar-asig/${id}`).then(r => r.data),
   envioListaCursosYdocentes: (data) => axiosInstance.post(`/api/curso_seccion/multiple`,data).then(r => r.data)
 }; 
 const matriculaService  = createApiService("matricula");
