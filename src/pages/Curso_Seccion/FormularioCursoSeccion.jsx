@@ -21,20 +21,22 @@ export default function FormularioCursoSeccion({ onExito, initialData }) {
   const [seleccionDocentes, setSeleccionDocentes] = useState({});
   const [mensajeExito, setMensajeExito] = useState(null);
   const [error, setError] = useState(null);
+    const [estado, setEstado] = useState(true); 
   const esEdicion = !!initialData;
 
   useEffect(() => {
     const cargarIniciales = async () => {
       try {
         const docentesData = await empleadoService.obtenerDocentes();
-        setDocentes(docentesData);
-console.log(initialData)
+        setDocentes(docentesData); 
         if (esEdicion) { 
            setCursoActual({
           id_curso: initialData.id_curso,
-          nombre_curso: `Curso ID ${initialData.id_curso}` // puedes personalizarlo si tienes el nombre
+          nombre_curso: `Curso:  ${initialData.nombre_curso}`  
            });
           setSeleccionDocentes({ [initialData.curso]: initialData.docente });
+            setEstado(initialData.estado);
+       
         } else {
           const periodosData = await periodoService.obtener();
           setPeriodos(periodosData);
@@ -116,15 +118,28 @@ console.log(initialData)
     const errorValidacion = validarFormulario();
     if (errorValidacion) return setError(errorValidacion);
 
-    const payload = Object.entries(seleccionDocentes).map(([idCurso, idDocente]) => ({
-      curso: parseInt(idCurso),
-      seccion: esEdicion ? initialData.seccion : parseInt(seccionSeleccionada),
-      docente: parseInt(idDocente),
-    }));
+   
 
     try {
-      await cursoSeccionService.envioListaCursosYdocentes(payload);
-      setMensajeExito("Registro exitoso.");
+      if(esEdicion){   
+        const payload = {
+          curso: parseInt(initialData.curso),
+          seccion: parseInt(initialData.seccion),
+          estado: estado,
+          docente: parseInt(seleccionDocentes[initialData.curso]),
+        };
+        await cursoSeccionService.actualizar(initialData.id_curso_seccion,payload)
+      }else{
+
+         const payload = Object.entries(seleccionDocentes).map(([idCurso, idDocente]) => ({
+          curso: parseInt(idCurso),
+          seccion: esEdicion ? initialData.seccion : parseInt(seccionSeleccionada),
+          docente: parseInt(idDocente),
+        }));
+        await cursoSeccionService.envioListaCursosYdocentes(payload);
+        setMensajeExito("Registro exitoso.");
+      }
+     
       onExito("Operación completada con éxito");
     } catch {
       setError("Error al registrar la información.");
@@ -168,8 +183,7 @@ console.log(initialData)
           </select>
         </>
       )}
-
-      {/* Cursos y docentes */}
+ 
       {esEdicion ? (
         <div className="flex items-center gap-4">
           <span className="font-semibold">{cursoActual?.nombre_curso}</span>
@@ -208,6 +222,17 @@ console.log(initialData)
             ))}
           </div>
         )
+      )}
+      {esEdicion && (
+        <label className="label cursor-pointer gap-4">
+          <span className="label-text">Activo</span>
+          <input
+            type="checkbox"
+            className="toggle toggle-success"
+            checked={estado}
+            onChange={(e) => setEstado(e.target.checked)}
+          />
+        </label>
       )}
 
       <button type="submit" className="btn btn-primary">

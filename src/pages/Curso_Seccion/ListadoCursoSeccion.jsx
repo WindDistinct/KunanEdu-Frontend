@@ -53,11 +53,13 @@ export default function ListadoCursoSeccion() {
     const formateado = {
       ...item,
       curso: item.id_curso,
+      nombre_curso:item.curso,
       seccion: item.id_seccion,
+      estado:item.estado,
       docente: item.id_emp,
     };
     setFormData(formateado);
-    setMostrarFormulario(true);
+    setMostrarFormulario(true); 
   };
 
   const handleExito = async (texto) => {
@@ -95,7 +97,7 @@ export default function ListadoCursoSeccion() {
         <dialog id="modalCS" className="modal modal-open">
           <div className="modal-box w-11/12 max-w-3xl">
             <h3 className="font-bold text-lg mb-4">
-              {formData ? "Editar Relación Curso-Sección" : "Registrar Nueva Relación"}
+              {formData ? "Editar Profesor" : "Registrar Nueva Relación"}
             </h3>
             <FormularioCursoSeccion onExito={handleExito} initialData={formData} />
 
@@ -123,7 +125,7 @@ export default function ListadoCursoSeccion() {
           ...(puedeAdministrar ? [{ key: "estado", label: "Estado" }] : []),
         ]}
         datos={lista}
-        //onEditar={handleEditar}
+        onEditar={handleEditar}
         onEliminar={handleEliminar}
         idKey="id_curso_seccion"
         mostrarAcciones={puedeAdministrar}
