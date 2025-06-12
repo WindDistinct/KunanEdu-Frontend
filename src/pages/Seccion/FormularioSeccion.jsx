@@ -96,7 +96,7 @@ export default function FormularioSeccion({ onExito, initialData }) {
         estado: true,
       });
     } catch (err) {
-      setError("Error al guardar. Verifique que no esté ocupada el aula en ese periodo");
+      setError("Error al guardar. Verifique que no exista una seccion activa ocupando esa aula en un mismo periodo");
     }
   };
 

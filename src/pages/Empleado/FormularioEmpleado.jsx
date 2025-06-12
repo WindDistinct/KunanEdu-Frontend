@@ -91,13 +91,12 @@ export default function FormularioEmpleado({ onExito, initialData }) {
       "dni",
       "telefono",
       "especialidad",
-      "cargo",
-      "observacion",
+      "cargo", 
       ...(form.cargo !== "almacen" && form.cargo !== "limpieza"
         ? ["usuario"]
         : []),
     ];
-
+console.log(camposObligatorios)
     for (const campo of camposObligatorios) {
       if (!form[campo]) {
         return "Todos los campos obligatorios deben estar completos";
@@ -115,9 +114,7 @@ export default function FormularioEmpleado({ onExito, initialData }) {
     if (!esTextoValido(form.especialidad)) {
       return "La especialidad solo debe contener letras y espacios";
     }
-    if (!esTextoValido(form.observacion)) {
-      return "La observación solo debe contener letras y espacios";
-    }
+     
     if (!esNumeroExacto(form.dni, 8)) {
       return "El DNI debe contener exactamente 8 dígitos numéricos";
     }
@@ -234,13 +231,22 @@ export default function FormularioEmpleado({ onExito, initialData }) {
         inputMode="numeric"
       />
 
-      <input
+
+      <select
         name="especialidad"
-        placeholder="Especialidad"
-        className="input input-bordered w-full"
+        className="select select-bordered w-full"
         value={form.especialidad}
         onChange={handleChange}
-      />
+      >
+        <option value="" disabled>Seleccione Especialidad</option>
+        <option value="ciencias">ciencias</option>
+        <option value="letras">letras</option>
+        <option value="matematicas">matematicas</option>
+        <option value="mixto">mixto</option>
+        <option value="aseo">aseo</option>
+        <option value="supervisor">supervisor</option>
+      </select>
+ 
 
       <select
         name="cargo"

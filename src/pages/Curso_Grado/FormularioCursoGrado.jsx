@@ -88,7 +88,7 @@ export default function FormularioCursoGrado({ onExito, initialData }) {
         estado: true,
       });
     } catch (err) {
-      setError("Error al guardar. Verifique que la relación no esté duplicada");
+      setError("Error al guardar. Verifique que el curso no se repita en el mismo grado");
     }
   };
 

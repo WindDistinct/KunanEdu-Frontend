@@ -73,7 +73,7 @@ export default function ListadoCursoGrado() {
   return (
     <div className="p-4">
       <h1 className="text-4xl font-semibold mb-4">
-        {puedeAdministrar ? "Malla curricular por grado" : "Listado Curso-Grado"}
+        {puedeAdministrar ? "Plan Curricular por grado" : "Listado Curso-Grado"}
       </h1>
 
       <button onClick={() => navigate("/")} className="btn btn-secondary mb-4">

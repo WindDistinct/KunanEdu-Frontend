@@ -23,7 +23,7 @@ export default function ListadoSeccion() {
           : await seccionService.obtener();
 
       const ordenadas = data.sort((a, b) => a.id_seccion - b.id_seccion);
-      setSecciones(ordenadas);
+      setSecciones(data);
     } catch (err) {
       setMensaje({ tipo: "error", texto: "Error al cargar las secciones: " + err });
     }

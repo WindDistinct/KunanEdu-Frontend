@@ -8,6 +8,7 @@ import {
 } from "../../api/requestApi";
 
 export default function FormularioCursoSeccion({ onExito, initialData }) {
+  const [bloquearSubmit, setBloquearSubmit] = useState(true);
   const [periodos, setPeriodos] = useState([]);
   const [secciones, setSecciones] = useState([]);
   const [docentes, setDocentes] = useState([]);
@@ -67,6 +68,7 @@ export default function FormularioCursoSeccion({ onExito, initialData }) {
     setSeccionSeleccionada(idSeccion);
     setSeleccionDocentes({});
     setError("");
+     setBloquearSubmit(true);
     try {
       const seccion = secciones.find((s) => s.id_seccion === parseInt(idSeccion));
       setGradoSeccion(seccion.id_grado);
@@ -75,6 +77,7 @@ export default function FormularioCursoSeccion({ onExito, initialData }) {
       if (yaAsignados.asignados) {
         setCursosDelGrado([]);
          setSeleccionDocentes({});
+         setBloquearSubmit(true);
         return setError("Esta sección ya tiene cursos asignados.");
       }
 
@@ -82,6 +85,7 @@ export default function FormularioCursoSeccion({ onExito, initialData }) {
       if (!cursosData.length) {
         setCursosDelGrado([]);
          setSeleccionDocentes({});
+         setBloquearSubmit(true);
         return setError("No hay cursos asignados al grado correspondiente.");
       }
 
@@ -91,8 +95,10 @@ export default function FormularioCursoSeccion({ onExito, initialData }) {
         inicialDocentes[c.id_curso] = "";
       });
       setSeleccionDocentes(inicialDocentes);
+        setBloquearSubmit(false);
     } catch {
       setError("Error al obtener cursos por grado.");
+      setBloquearSubmit(true);
     }
   };
 
@@ -235,7 +241,7 @@ export default function FormularioCursoSeccion({ onExito, initialData }) {
         </label>
       )}
 
-      <button type="submit" className="btn btn-primary">
+      <button type="submit" className="btn btn-primary" disabled={bloquearSubmit}>
         {esEdicion ? "Guardar Cambios" : "Registrar"}
       </button>
     </form>
