@@ -97,7 +97,7 @@ export default function ListadoCursoSeccion() {
         <dialog id="modalCS" className="modal modal-open">
           <div className="modal-box w-11/12 max-w-3xl">
             <h3 className="font-bold text-lg mb-4">
-              {formData ? "Editar Profesor" : "Registrar Nueva Relación"}
+              {formData ? "Editar Profesor" : "Asignar docente a la sección"}
             </h3>
             <FormularioCursoSeccion onExito={handleExito} initialData={formData} />
 

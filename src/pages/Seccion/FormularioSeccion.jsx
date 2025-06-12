@@ -96,7 +96,7 @@ export default function FormularioSeccion({ onExito, initialData }) {
         estado: true,
       });
     } catch (err) {
-      setError("Error al guardar. Verifique que no esté duplicado el nombre de la sección o aula duplicada");
+      setError("Error al guardar. Verifique que no esté ocupada el aula en ese periodo");
     }
   };
 
