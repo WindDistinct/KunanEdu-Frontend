@@ -29,7 +29,9 @@ const periodoService = {
 }; 
 const empleadoService = {
   ...createApiService("empleado"),
-  obtenerDocentes: () => axiosInstance.get(`/api/empleado/all-docente`).then(r => r.data)
+  obtenerDocentes: () => axiosInstance.get(`/api/empleado/all-docente`).then(r => r.data),
+  obtenerEmpleadoUsuarios: () => axiosInstance.get(`/api/empleado/all-usuarios`).then(r => r.data)
+
 };
 const cursoService = createApiService("curso");
 const aulaService = createApiService("aula"); 

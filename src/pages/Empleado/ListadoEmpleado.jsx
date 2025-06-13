@@ -28,7 +28,7 @@ export default function ListadoEmpleado() {
           fec_nac: empleado.fec_nac ? empleado.fec_nac.split("T")[0] : "",
         }))
         .sort((a, b) => a.id_emp - b.id_emp);
-
+console.log(data)
       setEmpleados(empleadosFormateados);
     } catch (error) {
       setMensaje({ tipo: "error", texto: "Error al cargar los empleados" });

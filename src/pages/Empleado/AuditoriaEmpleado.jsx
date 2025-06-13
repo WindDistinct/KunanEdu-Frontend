@@ -45,9 +45,7 @@ export default function AuditoriaEmpleado() {
           { key: "observacion_anterior", label: "Observación Anterior" },
           { key: "observacion_nuevo", label: "Observación Nueva" },
           { key: "cargo_anterior", label: "Cargo Anterior" },
-          { key: "cargo_nuevo", label: "Cargo Nuevo" },
-          { key: "usuario_anterior", label: "Usuario Anterior" },
-          { key: "usuario_nuevo", label: "Usuario Nuevo" },
+          { key: "cargo_nuevo", label: "Cargo Nuevo" }, 
           /*{ key: "estado_anterior", label: "Estado Anterior" },
           { key: "estado_nuevo", label: "Estado Nuevo" },*/
           { key: "operacion", label: "Operación" },

@@ -11,23 +11,13 @@ export default function FormularioEmpleado({ onExito, initialData }) {
     telefono: "",
     especialidad: "",
     cargo: "",
-    observacion: "",
-    usuario: "",
+    observacion: "", 
     estado: true,
   });
 
   const [error, setError] = useState(null);
-  const [mensajeExito, setMensajeExito] = useState(null);
-  const [usuarios, setUsuarios] = useState([]);
-
-  useEffect(() => {
-    const cargarUsuarios = async () => {
-      const data = await usuarioService.obtener();
-      setUsuarios(data);
-    };
-    cargarUsuarios();
-  }, []);
-
+  const [mensajeExito, setMensajeExito] = useState(null); 
+ 
   useEffect(() => {
     if (initialData) {
       const fechaFormateada = initialData.fec_nac
@@ -46,7 +36,7 @@ export default function FormularioEmpleado({ onExito, initialData }) {
       return () => clearTimeout(timer);
     }
   }, [mensajeExito]);
-  const handleChange = (e) => {
+    const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     let nuevoValor = type === "checkbox" ? checked : value;
 
@@ -56,18 +46,8 @@ export default function FormularioEmpleado({ onExito, initialData }) {
 
     if (["nombre_emp", "ape_pat_emp", "ape_mat_emp"].includes(name)) {
       nuevoValor = value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, "");
-    }
-
-    if (name === "cargo") {
-      const sinUsuario = ["almacen", "limpieza"];
-      setForm((prev) => ({
-        ...prev,
-        [name]: nuevoValor,
-        usuario: sinUsuario.includes(nuevoValor) ? "" : "",
-      }));
-    } else {
-      setForm((prev) => ({ ...prev, [name]: nuevoValor }));
-    }
+    } 
+      setForm((prev) => ({ ...prev, [name]: nuevoValor })); 
   };
 
   const obtenerFechaMaximaNacimiento = () => {
@@ -91,12 +71,8 @@ export default function FormularioEmpleado({ onExito, initialData }) {
       "dni",
       "telefono",
       "especialidad",
-      "cargo", 
-      ...(form.cargo !== "almacen" && form.cargo !== "limpieza"
-        ? ["usuario"]
-        : []),
-    ];
-console.log(camposObligatorios)
+      "cargo"
+    ]; 
     for (const campo of camposObligatorios) {
       if (!form[campo]) {
         return "Todos los campos obligatorios deben estar completos";
@@ -135,8 +111,7 @@ console.log(camposObligatorios)
     }
 
     try {
-      if (form.id_emp) {
-        console.log(form)
+      if (form.id_emp) { 
         await empleadoService.actualizar(form.id_emp, form);
         setMensajeExito("Empleado actualizado con éxito");
         onExito && onExito("Empleado actualizado con éxito");
@@ -154,8 +129,7 @@ console.log(camposObligatorios)
         telefono: "",
         especialidad: "",
         cargo: "",
-        observacion: "",
-        usuario: "",
+        observacion: "", 
         estado: true,
       });
     } catch (err) {
@@ -263,22 +237,7 @@ console.log(camposObligatorios)
         <option value="limpieza">Limpieza</option>
       </select>
 
-      {(form.cargo !== "almacen" && form.cargo !== "limpieza") && (
-        <select
-          name="usuario"
-          className="select select-bordered w-full"
-          value={form.usuario}
-          onChange={handleChange}
-        >
-          <option value="" disabled>Seleccione usuario</option>
-          {usuarios.map((u) => (
-            <option key={u.id_usuario} value={u.id_usuario}>
-              {u.username}
-            </option>
-          ))}
-        </select>
-      )}
-
+      
       <input
         name="observacion"
         placeholder="Observación"

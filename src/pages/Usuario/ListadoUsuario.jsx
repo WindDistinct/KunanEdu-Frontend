@@ -114,6 +114,7 @@ export default function ListadoUsuario() {
         columnas={[
           { key: "username", label: "Nombre de Usuario" },
           { key: "rol", label: "Rol" },
+           { key: "empleado", label: "Id empleado" },
           ...(puedeAdministrar ? [{ key: "estado", label: "Estado" }] : []),
         ]}
         datos={usuarios}

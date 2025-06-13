@@ -7,7 +7,7 @@ export default function MenuPrincipal() {
   const puedeVerMantenimientos = ["usuario", "administrador", "profesor"].includes(rol);
 
   const menuItemsEstaticos=[
-    { path: "/usuarios", nombre: "Usuarios" }, 
+     { path: "/empleados", nombre: "Empleados" },  
     { path: "/aulas", nombre: "Aulas" },
     { path: "/grados", nombre: "Grados" },
     { path: "/cursos", nombre: "Cursos" },  
@@ -15,7 +15,7 @@ export default function MenuPrincipal() {
      { path: "/alumnos", nombre: "Alumnos" },
   ]
   const menuItems = [ 
-    { path: "/empleados", nombre: "Empleados" }, 
+     { path: "/usuarios", nombre: "Usuarios" }, 
     { path: "/curso_grado", nombre: "CursoGrado" },
     { path: "/seccion", nombre: "Sección" },
     { path: "/matricula", nombre: "Matricula" },

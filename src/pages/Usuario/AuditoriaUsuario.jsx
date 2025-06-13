@@ -29,13 +29,11 @@ export default function AuditoriaUsuario() {
           { key: "id_audit_usuario", label: "ID Auditoría" },
           { key: "id_usuario", label: "ID Usuario" },
           { key: "username_anterior", label: "Username Anterior" },
-          { key: "username_nuevo", label: "Username Nuevo" },
-          /*{ key: "password_anterior", label: "Password Anterior" },
-          { key: "password_nuevo", label: "Password Nuevo" },*/
+          { key: "username_nuevo", label: "Username Nuevo" }, 
           { key: "rol_anterior", label: "Rol Anterior" },
           { key: "rol_nuevo", label: "Rol Nuevo" },
-          /*{ key: "estado_anterior", label: "Estado Anterior" },
-          { key: "estado_nuevo", label: "Estado Nuevo" },*/
+           { key: "empleado_anterior", label: "Empleado Anterior" },
+          { key: "empleado_nuevo", label: "Empleado Nuevo" },  
           { key: "operacion", label: "Operación" },
           { key: "fecha_modificacion", label: "Fecha Modificación" },
           { key: "usuario_modificador", label: "Usuario Modificador" }

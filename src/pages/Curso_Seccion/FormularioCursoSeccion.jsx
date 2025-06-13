@@ -8,7 +8,7 @@ import {
 } from "../../api/requestApi";
 
 export default function FormularioCursoSeccion({ onExito, initialData }) {
-  const [bloquearSubmit, setBloquearSubmit] = useState(true);
+  const [bloquearSubmit, setBloquearSubmit] = useState(false);
   const [periodos, setPeriodos] = useState([]);
   const [secciones, setSecciones] = useState([]);
   const [docentes, setDocentes] = useState([]);

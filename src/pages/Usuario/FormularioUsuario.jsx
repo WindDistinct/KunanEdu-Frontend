@@ -1,15 +1,31 @@
 import React, { useEffect, useState } from "react";
-import { usuarioService } from "../../api/requestApi";
+import { usuarioService, empleadoService } from "../../api/requestApi";
 
 export default function FormularioUsuario({ onExito, initialData }) {
   const [form, setForm] = useState({
     username: "",
     password: "",
     rol: "",
+    empleado: "",
     estado: true,
   });
+
+  const [empleados, setEmpleados] = useState([]);
   const [error, setError] = useState(null);
   const [mensajeExito, setMensajeExito] = useState(null);
+
+  useEffect(() => {
+    const cargarEmpleados = async () => {
+      try {
+        const data = await empleadoService.obtenerEmpleadoUsuarios();
+        setEmpleados(data); 
+      } catch (e) {
+        setError("Error al cargar los empleados");
+      }
+    };
+
+    cargarEmpleados();
+  }, []);
 
   useEffect(() => {
     if (initialData) {
@@ -26,19 +42,12 @@ export default function FormularioUsuario({ onExito, initialData }) {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    let nuevoValor = value;
-
-    if (type === "checkbox") {
-      nuevoValor = checked;
-    } else {
-      nuevoValor = value.trimStart();
-    }
-
+    const nuevoValor = type === "checkbox" ? checked : value.trimStart();
     setForm((prev) => ({ ...prev, [name]: nuevoValor }));
   };
 
   const validarFormulario = () => {
-    if (!form.username || !form.rol || (!initialData && !form.password)) {
+    if (!form.username || !form.rol || !form.empleado || (!initialData && !form.password)) {
       return "Todos los campos son obligatorios";
     }
     if (/\d/.test(form.username)) {
@@ -60,6 +69,7 @@ export default function FormularioUsuario({ onExito, initialData }) {
     const datos = {
       username: form.username.trim(),
       rol: form.rol,
+      empleado: parseInt(form.empleado),
       estado: form.estado,
     };
 
@@ -78,7 +88,13 @@ export default function FormularioUsuario({ onExito, initialData }) {
         onExito("Usuario registrado con éxito");
       }
 
-      setForm({ username: "", password: "", rol: "", estado: true });
+      setForm({
+        username: "",
+        password: "",
+        rol: "",
+        empleado: "",
+        estado: true,
+      });
     } catch (err) {
       setError("Error al guardar. Verifique que el usuario no esté duplicado");
     }
@@ -131,13 +147,25 @@ export default function FormularioUsuario({ onExito, initialData }) {
           value={form.rol}
           onChange={handleChange}
         >
-          <option value="" disabled>
-            Seleccione Rol
-          </option>
+          <option value="" disabled>Seleccione Rol</option>
           <option value="administrador">Administrador</option>
           <option value="usuario">Usuario</option>
           <option value="profesor">Profesor</option>
           <option value="auditor">Auditor</option>
+        </select>
+
+        <select
+          name="empleado"
+          className="select select-bordered w-full"
+          value={form.empleado}
+          onChange={handleChange}
+        >
+          <option value="" disabled>Seleccione Empleado</option>
+          {empleados.map((emp) => (
+            <option key={emp.id_emp} value={emp.id_emp}>
+              {emp.nombre_completo}    
+            </option>
+          ))}
         </select>
 
         {initialData && (
