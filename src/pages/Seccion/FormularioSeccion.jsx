@@ -45,6 +45,32 @@ export default function FormularioSeccion({ onExito, initialData }) {
     }
   }, [mensajeExito]);
 
+    useEffect(() => {
+    const asignarNombreSeccion = async () => {
+      if (!form.grado || !form.periodo || initialData) return;
+
+      try {
+        const existentes = await seccionService.obtenerPorGradoYPeriodo(form.grado, form.periodo);
+        const nombresDisponibles = ["Sección A", "Sección B", "Sección C"];
+        const usados = existentes.map((s) => s.nombre);
+        const nombreDisponible = nombresDisponibles.find((n) => !usados.includes(n));
+
+        if (nombreDisponible) {
+          setForm((prev) => ({ ...prev, nombre: nombreDisponible }));
+          setError(null);
+        } else {
+          setForm((prev) => ({ ...prev, nombre: "" }));
+          setError("Ya se han registrado todas las secciones posibles para ese grado y periodo.");
+        }
+      } catch (e) {
+        setError("Error al verificar secciones existentes.");
+      }
+    };
+
+    asignarNombreSeccion();
+  }, [form.grado, form.periodo, initialData]);
+
+
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     const nuevoValor = type === "checkbox" ? checked : value.trimStart();
@@ -78,6 +104,21 @@ export default function FormularioSeccion({ onExito, initialData }) {
     };
 
     try {
+
+      const seccionesExistentes = await seccionService.obtenerPorGradoYPeriodo(datos.grado, datos.periodo);
+      const duplicado = seccionesExistentes.find(
+        (s) =>
+          s.nombre === datos.nombre &&
+          s.estado === true &&
+          s.id_seccion !== form.id_seccion
+      );
+
+      if (duplicado) {
+        setError(`Ya existe una sección activa con el nombre ${datos.nombre} para ese grado y periodo.`);
+        return;
+      }
+
+
       if (form.id_seccion) {
         await seccionService.actualizar(form.id_seccion, datos);
         setMensajeExito("Sección actualizada con éxito");
@@ -116,13 +157,12 @@ export default function FormularioSeccion({ onExito, initialData }) {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <input
+             <input
           name="nombre"
           placeholder="Nombre de la sección"
           className="input input-bordered w-full"
           value={form.nombre}
-          onChange={handleChange}
-          onKeyDown={(e) => e.key === " " && e.target.selectionStart === 0 && e.preventDefault()}
+          readOnly
         />
 
         <select

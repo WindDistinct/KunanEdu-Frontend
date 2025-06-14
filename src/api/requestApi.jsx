@@ -24,8 +24,12 @@ const usuarioService = {
       throw error.response?.data?.message || "Error en login";
     }
   }
+}; 
+const seccionService = {
+  ...createApiService("seccion"),
+ obtenerPorGradoYPeriodo: (grado,periodo) => axiosInstance.get(`/api/seccion/grado-periodo/${grado}/${periodo}`).then(r => r.data)
+ 
 };
-const seccionService = createApiService("seccion");
 const gradoService = createApiService("grado");
 const periodoService = {
   ...createApiService("periodo"),
