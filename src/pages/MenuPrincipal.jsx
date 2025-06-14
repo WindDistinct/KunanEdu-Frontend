@@ -82,13 +82,16 @@ export default function MenuPrincipal() {
                 Auditoría {nombre}
               </Link>
             ))}
+             <Link to="/auditoria/notas" className="btn btn-accent w-full">
+              Auditoria Notas
+            </Link>
           </div>
         </section>
       )}
 
       {puedeVerNotas && (
        <section>
-        <h1 className="text-2xl font-semibold mb-4">Servicios Extras</h1>
+        <h1 className="text-4xl font-semibold mb-4">Servicios Extras</h1>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           <Link to="/notas" className="btn btn-accent w-full">
             Mis cursos

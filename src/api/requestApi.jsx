@@ -58,6 +58,7 @@ const matriculaService  = createApiService("matricula");
 
 
 const examenService = {
+  ...createApiService("examen"),
   obtenerNotasporAlumno: (id) => axiosInstance.get(`/api/examen/notas-alum/${idAlumno}`).then(r => r.data),
  registrarNotas: (data) => axiosInstance.post(`/api/examen/multiple`,data).then(r => r.data),
 obtenerNotasBimestre: (aula,bimestre,cursoseccion) => axiosInstance.get(`/api/examen/nota-bimestre/${aula}/${bimestre}/${cursoseccion}`).then(r => r.data)

@@ -30,6 +30,7 @@ import ListadoMatricula from "./pages/Matricula/ListadoMatricula";
 import AuditoriaMatricula from "./pages/Matricula/AuditoriaMatricula";
 import ListadoCursoSeccion from "./pages/Curso_Seccion/ListadoCursoSeccion";
 import AuditoriaCursoSeccion from "./pages/Curso_Seccion/AuditoriaCursoSeccion";
+import AuditoriaNota from "./pages/Examen/AuditoriaNota";
 
 
 function App() {
@@ -72,7 +73,7 @@ function App() {
               <Route path="/auditoria/curso_grado" element={<AuditoriaCursoGrado />} />
               <Route path="/auditoria/matricula" element={<AuditoriaMatricula />} />
               <Route path="/auditoria/curso_seccion" element={<AuditoriaCursoSeccion />} />
-
+              <Route path="/auditoria/notas" element={<AuditoriaNota />} />
  
 
             </Routes>
