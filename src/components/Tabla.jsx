@@ -8,6 +8,8 @@ export default function Tabla({
   idKey = "id",
   mostrarAcciones = true,
   filasPorPagina = 5,
+   textoBotonAccion = "Editar", // NUEVO: texto por defecto
+  soloBotonEditar = false, 
 }) {
   const [paginaActual, setPaginaActual] = useState(1);
 
@@ -37,7 +39,7 @@ export default function Tabla({
 
   return (
     <>
-      <div   className="overflow-x-auto">
+      <div className="overflow-x-auto">
         <table className="table table-zebra table-sm w-full">
           <thead className="bg-base-200">
             <tr>
@@ -57,16 +59,19 @@ export default function Tabla({
                   <td className="flex gap-1">
                     <button
                       onClick={() => onEditar(item)}
-                      className="btn btn-warning btn-xs"
+                      className="btn btn-info btn-xs"
                     >
-                      Editar
+                      {textoBotonAccion}
                     </button>
-                    <button
-                      onClick={() => onEliminar(item[idKey])}
-                      className="btn btn-error btn-xs"
-                    >
-                      Eliminar
-                    </button>
+
+                    {!soloBotonEditar && (
+                      <button
+                        onClick={() => onEliminar(item[idKey])}
+                        className="btn btn-error btn-xs"
+                      >
+                        Eliminar
+                      </button>
+                    )}
                   </td>
                 )}
               </tr>

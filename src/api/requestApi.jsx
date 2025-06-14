@@ -8,8 +8,12 @@ const createApiService = (resource) => ({
   eliminar: (id) => axiosInstance.delete(`/api/${resource}/delete/${id}`).then(r => r.data),
   auditar: () => axiosInstance.get(`/api/${resource}/all-audit`).then(r => r.data)
 });
+ 
+const alumnoService = {
+  ...createApiService("estudiante"),
+  obtenerAlumnosPorAula: (aula,cursoseccion) => axiosInstance.get(`/api/estudiante/alumnos-aula/${aula}/${cursoseccion}`).then(r => r.data)
+}; 
 
-const alumnoService = createApiService("estudiante");
 const usuarioService = {
   ...createApiService("usuario"),
   login: async ({ username, password }) => {
@@ -30,8 +34,9 @@ const periodoService = {
 const empleadoService = {
   ...createApiService("empleado"),
   obtenerDocentes: () => axiosInstance.get(`/api/empleado/all-docente`).then(r => r.data),
-  obtenerEmpleadoUsuarios: () => axiosInstance.get(`/api/empleado/all-usuarios`).then(r => r.data)
-
+  obtenerEmpleadoUsuarios: () => axiosInstance.get(`/api/empleado/all-usuarios`).then(r => r.data),
+  obtenerCursosPorUsuario: (idDocente,periodo) => axiosInstance.get(`/api/empleado/cursos-periodo/${idDocente}/${periodo}`).then(r => r.data)
+ 
 };
 const cursoService = createApiService("curso");
 const aulaService = createApiService("aula"); 
@@ -49,7 +54,10 @@ const matriculaService  = createApiService("matricula");
 
 
 const examenService = {
-  obtenerNotasporAlumno: (id) => axiosInstance.get(`/api/examen/notas-alum/${idAlumno}`).then(r => r.data)
+  obtenerNotasporAlumno: (id) => axiosInstance.get(`/api/examen/notas-alum/${idAlumno}`).then(r => r.data),
+ registrarNotas: (data) => axiosInstance.post(`/api/examen/multiple`,data).then(r => r.data),
+obtenerNotasBimestre: (aula,bimestre) => axiosInstance.get(`/api/examen/nota-bimestre/${aula}/${bimestre}`).then(r => r.data)
+
 }
 
 export { examenService, aulaService,matriculaService, cursoSeccionService,cursoGradoService,usuarioService, alumnoService, seccionService, gradoService, periodoService, empleadoService, cursoService };

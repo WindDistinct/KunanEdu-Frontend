@@ -1,0 +1,143 @@
+import React, { useEffect, useState } from "react";
+import { alumnoService, examenService } from "../../api/requestApi";
+
+export default function FormularioNota({ initialData, onCerrar }) {
+  const [alumnos, setAlumnos] = useState([]);
+  const [bimestre, setBimestre] = useState("");
+  const [notas, setNotas] = useState({});
+  const [notasCargadas, setNotasCargadas] = useState({});
+
+  useEffect(() => {
+    if (initialData) {
+      cargarAlumnos(initialData);
+    }
+  }, [initialData]);
+
+  const cargarAlumnos = async (curso) => {
+    try {
+      const response = await alumnoService.obtenerAlumnosPorAula(
+        curso.numero_aula,
+        curso.id_curso_seccion
+      );
+      setAlumnos(response);
+    } catch (error) {
+      console.error("Error al cargar alumnos:", error);
+    }
+  };
+
+  useEffect(() => {
+    const cargarNotas = async () => {
+      if (!bimestre || !initialData) return;
+
+      try {
+        const notasExistentes = await examenService.obtenerNotasBimestre(
+          initialData.numero_aula,
+          bimestre
+        );
+
+        const notasMap = {};
+        notasExistentes.forEach((n) => {
+          notasMap[n.id_alumno] = n.nota;
+        });
+
+        setNotasCargadas(notasMap);
+        setNotas(notasMap);
+      } catch (error) {
+        console.error("Error al obtener notas existentes:", error);
+      }
+    };
+
+    cargarNotas();
+  }, [bimestre, initialData]);
+
+  const handleNotaChange = (idAlumno, valor) => {
+    setNotas((prev) => ({
+      ...prev,
+      [idAlumno]: valor,
+    }));
+  };
+
+  const handleGuardar = async () => {
+    try {
+      const payload = alumnos
+        .filter((alumno) => !notasCargadas.hasOwnProperty(alumno.id_alumno))
+        .filter(
+          (alumno) =>
+            notas[alumno.id_alumno] !== undefined &&
+            notas[alumno.id_alumno] !== ""
+        )
+        .map((alumno) => ({
+          cursoseccion: initialData.id_curso_seccion,
+          matricula: alumno.id_matricula,
+          bimestre,
+          nota: parseFloat(notas[alumno.id_alumno]),
+        }));
+
+      if (payload.length === 0) {
+        alert("No hay notas nuevas para registrar.");
+        return;
+      }
+console.log(payload)
+      await examenService.registrarNotas(payload);
+      onCerrar();
+    } catch (error) {
+      console.error("Error al registrar notas:", error);
+    }
+  };
+
+  // 🔍 Verifica si hay al menos un alumno sin nota registrada
+  const hayCamposDisponibles =
+    bimestre &&
+    alumnos.some((a) => !notasCargadas.hasOwnProperty(a.id_alumno));
+
+  return (
+    <div className="space-y-4">
+      <div>
+        <label className="block font-semibold mb-1">Bimestre:</label>
+        <select
+          className="select select-bordered w-full"
+          value={bimestre}
+          onChange={(e) => setBimestre(e.target.value)}
+        >
+          <option value="">Seleccione un bimestre</option>
+          <option value="Primer Bimestre">1° Bimestre</option>
+          <option value="Segundo Bimestre">2° Bimestre</option>
+          <option value="Tercer Bimestres">3° Bimestre</option>
+          <option value="Cuarto Bimestre">4° Bimestre</option>
+        </select>
+      </div>
+
+      <div>
+        <h4 className="font-semibold mb-2">Alumnos:</h4>
+        {alumnos.map((alumno) => (
+          <div key={alumno.id_alumno} className="flex items-center gap-4 mb-2">
+            <span className="w-1/3">{alumno.nombre_completo}</span>
+            <input
+              type="number"
+              min="0"
+              max="20"
+              step="0.1"
+              className="input input-bordered w-24"
+              value={notas[alumno.id_alumno] ?? ""}
+              onChange={(e) =>
+                handleNotaChange(alumno.id_alumno, e.target.value)
+              }
+              disabled={
+                !bimestre ||
+                notasCargadas.hasOwnProperty(alumno.id_alumno)
+              }
+            />
+          </div>
+        ))}
+      </div>
+
+      <button
+        className="btn btn-success"
+        onClick={handleGuardar}
+        disabled={!hayCamposDisponibles}
+      >
+        Guardar Notas
+      </button>
+    </div>
+  );
+}

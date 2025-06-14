@@ -1,91 +1,138 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
+import Tabla from "../../components/Tabla";
+import { empleadoService, periodoService } from "../../api/requestApi";
+import Notificacion from "../../components/Notificacion";
 import { useNavigate } from "react-router-dom";
-import { alumnoService, examenService } from "../../api/requestApi";
-import Tabla from "../../components/TablaAuditoria";
-import "../../styles/Botones.css";
+import FormularioNota from "./FormularioNota";
 
-export default function ListadoNotas() {
-  const [alumnos, setAlumnos] = useState([]);
-  const [alumnoSeleccionado, setAlumnoSeleccionado] = useState("");
-  const [notas, setNotas] = useState([]);
+export default function ListadoUsuario() {
+  const [cursos, setCursos] = useState([]);
+  const [mensaje, setMensaje] = useState(null);
+  const [periodoSeleccionado, setPeriodoSeleccionado] = useState("");
+  const [periodosDisponibles, setPeriodosDisponibles] = useState([]);
+  const [formData, setFormData] = useState(null);
+  const [mostrarFormulario, setMostrarFormulario] = useState(false);
   const navigate = useNavigate();
 
-  const cargarAlumnos = async () => {
+  const id_usuario = localStorage.getItem("id_usuario");
+
+  const cargarCursos = useCallback(async () => {
+    if (!id_usuario || !periodoSeleccionado) return;
+
     try {
-      const data = await alumnoService.obtener();
-      setAlumnos(data);
+      const data = await empleadoService.obtenerCursosPorUsuario(
+        id_usuario,
+        periodoSeleccionado
+      ); 
+      setCursos(data);
     } catch (error) {
-      console.error("Error al cargar alumnos:", error);
+      setMensaje({ tipo: "error", texto: "Error al cargar los cursos: " + error });
     }
-  };
+    }, [id_usuario, periodoSeleccionado]);
 
-  const cargarNotas = async (idAlumno) => {
-    try {
-      const data = await examenService.obtenerNotasporAlumno(idAlumno);
-      setNotas(data);
+  const cargarPeriodos = async () => {
+    try { 
+     const data=await periodoService.obtener() 
+      setPeriodosDisponibles(data);
+      setCursos(data);
     } catch (error) {
-      console.error("Error al cargar notas:", error);
+      setMensaje({ tipo: "error", texto: "Error al cargar los periodo: " + error });
     }
-  };
 
-
-  const handleSeleccionAlumno = (e) => {
-    const id = e.target.value;
-    setAlumnoSeleccionado(id);
-    if (id) {
-      cargarNotas(id);
-    } else {
-      setNotas([]);
-    }
   };
 
   useEffect(() => {
-    cargarAlumnos();
+    cargarPeriodos();
   }, []);
 
-  return (
-    <div>
-      <div>
-        <h1>Reporte de Notas</h1>
-        <button onClick={() => navigate("/")} className="menu-button">
-          Volver al Menú
-        </button>
-      </div>
-      <br />
+  useEffect(() => {
+    cargarCursos();
+  }, [cargarCursos]);
 
-      <div>
-        <label htmlFor="alumnoSelect">Seleccione un alumno:</label>
+  useEffect(() => {
+    if (mensaje) {
+      const timer = setTimeout(() => {
+        setMensaje(null);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [mensaje]);
+
+  const handleEditar = (curso) => {
+    setFormData(curso);
+    setMostrarFormulario(true);
+  };
+  const handleCancelar = () => {
+    setFormData(null);
+    setMostrarFormulario(false);
+  };
+
+  return (
+    <div className="p-4">
+      <h1 className="text-4xl font-semibold mb-4">Mis Cursos por Periodo</h1>
+
+      <button onClick={() => navigate("/")} className="btn btn-secondary mb-4">
+        ← Volver al Menú
+      </button>
+
+      <div className="mb-4">
+        <label className="block text-lg font-medium mb-2">Selecciona un Periodo:</label>
         <select
-          id="alumnoSelect"
-          value={alumnoSeleccionado}
-          onChange={handleSeleccionAlumno}
+          className="select select-bordered w-full max-w-xs"
+          value={periodoSeleccionado}
+          onChange={(e) => setPeriodoSeleccionado(e.target.value)}
         >
-          <option value="">-- Seleccione --</option>
-          {alumnos.map((alumno) => (
-            <option key={alumno.id_alumno} value={alumno.id_alumno}>
-              {alumno.nombre + " " + alumno.apellido_paterno}
+          <option value="">-- Selecciona un periodo --</option>
+          {periodosDisponibles.map((p) => (
+            <option key={p.id_periodo} value={p.id_periodo}>
+              {p.anio} {p.descripcion}
             </option>
           ))}
         </select>
       </div>
+           
+      {mostrarFormulario && (
+        <dialog id="modalNota" className="modal modal-open">
+          <div className="modal-box w-11/12 max-w-4xl">
+            <h3 className="font-bold text-lg mb-4">
+              Ingresar Notas - {formData?.nombre_curso}
+            </h3>
 
-      <br />
+            <FormularioNota initialData={formData} onCerrar={handleCancelar} />
 
-      {notas.length > 0 ? (
+            <div className="modal-action">
+              <button className="btn btn-error" onClick={handleCancelar}>
+                Cancelar
+              </button>
+            </div>
+          </div>
+          <form method="dialog" className="modal-backdrop">
+            <button onClick={handleCancelar}>Cerrar</button>
+          </form>
+        </dialog>
+      )}
+
+
+      <div className="h-12 mb-4">
+        <Notificacion mensaje={mensaje?.texto} tipo={mensaje?.tipo} />
+      </div>
+
+      {periodoSeleccionado && (
         <Tabla
           columnas={[
-            { key: "id_alumno", label: "ID Alumno" },
-            { key: "nombre_alumno", label: "Alumno" },
             { key: "nombre_curso", label: "Curso" },
-            { key: "nombre_seccion", label: "Sección" },
-            { key: "bimestre", label: "Bimestre" },
-            { key: "nota", label: "Nota" }
+            { key: "numero_aula", label: "Aula" },
+            { key: "seccion", label: "Sección" },
+            { key: "grado", label: "Grado" },
+            { key: "periodo", label: "Periodo" },
           ]}
-          datos={notas}
-          idKey="id_alumno"
+         datos={cursos}
+  onEditar={handleEditar}
+  idKey="id_curso_seccion"
+  mostrarAcciones={true}
+  textoBotonAccion="Ingresar Nota" // 👈 Cambia "Editar" por esto
+  soloBotonEditar={true} // 
         />
-      ) : (
-        alumnoSeleccionado && <p>No hay notas para este alumno.</p>
       )}
     </div>
   );
