@@ -18,9 +18,9 @@ export default function MenuPrincipal() {
   const menuItems = [ 
      { path: "/usuarios", nombre: "Usuarios" }, 
     { path: "/curso_grado", nombre: "CursoGrado" },
-    { path: "/seccion", nombre: "Sección" },
-    { path: "/matricula", nombre: "Matricula" },
     { path: "/curso_seccion", nombre: "CursoSeccion" },
+    { path: "/seccion", nombre: "Sección" },
+    { path: "/matricula", nombre: "Matricula" }
 
   ];
 

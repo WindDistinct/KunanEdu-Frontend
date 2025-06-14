@@ -27,6 +27,7 @@ export default function FormularioCursoSeccion({ onExito, initialData }) {
 
   useEffect(() => {
     const cargarIniciales = async () => {
+    
       try {
         const docentesData = await empleadoService.obtenerDocentes();
         setDocentes(docentesData); 
@@ -39,7 +40,7 @@ export default function FormularioCursoSeccion({ onExito, initialData }) {
             setEstado(initialData.estado);
        
         } else {
-          const periodosData = await periodoService.obtener();
+          const periodosData = await periodoService.obtener(); 
           setPeriodos(periodosData);
         }
       } catch {
@@ -82,6 +83,8 @@ export default function FormularioCursoSeccion({ onExito, initialData }) {
       }
 
       const cursosData = await cursoGradoService.obtenerCursosPorGrado(seccion.id_grado);
+      
+            console.log(cursosData)
       if (!cursosData.length) {
         setCursosDelGrado([]);
          setSeleccionDocentes({});
@@ -241,9 +244,11 @@ export default function FormularioCursoSeccion({ onExito, initialData }) {
         </label>
       )}
 
-      <button type="submit" className="btn btn-primary" disabled={bloquearSubmit}>
+     <div>
+       <button type="submit" className="btn btn-primary" disabled={bloquearSubmit}>
         {esEdicion ? "Guardar Cambios" : "Registrar"}
       </button>
+     </div>
     </form>
   );
 }

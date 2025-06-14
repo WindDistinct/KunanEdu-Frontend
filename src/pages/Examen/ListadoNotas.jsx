@@ -49,6 +49,12 @@ export default function ListadoUsuario() {
     cargarCursos();
   }, [cargarCursos]);
 
+  const handleExito = async (texto) => {
+    setMensaje({ tipo: "success", texto });
+    setFormData(null);
+    setMostrarFormulario(false);
+  };
+
   useEffect(() => {
     if (mensaje) {
       const timer = setTimeout(() => {
@@ -69,7 +75,7 @@ export default function ListadoUsuario() {
 
   return (
     <div className="p-4">
-      <h1 className="text-4xl font-semibold mb-4">Mis Cursos por Periodo</h1>
+      <h1 className="text-4xl font-semibold mb-4">Notas de mis Cursos</h1>
 
       <button onClick={() => navigate("/")} className="btn btn-secondary mb-4">
         ← Volver al Menú
@@ -98,7 +104,7 @@ export default function ListadoUsuario() {
               Ingresar Notas - {formData?.nombre_curso}
             </h3>
 
-            <FormularioNota initialData={formData} onCerrar={handleCancelar} />
+            <FormularioNota initialData={formData} onCerrar={handleCancelar} onExito={handleExito} />
 
             <div className="modal-action">
               <button className="btn btn-error" onClick={handleCancelar}>
@@ -130,8 +136,8 @@ export default function ListadoUsuario() {
   onEditar={handleEditar}
   idKey="id_curso_seccion"
   mostrarAcciones={true}
-  textoBotonAccion="Ingresar Nota" // 👈 Cambia "Editar" por esto
-  soloBotonEditar={true} // 
+  textoBotonAccion="Ingresar Nota"  
+  soloBotonEditar={true}  
         />
       )}
     </div>

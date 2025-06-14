@@ -1,17 +1,28 @@
 import React, { useEffect, useState } from "react";
 import { alumnoService, examenService } from "../../api/requestApi";
 
-export default function FormularioNota({ initialData, onCerrar }) {
+export default function FormularioNota({ initialData, onCerrar,onExito }) {
   const [alumnos, setAlumnos] = useState([]);
   const [bimestre, setBimestre] = useState("");
   const [notas, setNotas] = useState({});
   const [notasCargadas, setNotasCargadas] = useState({});
+const [error, setError] = useState(null);
+ const [mensajeExito, setMensajeExito] = useState(null);
+
 
   useEffect(() => {
+    console.log(initialData)
     if (initialData) {
       cargarAlumnos(initialData);
     }
   }, [initialData]);
+
+  useEffect(() => {
+      if (mensajeExito) {
+        const timer = setTimeout(() => setMensajeExito(null), 3000);
+        return () => clearTimeout(timer);
+      }
+    }, [mensajeExito]);
 
   const cargarAlumnos = async (curso) => {
     try {
@@ -32,7 +43,8 @@ export default function FormularioNota({ initialData, onCerrar }) {
       try {
         const notasExistentes = await examenService.obtenerNotasBimestre(
           initialData.numero_aula,
-          bimestre
+          bimestre,
+          initialData.id_curso_seccion
         );
 
         const notasMap = {};
@@ -50,13 +62,31 @@ export default function FormularioNota({ initialData, onCerrar }) {
     cargarNotas();
   }, [bimestre, initialData]);
 
-  const handleNotaChange = (idAlumno, valor) => {
+ const handleNotaChange = (idAlumno, valor) => {
+  const notaNumerica = parseFloat(valor);
+
+  // Permitir limpiar
+  if (valor === "") {
+    setError(null);
     setNotas((prev) => ({
       ...prev,
-      [idAlumno]: valor,
+      [idAlumno]: "",
     }));
-  };
+    return;
+  }
 
+  // Validar rango
+  if (isNaN(notaNumerica) || notaNumerica < 0 || notaNumerica > 20) {
+    setError(`La nota para el alumno ${idAlumno} debe estar entre 0 y 20.`);
+    return;
+  }
+
+  setError(null);
+  setNotas((prev) => ({
+    ...prev,
+    [idAlumno]: valor,
+  }));
+};
   const handleGuardar = async () => {
     try {
       const payload = alumnos
@@ -74,12 +104,15 @@ export default function FormularioNota({ initialData, onCerrar }) {
         }));
 
       if (payload.length === 0) {
-        alert("No hay notas nuevas para registrar.");
-        return;
-      }
-console.log(payload)
+        setMensajeExito("No se ha ingresado una nota");
+      onExito("No se ha ingresado una nota");
+       onCerrar();
+       return
+      } 
       await examenService.registrarNotas(payload);
       onCerrar();
+      setMensajeExito("Nota ingresada con éxito");
+      onExito("Nota ingresada con éxito");
     } catch (error) {
       console.error("Error al registrar notas:", error);
     }
@@ -92,6 +125,7 @@ console.log(payload)
 
   return (
     <div className="space-y-4">
+      {error && <div className="alert alert-error">{error}</div>}
       <div>
         <label className="block font-semibold mb-1">Bimestre:</label>
         <select
