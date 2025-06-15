@@ -3,8 +3,11 @@ import Tabla from "../../components/Tabla";
 import { empleadoService, periodoService, examenService } from "../../api/requestApi";
 import Notificacion from "../../components/Notificacion";
 import { useNavigate } from "react-router-dom";
+import FormularioNotaCurso from "./FormularioNotaCurso";
 
 export default function ListadoNotasPorCurso() {
+    const [formData, setFormData] = useState(null);
+     const [mostrarFormulario, setMostrarFormulario] = useState(false);
   const [periodos, setPeriodos] = useState([]);
   const [periodoSeleccionado, setPeriodoSeleccionado] = useState("");
   const [cursos, setCursos] = useState([]);
@@ -37,14 +40,14 @@ export default function ListadoNotasPorCurso() {
     }
   }, [id_usuario, periodoSeleccionado]);
 
-  const cargarNotas = useCallback(async () => {
-    console.log(cursoSeleccionado)
-    console.log(periodoSeleccionado)
+  const cargarNotas = useCallback(async () => { 
     if (!cursoSeleccionado) return;
 
     try {
       const data = await examenService.obtenerNotasCurso(id_usuario,periodoSeleccionado,cursoSeleccionado);
-      setNotas(data);
+      
+       const examenOrdenadas = data.sort((a, b) => a.id_examen - b.id_examen);
+       setNotas(examenOrdenadas);
     } catch (error) {
       setMensaje({ tipo: "error", texto: "Error al cargar notas: " + error });
     }
@@ -69,6 +72,34 @@ export default function ListadoNotasPorCurso() {
     }
   }, [mensaje]);
 
+  const handleEditar = (nota) => {
+  setFormData(nota);
+  setMostrarFormulario(true);
+  };
+
+  const handleEliminar = async (id_examen) => {
+    try {
+      await examenService.eliminar(id_examen);
+      setMensaje({ tipo: "success", texto: "Nota eliminada correctamente" });
+      await cargarNotas();
+    } catch (error) {
+      setMensaje({ tipo: "error", texto: "Error al eliminar la nota: " + error });
+    }
+  };
+
+  const handleExito = async (texto) => {
+  setMensaje({ tipo: "success", texto });
+  setFormData(null);
+  setMostrarFormulario(false);
+  await cargarNotas();
+  };
+
+  const handleCancelar = () => {
+  setFormData(null);
+  setMostrarFormulario(false);
+  };
+
+
   return (
     <div className="p-4">
       <h1 className="text-4xl font-semibold mb-4">Notas por Curso</h1>
@@ -76,6 +107,28 @@ export default function ListadoNotasPorCurso() {
       <button onClick={() => navigate("/")} className="btn btn-secondary mb-4">
         ← Volver al Menú
       </button>
+
+      {mostrarFormulario && (
+      <dialog id="modalNota" className="modal modal-open">
+        <div className="modal-box w-11/12 max-w-2xl">
+          <h3 className="font-bold text-lg mb-4">
+            {formData ? "Editar Nota" : "Registrar Nota"}
+          </h3>
+
+          <FormularioNotaCurso initialData={formData} onExito={handleExito} />
+
+          <div className="modal-action">
+            <button className="btn btn-error" onClick={handleCancelar}>
+              Cancelar
+            </button>
+          </div>
+        </div>
+        <form method="dialog" className="modal-backdrop">
+          <button onClick={handleCancelar}>Cerrar</button>
+        </form>
+      </dialog>
+    )}
+ 
 
       <div className="mb-4">
         <label className="block text-lg font-medium mb-2">Selecciona un Periodo:</label>
@@ -123,8 +176,12 @@ export default function ListadoNotasPorCurso() {
               { key: "seccion", label: "Seccion" },
             { key: "bimestre", label: "Bimestre" },
             { key: "nota", label: "Nota" },
+            { key: "estado", label: "Estado" }
           ]}
           datos={notas}
+          onEditar={handleEditar}
+          onEliminar={handleEliminar}
+          mostrarAcciones={true}
           idKey="id_examen"
         />
       )}
