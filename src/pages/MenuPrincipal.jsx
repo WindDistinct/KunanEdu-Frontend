@@ -97,6 +97,11 @@ export default function MenuPrincipal() {
             Mis cursos
           </Link>
         </div>
+         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          <Link to="/nota_curso" className="btn btn-accent w-full">
+            Mantenimiento Notas
+          </Link>
+        </div>
       </section>
       )}
 
