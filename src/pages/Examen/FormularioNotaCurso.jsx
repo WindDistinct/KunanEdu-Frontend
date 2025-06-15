@@ -3,14 +3,31 @@ import { examenService } from "../../api/requestApi";
 
 export default function FormularioNotaCurso({ onExito, initialData }) {
   const [form, setForm] = useState({ 
-    nota: "",
-    estado: true,
+    id_examen: "",
+  nota: "",
+  estado: true,
+  nombre_completo: "",
+  nombre_curso: "",
+  bimestre: "",
+  id_matricula: "",
+  id_curso_seccion: ""
   });
   const [error, setError] = useState(null);
   const [mensajeExito, setMensajeExito] = useState(null);
 
   useEffect(() => {
-    if (initialData) setForm(initialData); 
+    if (initialData) {
+        setForm({
+        id_examen: initialData.id_examen ?? "",
+        nota: initialData.nota?.toString() ?? "",
+        estado: initialData.estado ?? true,
+        nombre_completo: initialData.nombre_completo ?? "",
+        nombre_curso: initialData.nombre_curso ?? "",
+        bimestre: initialData.bimestre ?? "",
+        id_matricula: initialData.id_matricula ?? "",
+        id_curso_seccion: initialData.id_curso_seccion ?? ""
+        });
+    }
   }, [initialData]);
 
   useEffect(() => {
@@ -98,7 +115,7 @@ export default function FormularioNotaCurso({ onExito, initialData }) {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <input
-          name="alumno"
+          name="nombre_completo"
           placeholder="ID Alumno"
           className="input input-bordered w-full"
           value={form.nombre_completo}
