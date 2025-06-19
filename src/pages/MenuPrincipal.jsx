@@ -1,7 +1,8 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 
-export default function MenuPrincipal() {
+
+export default function MenuPrincipal({ onLogout }) {
   const navigate = useNavigate();
   const rol = localStorage.getItem("rol");
 
@@ -11,8 +12,11 @@ export default function MenuPrincipal() {
 
   const handleLogout = () => {
     localStorage.clear();
+    onLogout();
     navigate("/login");
   };
+
+  
 
   const menuItemsEstaticos = [
     { path: "/empleados", nombre: "Empleados" },

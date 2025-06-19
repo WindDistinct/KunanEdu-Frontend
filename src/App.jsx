@@ -49,7 +49,7 @@ function App() {
         {autenticado ? (
             <Routes>
               <Route path="/login" element={<LoginUser />} />
-              <Route path="/" element={<MenuPrincipal />} />
+              <Route path="/" element={<MenuPrincipal onLogout={() => setAutenticado(false)} />} />
               <Route path="/aulas" element={<ListadoAula />} />
               <Route path="/alumnos" element={<ListadoAlumno />} />
               <Route path="/cursos" element={<ListadoCurso />} />
