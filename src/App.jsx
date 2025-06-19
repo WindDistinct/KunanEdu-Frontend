@@ -1,7 +1,7 @@
 import "./App.css";
 import logo from "/logo.svg";
 import { useState } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 
 import LoginUser from "./components/LoginUser";
 import MenuPrincipal from "./pages/MenuPrincipal";
@@ -38,15 +38,17 @@ function App() {
   const [autenticado, setAutenticado] = useState(false);
 
   return (
-    <div  className="App">
-      <header className="App-header">
+    <div className="flex flex-col min-h-screen">
+      <header className="sticky top-0 left-0 w-full z-50 bg-white shadow-md flex items-center px-6 h-16">
         <img src={logo} className="App-logo" alt="logo" />
         <h1 className="App-title">KunanEdu</h1>
       </header>
-      <main className="App-main">
+      <main className="px-4 py-6 text-center">
+        <div className={`${autenticado ? 'h-[calc(100vh-60px)]' : ''}`}>
+
         {autenticado ? (
-          <Router>
             <Routes>
+              <Route path="/login" element={<LoginUser />} />
               <Route path="/" element={<MenuPrincipal />} />
               <Route path="/aulas" element={<ListadoAula />} />
               <Route path="/alumnos" element={<ListadoAlumno />} />
@@ -78,10 +80,13 @@ function App() {
  
 
             </Routes>
-          </Router>
         ) : (
-          <LoginUser onLoginCorrecto={() => setAutenticado(true)} />
+          <Routes>
+            <Route path="/login" element={<LoginUser onLoginCorrecto={() => setAutenticado(true)} />} />
+            <Route path="*" element={<Navigate to="/login" replace />} />
+          </Routes>
         )}
+        </div>
       </main>
     </div>
   );

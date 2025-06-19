@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { usuarioService } from '../api/requestApi';
+import { useNavigate } from 'react-router-dom';
 
 export default function LoginUser({ onLoginCorrecto }) {
+	const navigate = useNavigate();
 	const [usuario, setUsuario] = useState('');
 	const [password, setPassword] = useState('');
 	const [mensaje, setMensaje] = useState('');
@@ -14,6 +16,7 @@ export default function LoginUser({ onLoginCorrecto }) {
 			localStorage.setItem("rol", data.rol);
 			localStorage.setItem("id_usuario", data.usuario);
 			setMensaje("Bienvenido!");
+			navigate("/");
 			onLoginCorrecto();
 		} catch (error) {
 			setMensaje("Usuario o contraseña incorrectos");
@@ -21,7 +24,7 @@ export default function LoginUser({ onLoginCorrecto }) {
 	};
 
 	return (
-		<div className="flex justify-center items-center min-h-screen ">
+		<div className="flex justify-center items-center h-[calc(80vh)]">
 			<div className="card w-full max-w-sm bg-base-100 shadow-xl p-6">
 				<h3 className="text-2xl font-bold text-center mb-4">Iniciar Sesión</h3>
 				<form onSubmit={handleSubmit} className="space-y-4">

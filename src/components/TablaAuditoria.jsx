@@ -87,7 +87,7 @@ export default function TablaAuditoria({
         </tbody>
       </table>
 
-      <div className="fixed  left-0 w-full  py-2   z-50 flex justify-center">
+      <div className="  left-0 w-full  py-2   z-50 flex justify-center">
         <div className="join">
           <button
             className="join-item btn btn-sm"
