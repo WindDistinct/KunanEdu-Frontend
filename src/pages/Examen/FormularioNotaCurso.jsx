@@ -1,24 +1,26 @@
 import React, { useEffect, useState } from "react";
-import { examenService } from "../../api/requestApi";
+import { notaService } from "../../api/requestApi";
 
 export default function FormularioNotaCurso({ onExito, initialData }) {
-  const [form, setForm] = useState({ 
+  const [form, setForm] = useState({
     id_examen: "",
-  nota: "",
-  estado: true,
-  nombre_completo: "",
-  nombre_curso: "",
-  bimestre: "",
-  id_matricula: "",
-  id_curso_seccion: ""
+    id_nota: "",
+    nota: "",
+    estado: true,
+    nombre_completo: "",
+    nombre_curso: "",
+    bimestre: "",
+    id_matricula: "",
+    id_curso_seccion: ""
   });
   const [error, setError] = useState(null);
   const [mensajeExito, setMensajeExito] = useState(null);
 
   useEffect(() => {
     if (initialData) {
-        setForm({
+      setForm({
         id_examen: initialData.id_examen ?? "",
+        id_nota: initialData.id_nota ?? "",
         nota: initialData.nota?.toString() ?? "",
         estado: initialData.estado ?? true,
         nombre_completo: initialData.nombre_completo ?? "",
@@ -26,7 +28,7 @@ export default function FormularioNotaCurso({ onExito, initialData }) {
         bimestre: initialData.bimestre ?? "",
         id_matricula: initialData.id_matricula ?? "",
         id_curso_seccion: initialData.id_curso_seccion ?? ""
-        });
+      });
     }
   }, [initialData]);
 
@@ -54,13 +56,13 @@ export default function FormularioNotaCurso({ onExito, initialData }) {
 
   const validarFormulario = () => {
     const { bimestre, nota } = form;
-    if ( !bimestre || !nota) {
+    if (!bimestre || !nota) {
       return "Todos los campos son obligatorios";
     }
     if (!/^\d+$/.test(nota) || parseInt(nota) < 0 || parseInt(nota) > 20) {
       return "La nota debe ser un número entre 0 y 20";
     }
-       if (nota < 0) {
+    if (nota < 0) {
       return "La nota no puede ser menor que 0";
     }
     if (nota > 20) {
@@ -80,19 +82,19 @@ export default function FormularioNotaCurso({ onExito, initialData }) {
     }
 
     const datos = {
-      matricula:initialData.id_matricula,
-      cursoseccion:initialData.id_curso_seccion,
-      bimestre:initialData.bimestre,
+      id_nota: form.id_nota,
+      matricula: form.id_matricula,
       nota: parseInt(form.nota),
       estado: form.estado,
     };
 
     try {
-        
-        await examenService.actualizar(form.id_examen, datos);
-        setMensajeExito("Nota actualizada con éxito");
-        onExito("Nota actualizada con éxito");
-      
+      console.log(datos);
+
+      await notaService.actualizar(form.id_nota, datos);
+      setMensajeExito("Nota actualizada con éxito");
+      onExito("Nota actualizada con éxito");
+
     } catch (err) {
       setError("Error al guardar la nota. Intenta nuevamente.");
     }
@@ -138,10 +140,10 @@ export default function FormularioNotaCurso({ onExito, initialData }) {
           name="bimestre"
           placeholder="Bimestre"
           className="input input-bordered w-full"
-          value={form.bimestre} 
+          value={form.bimestre}
           disabled
         />
-         
+
         <input
           name="nota"
           placeholder="Nota (0-20)"

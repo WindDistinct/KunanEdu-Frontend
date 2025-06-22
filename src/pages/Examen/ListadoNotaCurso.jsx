@@ -6,8 +6,9 @@ import { useNavigate } from "react-router-dom";
 import FormularioNotaCurso from "./FormularioNotaCurso";
 
 export default function ListadoNotasPorCurso() {
-    const [formData, setFormData] = useState(null);
-     const [mostrarFormulario, setMostrarFormulario] = useState(false);
+
+  const [formData, setFormData] = useState(null);
+  const [mostrarFormulario, setMostrarFormulario] = useState(false);
   const [periodos, setPeriodos] = useState([]);
   const [periodoSeleccionado, setPeriodoSeleccionado] = useState("");
   const [cursos, setCursos] = useState([]);
@@ -40,14 +41,14 @@ export default function ListadoNotasPorCurso() {
     }
   }, [id_usuario, periodoSeleccionado]);
 
-  const cargarNotas = useCallback(async () => { 
+  const cargarNotas = useCallback(async () => {
     if (!cursoSeleccionado) return;
 
     try {
-      const data = await examenService.obtenerNotasCurso(id_usuario,periodoSeleccionado,cursoSeleccionado);
-      
-       const examenOrdenadas = data.sort((a, b) => a.id_examen - b.id_examen);
-       setNotas(examenOrdenadas);
+      const data = await examenService.obtenerNotasCurso(id_usuario, periodoSeleccionado, cursoSeleccionado);
+
+      const examenOrdenadas = data.sort((a, b) => a.id_examen - b.id_examen);
+      setNotas(examenOrdenadas);
     } catch (error) {
       setMensaje({ tipo: "error", texto: "Error al cargar notas: " + error });
     }
@@ -73,8 +74,9 @@ export default function ListadoNotasPorCurso() {
   }, [mensaje]);
 
   const handleEditar = (nota) => {
-  setFormData(nota);
-  setMostrarFormulario(true);
+    console.log(nota);
+    setFormData(nota);
+    setMostrarFormulario(true);
   };
 
   const handleEliminar = async (id_examen) => {
@@ -88,15 +90,15 @@ export default function ListadoNotasPorCurso() {
   };
 
   const handleExito = async (texto) => {
-  setMensaje({ tipo: "success", texto });
-  setFormData(null);
-  setMostrarFormulario(false);
-  await cargarNotas();
+    setMensaje({ tipo: "success", texto });
+    setFormData(null);
+    setMostrarFormulario(false);
+    await cargarNotas();
   };
 
   const handleCancelar = () => {
-  setFormData(null);
-  setMostrarFormulario(false);
+    setFormData(null);
+    setMostrarFormulario(false);
   };
 
 
@@ -109,26 +111,26 @@ export default function ListadoNotasPorCurso() {
       </button>
 
       {mostrarFormulario && (
-      <dialog id="modalNota" className="modal modal-open">
-        <div className="modal-box w-11/12 max-w-2xl">
-          <h3 className="font-bold text-lg mb-4">
-            {formData ? "Editar Nota" : "Registrar Nota"}
-          </h3>
+        <dialog id="modalNota" className="modal modal-open">
+          <div className="modal-box w-11/12 max-w-2xl">
+            <h3 className="font-bold text-lg mb-4">
+              {formData ? "Editar Nota" : "Registrar Nota"}
+            </h3>
 
-          <FormularioNotaCurso initialData={formData} onExito={handleExito} />
+            <FormularioNotaCurso initialData={formData} onExito={handleExito} />
 
-          <div className="modal-action">
-            <button className="btn btn-error" onClick={handleCancelar}>
-              Cancelar
-            </button>
+            <div className="modal-action">
+              <button className="btn btn-error" onClick={handleCancelar}>
+                Cancelar
+              </button>
+            </div>
           </div>
-        </div>
-        <form method="dialog" className="modal-backdrop">
-          <button onClick={handleCancelar}>Cerrar</button>
-        </form>
-      </dialog>
-    )}
- 
+          <form method="dialog" className="modal-backdrop">
+            <button onClick={handleCancelar}>Cerrar</button>
+          </form>
+        </dialog>
+      )}
+
 
       <div className="mb-4">
         <label className="block text-lg font-medium mb-2">Selecciona un Periodo:</label>
@@ -172,8 +174,8 @@ export default function ListadoNotasPorCurso() {
         <Tabla
           columnas={[
             { key: "nombre_completo", label: "Alumno" },
-              { key: "numero_aula", label: "Aula" },
-              { key: "seccion", label: "Seccion" },
+            { key: "numero_aula", label: "Aula" },
+            { key: "seccion", label: "Seccion" },
             { key: "bimestre", label: "Bimestre" },
             { key: "nota", label: "Nota" },
             { key: "estado", label: "Estado" }

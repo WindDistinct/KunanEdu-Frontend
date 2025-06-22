@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { alumnoService, examenService } from "../../api/requestApi";
 
-export default function FormularioNota({ initialData, onCerrar,onExito }) {
+export default function FormularioNota({ initialData, onCerrar, onExito }) {
   const [alumnos, setAlumnos] = useState([]);
   const [bimestre, setBimestre] = useState("");
   const [notas, setNotas] = useState({});
   const [notasCargadas, setNotasCargadas] = useState({});
-const [error, setError] = useState(null);
- const [mensajeExito, setMensajeExito] = useState(null);
+  const [error, setError] = useState(null);
+  const [mensajeExito, setMensajeExito] = useState(null);
 
 
   useEffect(() => {
@@ -18,11 +18,11 @@ const [error, setError] = useState(null);
   }, [initialData]);
 
   useEffect(() => {
-      if (mensajeExito) {
-        const timer = setTimeout(() => setMensajeExito(null), 3000);
-        return () => clearTimeout(timer);
-      }
-    }, [mensajeExito]);
+    if (mensajeExito) {
+      const timer = setTimeout(() => setMensajeExito(null), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [mensajeExito]);
 
   const cargarAlumnos = async (curso) => {
     try {
@@ -46,7 +46,7 @@ const [error, setError] = useState(null);
           bimestre,
           initialData.id_curso_seccion
         );
-
+        console.log(notasExistentes)
         const notasMap = {};
         notasExistentes.forEach((n) => {
           notasMap[n.id_alumno] = n.nota;
@@ -62,33 +62,40 @@ const [error, setError] = useState(null);
     cargarNotas();
   }, [bimestre, initialData]);
 
- const handleNotaChange = (idAlumno, valor) => {
-  const notaNumerica = parseFloat(valor);
+  const handleNotaChange = (idAlumno, valor) => {
+    const notaNumerica = parseFloat(valor);
 
-  // Permitir limpiar
-  if (valor === "") {
+    // Permitir limpiar
+    if (valor === "") {
+      setError(null);
+      setNotas((prev) => ({
+        ...prev,
+        [idAlumno]: "",
+      }));
+      return;
+    }
+
+    // Validar rango
+    if (isNaN(notaNumerica) || notaNumerica < 0 || notaNumerica > 20) {
+      setError(`La nota para el alumno ${idAlumno} debe estar entre 0 y 20.`);
+      return;
+    }
+
     setError(null);
     setNotas((prev) => ({
       ...prev,
-      [idAlumno]: "",
+      [idAlumno]: valor,
     }));
-    return;
-  }
-
-  // Validar rango
-  if (isNaN(notaNumerica) || notaNumerica < 0 || notaNumerica > 20) {
-    setError(`La nota para el alumno ${idAlumno} debe estar entre 0 y 20.`);
-    return;
-  }
-
-  setError(null);
-  setNotas((prev) => ({
-    ...prev,
-    [idAlumno]: valor,
-  }));
-};
+  };
   const handleGuardar = async () => {
     try {
+
+      if (!initialData || !initialData.id_examen) {
+        console.error("❌ No se puede guardar porque falta el ID del examen.");
+        setError("Error interno: examen no definido.");
+        return;
+      }
+
       const payload = alumnos
         .filter((alumno) => !notasCargadas.hasOwnProperty(alumno.id_alumno))
         .filter(
@@ -97,24 +104,26 @@ const [error, setError] = useState(null);
             notas[alumno.id_alumno] !== ""
         )
         .map((alumno) => ({
-          cursoseccion: initialData.id_curso_seccion,
-          matricula: alumno.id_matricula,
-          bimestre,
+          id_examen: initialData.id_examen,
+          id_matricula: alumno.id_matricula,
           nota: parseFloat(notas[alumno.id_alumno]),
         }));
 
+      console.log("Payload a enviar:", payload);
+
       if (payload.length === 0) {
         setMensajeExito("No se ha ingresado una nota");
-      onExito("No se ha ingresado una nota");
-       onCerrar();
-       return
-      } 
+        onExito("No se ha ingresado una nota");
+        onCerrar();
+        return
+      }
       await examenService.registrarNotas(payload);
       onCerrar();
       setMensajeExito("Nota ingresada con éxito");
       onExito("Nota ingresada con éxito");
     } catch (error) {
-      console.error("Error al registrar notas:", error);
+      console.error("Error al insertar nota:", error.message, error.stack);
+      throw error; // esto es lo que provoca el 500
     }
   };
 

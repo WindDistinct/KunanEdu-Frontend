@@ -8,11 +8,11 @@ const createApiService = (resource) => ({
   eliminar: (id) => axiosInstance.delete(`/api/${resource}/delete/${id}`).then(r => r.data),
   auditar: () => axiosInstance.get(`/api/${resource}/all-audit`).then(r => r.data)
 });
- 
+
 const alumnoService = {
   ...createApiService("estudiante"),
-  obtenerAlumnosPorAula: (aula,cursoseccion) => axiosInstance.get(`/api/estudiante/alumnos-aula/${aula}/${cursoseccion}`).then(r => r.data)
-}; 
+  obtenerAlumnosPorAula: (aula, cursoseccion) => axiosInstance.get(`/api/estudiante/alumnos-aula/${aula}/${cursoseccion}`).then(r => r.data)
+};
 
 const usuarioService = {
   ...createApiService("usuario"),
@@ -24,46 +24,50 @@ const usuarioService = {
       throw error.response?.data?.message || "Error en login";
     }
   }
-}; 
+};
 const seccionService = {
   ...createApiService("seccion"),
- obtenerPorGradoYPeriodo: (grado,periodo) => axiosInstance.get(`/api/seccion/grado-periodo/${grado}/${periodo}`).then(r => r.data)
- 
+  obtenerPorGradoYPeriodo: (grado, periodo) => axiosInstance.get(`/api/seccion/grado-periodo/${grado}/${periodo}`).then(r => r.data)
+
 };
 const gradoService = createApiService("grado");
 const periodoService = {
   ...createApiService("periodo"),
   obtenerSeccionesPeriodo: (idPeriodo) => axiosInstance.get(`/api/periodo/seccion-periodo/${idPeriodo}`).then(r => r.data)
-}; 
+};
 const empleadoService = {
   ...createApiService("empleado"),
   obtenerDocentes: () => axiosInstance.get(`/api/empleado/all-docente`).then(r => r.data),
   obtenerEmpleadoUsuarios: () => axiosInstance.get(`/api/empleado/all-usuarios`).then(r => r.data),
-  obtenerCursosPorUsuario: (idDocente,periodo) => axiosInstance.get(`/api/empleado/cursos-periodo/${idDocente}/${periodo}`).then(r => r.data)
- 
+  obtenerCursosPorUsuario: (idDocente, periodo) => axiosInstance.get(`/api/empleado/cursos-periodo/${idDocente}/${periodo}`).then(r => r.data)
+
 };
 const cursoService = createApiService("curso");
-const aulaService = createApiService("aula"); 
+const aulaService = createApiService("aula");
 const cursoGradoService = {
   ...createApiService("curso_grado"),
   obtenerCursosPorGrado: (idGrado) => axiosInstance.get(`/api/curso_grado/cursos/${idGrado}`).then(r => r.data)
-}; 
- 
+};
+
 const cursoSeccionService = {
   ...createApiService("curso_seccion"),
   verificarCursosAsignados: (id) => axiosInstance.get(`/api/curso_seccion/verificar-asig/${id}`).then(r => r.data),
-  envioListaCursosYdocentes: (data) => axiosInstance.post(`/api/curso_seccion/multiple`,data).then(r => r.data)
-}; 
-const matriculaService  = createApiService("matricula");
+  envioListaCursosYdocentes: (data) => axiosInstance.post(`/api/curso_seccion/multiple`, data).then(r => r.data)
+};
+const matriculaService = createApiService("matricula");
 
 
 const examenService = {
   ...createApiService("examen"),
-  obtenerNotasporAlumno: (id) => axiosInstance.get(`/api/examen/notas-alum/${idAlumno}`).then(r => r.data),
- registrarNotas: (data) => axiosInstance.post(`/api/examen/multiple`,data).then(r => r.data),
-obtenerNotasBimestre: (aula,bimestre,cursoseccion) => axiosInstance.get(`/api/examen/nota-bimestre/${aula}/${bimestre}/${cursoseccion}`).then(r => r.data),
-obtenerNotasCurso: (docente,periodo,cursoseccion) => axiosInstance.get(`/api/examen/notas-curso/${docente}/${periodo}/${cursoseccion}`).then(r => r.data)
+  obtenerNotasporAlumno: (idAlumno) => axiosInstance.get(`/api/examen/notas-alum/${idAlumno}`).then(r => r.data),
+  registrarNotas: (data) => axiosInstance.post(`/api/examen/multiple`, data).then(r => r.data),
+  obtenerNotasBimestre: (aula, bimestre, cursoseccion) => axiosInstance.get(`/api/examen/nota-bimestre/${aula}/${bimestre}/${cursoseccion}`).then(r => r.data),
+  obtenerNotasCurso: (docente, periodo, cursoseccion) => axiosInstance.get(`/api/examen/notas-curso/${docente}/${periodo}/${cursoseccion}`).then(r => r.data)
 
 }
 
-export { examenService, aulaService,matriculaService, cursoSeccionService,cursoGradoService,usuarioService, alumnoService, seccionService, gradoService, periodoService, empleadoService, cursoService };
+const notaService = {
+  ...createApiService("nota")
+}
+
+export { notaService, examenService, aulaService, matriculaService, cursoSeccionService, cursoGradoService, usuarioService, alumnoService, seccionService, gradoService, periodoService, empleadoService, cursoService };
