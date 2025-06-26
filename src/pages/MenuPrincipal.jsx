@@ -1,22 +1,14 @@
 import React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 
-export default function MenuPrincipal({ onLogout }) {
-  const navigate = useNavigate();
+export default function MenuPrincipal() {
+  
   const rol = localStorage.getItem("rol");
 
   const puedeVerAuditoria = rol === "auditor";
   const puedeVerMantenimientos = ["usuario", "administrador", "profesor"].includes(rol);
   const puedeVerNotas = ["tutor", "profesor"].includes(rol);
-
-  const handleLogout = () => {
-    localStorage.clear();
-    onLogout();
-    navigate("/login");
-  };
-
-  
 
   const menuItemsEstaticos = [
     { path: "/empleados", nombre: "Empleados" },
@@ -59,13 +51,8 @@ export default function MenuPrincipal({ onLogout }) {
     <div className="min-h-screen flex flex-col">
       
       <div className="navbar bg-base-100 shadow-md px-6">
-        <div className="flex-1 text-lg font-semibold  text-left">
-          Bienvenido, estás accediendo como {rol}
-        </div>
-        <div className="flex-none">
-          <button onClick={handleLogout} className="btn btn-error text-white">
-            Cerrar Sesión
-          </button>
+        <div className="flex-1 text-lg font-semibold  text-center">
+          Bienvenido, estás accediendo como <span className="font-bold uppercase">{rol}</span>.
         </div>
       </div>
 

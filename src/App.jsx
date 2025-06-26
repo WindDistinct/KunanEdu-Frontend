@@ -1,7 +1,7 @@
 import "./App.css";
 import logo from "/logo.svg";
 import { useState } from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 
 import LoginUser from "./components/LoginUser";
 import MenuPrincipal from "./pages/MenuPrincipal";
@@ -36,12 +36,26 @@ import ListadoNotasPorCurso from "./pages/Examen/ListadoNotaCurso";
 
 function App() {
   const [autenticado, setAutenticado] = useState(false);
+  const navigate = useNavigate();
+  const handleLogout = () => {
+      localStorage.clear();
+      setAutenticado(false);
+      navigate("/login");
+    };
+   
 
   return (
     <div className="flex flex-col min-h-screen">
-      <header className="sticky top-0 left-0 w-full z-50 bg-white shadow-md flex items-center px-6 h-16">
-        <img src={logo} className="App-logo" alt="logo" />
-        <h1 className="App-title">KunanEdu</h1>
+      <header className="sticky top-0 left-0 w-full z-50 bg-white shadow-md flex items-center justify-between px-6 h-16">
+        <div className="flex items-center gap-4">
+          <img src={logo} className="App-logo" alt="logo" />
+          <h1 className="App-title">KunanEdu</h1>
+        </div>
+        {autenticado && (
+    <button onClick={handleLogout} className="btn btn-error text-white">
+      Cerrar Sesión
+    </button>
+  )}
       </header>
       <main className="px-4 py-6 text-center">
         <div className={`${autenticado ? 'h-[calc(100vh-60px)]' : ''}`}>
@@ -49,7 +63,7 @@ function App() {
         {autenticado ? (
             <Routes>
               <Route path="/login" element={<LoginUser />} />
-              <Route path="/" element={<MenuPrincipal onLogout={() => setAutenticado(false)} />} />
+              <Route path="/" element={<MenuPrincipal  />} />
               <Route path="/aulas" element={<ListadoAula />} />
               <Route path="/alumnos" element={<ListadoAlumno />} />
               <Route path="/cursos" element={<ListadoCurso />} />

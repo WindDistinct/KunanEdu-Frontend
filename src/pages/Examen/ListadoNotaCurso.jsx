@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { periodoService, alumnoService, notaService } from "../../api/requestApi";
+import { useNavigate } from "react-router-dom";
 import Notificacion from "../../components/Notificacion";
 
 export default function ListadoNotasPorCurso() {
@@ -11,6 +12,7 @@ export default function ListadoNotasPorCurso() {
   const [mensaje, setMensaje] = useState(null);
   const [infoAlumno, setInfoAlumno] = useState(null);
   const [infoPeriodo, setInfoPeriodo] = useState(null);
+    const navigate = useNavigate();
 
   const cargarPeriodos = async () => {
     try {
@@ -95,7 +97,9 @@ export default function ListadoNotasPorCurso() {
       </style>
 
       <h1 className="text-3xl font-bold mb-6">Reporte de Notas por Alumno</h1>
-
+          <button onClick={() => navigate("/")} className="btn btn-secondary mb-4">
+        ← Volver al Menú
+      </button>
       <div className="flex flex-wrap gap-4 mb-6">
         <div>
           <label className="block font-medium mb-1">Periodo</label>
