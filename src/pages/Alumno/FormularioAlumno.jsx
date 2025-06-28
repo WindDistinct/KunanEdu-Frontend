@@ -11,7 +11,8 @@ const inicialForm = {
   nombre: "",
   apellido_paterno: "",
   apellido_materno: "",
-  dni: "",
+  tipo_documento: "",
+  numero_documento: "",
   direccion: "",
   telefono: "",
   fecha_nacimiento: "",
@@ -51,7 +52,7 @@ export default function FormularioAlumno({ onExito, initialData }) {
   const handleChange = ({ target: { name, value, type, checked } }) => {
     let newValue = type === "checkbox" ? checked : value;
 
-    if (["dni", "telefono"].includes(name)) {
+    if (["numero_documento", "telefono"].includes(name)) {
       newValue = newValue.replace(/\D/g, "");
     }
 
@@ -71,7 +72,7 @@ export default function FormularioAlumno({ onExito, initialData }) {
       nombre,
       apellido_paterno,
       apellido_materno,
-      dni,
+      tipo_documento,numero_documento,
       direccion,
       telefono,
       fecha_nacimiento,
@@ -81,7 +82,8 @@ export default function FormularioAlumno({ onExito, initialData }) {
       !nombre ||
       !apellido_paterno ||
       !apellido_materno ||
-      !dni ||
+      !tipo_documento ||
+      !numero_documento ||
       !direccion ||
       !telefono ||
       !fecha_nacimiento
@@ -95,8 +97,16 @@ export default function FormularioAlumno({ onExito, initialData }) {
       return "El apellido paterno debe tener al menos 2 letras y no contener números";
     if (!validarTexto(apellido_materno))
       return "El apellido materno debe tener al menos 2 letras y no contener números";
-    if (!validarNumeroExacto(dni, 8))
+    if (!tipo_documento)
+      return "Debe seleccionar un tipo de documento";
+    if (!numero_documento)
+      return "Debe ingresar el número de documento";
+    if (tipo_documento === "DNI" && !validarNumeroExacto(numero_documento, 8))
       return "El DNI debe tener exactamente 8 dígitos numéricos";
+    if (tipo_documento === "CARNET" && numero_documento.length < 9)
+      return "El Carnet debe tener al menos 9 caracteres";
+    if (tipo_documento === "PASAPORTE" && numero_documento.length < 9)
+      return "El pasaporte debe tener al menos 9 caracteres";
     if (direccion.length < 5)
       return "La dirección debe tener al menos 5 caracteres";
     if (!validarNumeroExacto(telefono, 9))
@@ -148,81 +158,132 @@ export default function FormularioAlumno({ onExito, initialData }) {
         )}
       </div>
 
-      <input
-        name="nombre"
-        placeholder="Nombres"
-        className="input input-bordered w-full"
-        value={form.nombre}
-        onChange={handleChange}
-      />
-
-      <input
-        name="apellido_paterno"
-        placeholder="Apellido Paterno"
-        className="input input-bordered w-full"
-        value={form.apellido_paterno}
-        onChange={handleChange}
-      />
-
-      <input
-        name="apellido_materno"
-        placeholder="Apellido Materno"
-        className="input input-bordered w-full"
-        value={form.apellido_materno}
-        onChange={handleChange}
-      />
-
-      <input
-        name="dni"
-        placeholder="DNI"
-        className="input input-bordered w-full"
-        value={form.dni}
-        onChange={handleChange}
-        maxLength={8}
-        inputMode="numeric"
-        onKeyDown={(e) => e.key === " " && e.preventDefault()}
-      />
-
-      <input
-        name="telefono"
-        placeholder="Teléfono"
-        className="input input-bordered w-full"
-        value={form.telefono}
-        onChange={handleChange}
-        maxLength={9}
-        inputMode="numeric"
-        onKeyDown={(e) => e.key === " " && e.preventDefault()}
-      />
-
-      <input
-        name="direccion"
-        placeholder="Dirección"
-        className="input input-bordered w-full"
-        value={form.direccion}
-        onChange={handleChange}
-      />
-
-      <input
-        name="fecha_nacimiento"
-        type="date"
-        className="input input-bordered w-full"
-        value={form.fecha_nacimiento}
-        onChange={handleChange}
-        max={fechaMaximaNacimiento}
-      />
-
-      {initialData && (
-        <label className="label cursor-pointer w-full mt-1">
-          <span className="label-text">Activo</span>
+      <div>
+        <label className="label">
+          <span className="label-text">Nombres</span>
+        </label>
+        <input
+          name="nombre"
+          className="input input-bordered w-full"
+          value={form.nombre}
+          onChange={handleChange}
+        />
+      </div>
+      <div>
+          <label className="label">
+            <span className="label-text">Apellido Paterno</span>
+          </label>
           <input
-            type="checkbox"
-            name="estado"
-            className="toggle toggle-success"
-            checked={!!form.estado}
+            name="apellido_paterno"
+            className="input input-bordered w-full"
+            value={form.apellido_paterno}
             onChange={handleChange}
           />
+      </div> 
+      <div>
+          <label className="label">
+            <span className="label-text">Apellido Materno</span>
+          </label>
+          <input
+            name="apellido_materno"
+            className="input input-bordered w-full"
+            value={form.apellido_materno}
+            onChange={handleChange}
+          />
+      </div>
+
+      <div>
+          <label className="label">
+            <span className="label-text">Tipo de Documento</span>
+          </label>
+          <select
+            name="tipo_documento"
+            className="select select-bordered w-full"
+            value={form.tipo_documento}
+            onChange={handleChange}
+          >
+            <option value="">Elija un tipo de documento</option>
+            <option value="DNI">DNI</option>
+            <option value="CARNET">Carnet de extranjería</option>
+            <option value="PASAPORTE">Pasaporte</option>
+          </select>
+      </div>
+
+      <div>
+          <label className="label">
+            <span className="label-text">Número de Documento</span>
+          </label>
+          <input
+            name="numero_documento"
+            className="input input-bordered w-full"
+            value={form.numero_documento}
+            onChange={handleChange}
+            maxLength={form.tipo_documento === "DNI" ? 8 : 12}
+            inputMode="numeric"
+            onKeyDown={(e) => e.key === " " && e.preventDefault()}
+          />
+      </div>
+ 
+      <div>
+          <label className="label">
+            <span className="label-text">Teléfono</span>
+          </label>
+          <input
+            name="telefono"
+            className="input input-bordered w-full"
+            value={form.telefono}
+            onChange={handleChange}
+            maxLength={9}
+            inputMode="numeric"
+            onKeyDown={(e) => e.key === " " && e.preventDefault()}
+          />
+      </div>
+
+      <div>
+        <label className="label">
+          <span className="label-text">Dirección</span>
         </label>
+        <input
+          name="direccion"
+          className="input input-bordered w-full"
+          value={form.direccion}
+          onChange={handleChange}
+        />
+      </div>
+
+      <div>
+        <label className="label">
+          <span className="label-text">Fecha de Nacimiento</span>
+        </label>
+        <input
+          name="fecha_nacimiento"
+          type="date"
+          className="input input-bordered w-full"
+          value={form.fecha_nacimiento}
+          onChange={handleChange}
+          max={fechaMaximaNacimiento}
+        />
+      </div>
+     {initialData && (
+        <div className="col-span-2 mt-2">
+          <label className="label cursor-pointer w-full">
+            <span className="label-text">
+              Estado:{" "}
+              <span className={`font-semibold ml-2 ${form.estado ? "text-green-600" : "text-red-600"}`}>
+                {form.estado ? "Activo" : "Inactivo"}
+              </span>
+            </span>
+            <input
+              type="checkbox"
+              name="estado"
+              className="toggle toggle-success ml-4"
+              checked={!!form.estado}
+              onChange={handleChange}
+            />
+          </label>
+        </div>
       )}
+          
 
       <div className="col-span-2 mt-2">
         <button type="submit" className="btn btn-success">

@@ -34,6 +34,7 @@ export default function AuditoriaGrado() {
           { key: "nivel_nuevo", label: "Nivel Nuevo" },
           { key: "anio_anterior", label: "Año Anterior" },
           { key: "anio_nuevo", label: "Año Nuevo" },
+           { key: "observacion", label: "Observacion" },
           { key: "operacion", label: "Operación" },
           { key: "fecha_modificacion", label: "Fecha Modificación" },
           { key: "usuario_modificador", label: "Usuario Modificador" }

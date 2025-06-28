@@ -38,8 +38,8 @@ export default function AuditoriaAlumno() {
             { key: "apellido_materno_anterior", label: "Apellido Materno Anterior" },
             { key: "apellido_materno_nuevo", label: "Apellido Materno Nuevo" },
             
-            { key: "dni_anterior", label: "DNI Anterior" },
-            { key: "dni_nuevo", label: "DNI Nuevo" },
+            { key: "numero_documento_anterior", label: "Numero documento Anterior" },
+            { key: "numero_documento_nuevo", label: "Numero documento Nuevo" },
             { key: "direccion_anterior", label: "Dirección Anterior" },
             { key: "direccion_nuevo", label: "Dirección Nueva" },
             { key: "telefono_anterior", label: "Teléfono Anterior" },

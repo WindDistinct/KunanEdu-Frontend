@@ -33,8 +33,10 @@ const seccionService = {
   ...createApiService("seccion"),
   obtenerPorGradoYPeriodo: (grado, periodo) => axiosInstance.get(`/api/seccion/grado-periodo/${grado}/${periodo}`).then(r => r.data)
 };
-
-const gradoService = createApiService("grado");
+ 
+const gradoService = {
+  ...createApiService("grado")
+};
 
 const periodoService = {
   ...createApiService("periodo"),

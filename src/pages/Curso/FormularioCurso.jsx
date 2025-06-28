@@ -94,28 +94,42 @@ export default function FormularioCurso({ onExito, initialData }) {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <input
-          name="nombre_curso"
-          placeholder="Nombre del Curso"
-          className="input input-bordered w-full"
-          value={form.nombre_curso}
-          onChange={handleChange}
-          maxLength={50}
-          onKeyDown={(e) => e.key === " " && e.target.selectionStart === 0 && e.preventDefault()}
-        />
 
-        {initialData && (
-          <label className="label cursor-pointer gap-4">
-            <span className="label-text">Activo</span>
-            <input
-              type="checkbox"
-              className="toggle toggle-success"
-              name="estado"
-              checked={!!form.estado}
-              onChange={handleChange}
-            />
+        <div>
+          <label className="label">
+            <span className="label-text">Nombre Curso</span>
           </label>
+          <input
+            name="nombre_curso"
+            className="input input-bordered w-full"
+            value={form.nombre_curso}
+            onChange={handleChange}
+            maxLength={50}
+            onKeyDown={(e) => e.key === " " && e.target.selectionStart === 0 && e.preventDefault()}
+          />
+        </div>
+
+        
+        {initialData && (
+          <div className="col-span-2 mt-2">
+            <label className="label cursor-pointer w-full">
+              <span className="label-text">
+                Estado:{" "}
+                <span className={`font-semibold ml-2 ${form.estado ? "text-green-600" : "text-red-600"}`}>
+                  {form.estado ? "Activo" : "Inactivo"}
+                </span>
+              </span>
+              <input
+                type="checkbox"
+                name="estado"
+                className="toggle toggle-success ml-4"
+                checked={!!form.estado}
+                onChange={handleChange}
+              />
+            </label>
+          </div>
         )}
+        
       </div>
 
       <div>

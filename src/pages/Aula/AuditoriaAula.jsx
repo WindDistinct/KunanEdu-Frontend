@@ -34,6 +34,7 @@ export default function AuditoriaAula() {
           { key: "aforo_nuevo", label: "Aforo Nuevo" },
           { key: "ubicacion_anterior", label: "Ubicación Anterior" },
           { key: "ubicacion_nuevo", label: "Ubicación Nuevo" },
+            { key: "observacion", label: "Observacion" },
           { key: "operacion", label: "Operación" },
           { key: "fecha_modificacion", label: "Fecha Modificación" },
           { key: "usuario_modificador", label: "Usuario Modificador" },

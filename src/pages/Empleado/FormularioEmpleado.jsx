@@ -7,7 +7,8 @@ export default function FormularioEmpleado({ onExito, initialData }) {
     ape_pat_emp: "",
     ape_mat_emp: "",
     fec_nac: "",
-    dni: "",
+   tipo_documento: "",
+  numero_documento: "",
     telefono: "",
     especialidad: "",
     cargo: "",
@@ -40,7 +41,7 @@ export default function FormularioEmpleado({ onExito, initialData }) {
     const { name, value, type, checked } = e.target;
     let nuevoValor = type === "checkbox" ? checked : value;
 
-    if (["dni", "telefono"].includes(name)) {
+    if (["numero_documento", "telefono"].includes(name)) {
       nuevoValor = value.replace(/\D/g, "");
     }
 
@@ -68,7 +69,8 @@ export default function FormularioEmpleado({ onExito, initialData }) {
       "ape_pat_emp",
       "ape_mat_emp",
       "fec_nac",
-      "dni",
+      "tipo_documento",
+      "numero_documento",
       "telefono",
       "especialidad",
       "cargo"
@@ -89,11 +91,18 @@ export default function FormularioEmpleado({ onExito, initialData }) {
     }
     if (!esTextoValido(form.especialidad)) {
       return "La especialidad solo debe contener letras y espacios";
-    }
-     
-    if (!esNumeroExacto(form.dni, 8)) {
-      return "El DNI debe contener exactamente 8 dígitos numéricos";
-    }
+    } 
+    if (!form.tipo_documento)
+      return "Debe seleccionar un tipo de documento";
+    if (!form.numero_documento)
+      return "Debe ingresar el número de documento";
+    if (form.tipo_documento === "DNI" && !esNumeroExacto(form.numero_documento, 8))
+      return "El DNI debe tener exactamente 8 dígitos numéricos";
+    if (form.tipo_documento === "CARNET" && form.numero_documento.length < 9)
+      return "El Carnet debe tener al menos 9 caracteres";
+    if (form.tipo_documento === "PASAPORTE" && form.numero_documento.length < 9)
+      return "El pasaporte debe tener al menos 9 caracteres";
+ 
     if (!esNumeroExacto(form.telefono, 9)) {
       return "El teléfono debe contener exactamente 9 dígitos numéricos";
     }
@@ -125,7 +134,8 @@ export default function FormularioEmpleado({ onExito, initialData }) {
         ape_pat_emp: "",
         ape_mat_emp: "",
         fec_nac: "",
-        dni: "",
+        tipo_documento: "",
+        numero_documento: "", 
         telefono: "",
         especialidad: "",
         cargo: "",
@@ -152,112 +162,175 @@ export default function FormularioEmpleado({ onExito, initialData }) {
         )}
       </div>
 
-      <input
-        name="nombre_emp"
-        placeholder="Nombres"
-        className="input input-bordered w-full"
-        value={form.nombre_emp}
-        onChange={handleChange}
-      />
+     <div>
+        <label className="label">
+          <span className="label-text">Nombres</span>
+        </label>
+        <input
+          name="nombre_emp"
+          className="input input-bordered w-full"
+          value={form.nombre_emp}
+          onChange={handleChange}
+        />
+      </div>
 
-      <input
-        name="ape_pat_emp"
-        placeholder="Apellido Paterno"
-        className="input input-bordered w-full"
-        value={form.ape_pat_emp}
-        onChange={handleChange}
-      />
+      <div>
+            <label className="label">
+              <span className="label-text">Apellido Paterno</span>
+            </label>
+            <input
+              name="ape_pat_emp"
+              className="input input-bordered w-full"
+              value={form.ape_pat_emp}
+              onChange={handleChange}
+            />
+      </div> 
 
-      <input
-        name="ape_mat_emp"
-        placeholder="Apellido Materno"
-        className="input input-bordered w-full"
-        value={form.ape_mat_emp}
-        onChange={handleChange}
-      />
-
-      <input
-        name="fec_nac"
-        type="date"
-        className="input input-bordered w-full"
-        value={form.fec_nac}
-        onChange={handleChange}
-        max={obtenerFechaMaximaNacimiento()}
-      />
-
-      <input
-        name="dni"
-        placeholder="DNI"
-        className="input input-bordered w-full"
-        maxLength={8}
-        value={form.dni}
-        onChange={handleChange}
-        inputMode="numeric"
-      />
-
-      <input
-        name="telefono"
-        placeholder="Teléfono"
-        className="input input-bordered w-full"
-        maxLength={9}
-        value={form.telefono}
-        onChange={handleChange}
-        inputMode="numeric"
-      />
-
-
-      <select
-        name="especialidad"
-        className="select select-bordered w-full"
-        value={form.especialidad}
-        onChange={handleChange}
-      >
-        <option value="" disabled>Seleccione Especialidad</option>
-        <option value="ciencias">ciencias</option>
-        <option value="letras">letras</option>
-        <option value="matematicas">matematicas</option>
-        <option value="mixto">mixto</option>
-        <option value="aseo">aseo</option>
-        <option value="supervisor">supervisor</option>
-      </select>
- 
-
-      <select
-        name="cargo"
-        className="select select-bordered w-full"
-        value={form.cargo}
-        onChange={handleChange}
-      >
-        <option value="" disabled>Seleccione cargo</option>
-        <option value="docente">Docente</option>
-        <option value="tutor">Tutor</option>
-        <option value="director">Director</option>
-        <option value="consultor">Consultor</option>
-        <option value="almacen">Almacén</option>
-        <option value="limpieza">Limpieza</option>
-      </select>
-
-      
-      <input
-        name="observacion"
-        placeholder="Observación"
-        className="input input-bordered w-full"
-        value={form.observacion}
-        onChange={handleChange}
-      />
-
-      {initialData && (
-        <label className="label cursor-pointer gap-4">
-          <span className="label-text">Activo</span>
+     <div>
+          <label className="label">
+            <span className="label-text">Apellido Materno</span>
+          </label>
           <input
-            type="checkbox"
-            className="toggle toggle-success"
-            name="estado"
-            checked={!!form.estado}
+            name="ape_mat_emp"
+            className="input input-bordered w-full"
+            value={form.ape_mat_emp}
             onChange={handleChange}
           />
+      </div>
+      <div>
+        <label className="label">
+          <span className="label-text">Fecha de Nacimiento</span>
         </label>
+        <input
+          name="fec_nac"
+          type="date"
+          className="input input-bordered w-full"
+          value={form.fec_nac}
+          onChange={handleChange}
+          max={obtenerFechaMaximaNacimiento}
+        />
+      </div>
+      
+      <div>
+          <label className="label">
+            <span className="label-text">Tipo de Documento</span>
+          </label>
+          <select
+            name="tipo_documento"
+            className="select select-bordered w-full"
+            value={form.tipo_documento}
+            onChange={handleChange}
+          >
+            <option value="">Elija un tipo de documento</option>
+            <option value="DNI">DNI</option>
+            <option value="CARNET">Carnet de extranjería</option>
+            <option value="PASAPORTE">Pasaporte</option>
+          </select>
+      </div>
+
+       <div>
+          <label className="label">
+            <span className="label-text">Número de Documento</span>
+          </label>
+          <input
+            name="numero_documento"
+            className="input input-bordered w-full"
+            value={form.numero_documento}
+            onChange={handleChange}
+            maxLength={form.tipo_documento === "DNI" ? 8 : 12}
+            inputMode="numeric"
+            onKeyDown={(e) => e.key === " " && e.preventDefault()}
+          />
+      </div>
+      <div>
+            <label className="label">
+              <span className="label-text">Teléfono</span>
+            </label>
+            <input
+              name="telefono"
+              className="input input-bordered w-full"
+              value={form.telefono}
+              onChange={handleChange}
+              maxLength={9}
+              inputMode="numeric"
+              onKeyDown={(e) => e.key === " " && e.preventDefault()}
+            />
+      </div>
+       
+       
+        <div>
+          <label className="label">
+            <span className="label-text">Especialidad</span>
+          </label>
+          <select
+            name="especialidad"
+            className="select select-bordered w-full"
+            value={form.especialidad}
+            onChange={handleChange}
+          >
+            <option value="" disabled>Seleccione Especialidad</option>
+            <option value="ciencias">ciencias</option>
+            <option value="letras">letras</option>
+            <option value="matematicas">matematicas</option>
+            <option value="mixto">mixto</option>
+            <option value="aseo">aseo</option>
+            <option value="supervisor">supervisor</option>
+          </select>
+      </div>
+
+      <div>
+          <label className="label">
+            <span className="label-text">Cargo</span>
+          </label>
+          <select
+            name="cargo"
+            className="select select-bordered w-full"
+            value={form.cargo}
+            onChange={handleChange}
+          >
+            <option value="" disabled>Seleccione cargo</option>
+            <option value="docente">Docente</option>
+            <option value="tutor">Tutor</option>
+            <option value="director">Director</option>
+            <option value="consultor">Consultor</option>
+            <option value="almacen">Almacén</option>
+            <option value="limpieza">Limpieza</option>
+          </select>
+      </div>
+   
+      <div>
+            <label className="label">
+              <span className="label-text">Observación</span>
+            </label>
+            <input
+              name="observacion"
+              className="input input-bordered w-full"
+              value={form.observacion}
+              onChange={handleChange}
+              
+            />
+      </div>
+      {initialData && (
+        <div className="col-span-2 mt-2">
+          <label className="label cursor-pointer w-full">
+            <span className="label-text">
+              Estado:{" "}
+              <span className={`font-semibold ml-2 ${form.estado ? "text-green-600" : "text-red-600"}`}>
+                {form.estado ? "Activo" : "Inactivo"}
+              </span>
+            </span>
+            <input
+              type="checkbox"
+              name="estado"
+              className="toggle toggle-success ml-4"
+              checked={!!form.estado}
+              onChange={handleChange}
+            />
+          </label>
+        </div>
       )}
+
+    
 
       <div className="col-span-2">
         <button type="submit" className="btn btn-success">
