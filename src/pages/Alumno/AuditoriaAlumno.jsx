@@ -44,6 +44,7 @@ export default function AuditoriaAlumno() {
             { key: "direccion_nuevo", label: "Dirección Nueva" },
             { key: "telefono_anterior", label: "Teléfono Anterior" },
             { key: "telefono_nuevo", label: "Teléfono Nuevo" }, 
+             { key: "observacion", label: "Observacion" },
             { key: "operacion", label: "Operación" },
             { key: "fecha_modificacion", label: "Fecha Modificación" },
             { key: "usuario_modificador", label: "Usuario Modificador" }

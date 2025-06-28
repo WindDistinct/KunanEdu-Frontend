@@ -34,8 +34,7 @@ export default function AuditoriaPeriodo() {
           { key: "descripcion_nuevo", label: "Descripción Nueva" },
           { key: "progreso_anterior", label: "Progreso Anterior" },
           { key: "progreso_nuevo", label: "Progreso Nuevo" },
-          /*{ key: "estado_anterior", label: "Estado Anterior" },
-          { key: "estado_nuevo", label: "Estado Nuevo" },*/
+             { key: "observacion", label: "Observacion" },
           { key: "operacion", label: "Operación" },
           { key: "fecha_modificacion", label: "Fecha Modificación" },
           { key: "usuario_modificador", label: "Usuario Modificador" }

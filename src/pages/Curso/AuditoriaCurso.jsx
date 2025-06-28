@@ -30,6 +30,7 @@ export default function AuditoriaCurso() {
           { key: "id_curso", label: "ID Aula" },
           { key: "nombre_curso_anterior", label: "Curso Anterior" },
           { key: "nombre_curso_nuevo", label: "Curso Nuevo" },
+            { key: "observacion", label: "Observacion" },
           { key: "operacion", label: "Operación" },
           { key: "fecha_modificacion", label: "Fecha Modificación" },
           { key: "usuario_modificador", label: "Usuario Modificador" },

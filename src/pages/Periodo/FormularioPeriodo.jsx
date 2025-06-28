@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { periodoService } from "../../api/requestApi";
 
 export default function FormularioPeriodo({ onExito, initialData }) {
+   const [observacion, setObservacion] = useState("");
   const [form, setForm] = useState({
     anio: "",
     descripcion: "",
@@ -58,15 +59,25 @@ export default function FormularioPeriodo({ onExito, initialData }) {
       return;
     }
 
-    const datos = {
+     if (form.id_periodo) {
+      document.getElementById("modalObservacion").showModal(); 
+    } else {
+      await enviarFormulario();
+    }
+ 
+  };
+
+  const enviarFormulario = async () => { 
+    try {
+
+      const datos = {
       ...form,
       anio: String(form.anio ?? "").trim(),
       descripcion: String(form.descripcion ?? "").trim(),
       progreso: String(form.progreso ?? "").trim(),
       estado: form.estado,
-    };
-
-    try {
+      observacion: observacion.trim(),
+      };
       if (form.id_periodo) {
         await periodoService.actualizar(form.id_periodo, datos);
         setMensajeExito("Periodo actualizado con éxito");
@@ -76,20 +87,22 @@ export default function FormularioPeriodo({ onExito, initialData }) {
         setMensajeExito("Periodo registrado con éxito");
         onExito("Periodo registrado con éxito");
       }
-
       setForm({
         anio: "",
         descripcion: "",
         progreso: "",
         estado: true,
       });
+      setObservacion("");
+      document.getElementById("modalObservacion").close(); 
     } catch (err) {
-      setError("Error al guardar. Verifique que el año no esté duplicado.");
+      setError("Error al guardar. Verifique que el nombre de curso no esté duplicado");
     }
-  };
+    }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+     <>
+      <form onSubmit={handleSubmit} className="space-y-4">
       <div className="col-span-2 h-16 relative">
         {error && (
           <div className="alert alert-error absolute w-full">
@@ -179,12 +192,47 @@ export default function FormularioPeriodo({ onExito, initialData }) {
             
             
       </div>
-
-      <div>
-        <button type="submit" className="btn btn-success">
-          {form.id_periodo ? "Actualizar" : "Registrar"} Periodo
+      <div className="mt-4">
+        <button
+          type="submit"
+          className={`btn ${form.id_periodo ? "btn-warning" : "btn-success"}`}
+        >
+          {form.id_periodo ? "Actualizar " : "Registrar "} Periodo
         </button>
-      </div>
+      </div>   
+      
     </form>
+     <dialog id="modalObservacion" className="modal">
+          <div className="modal-box">
+            <h3 className="font-bold text-lg">Justifique su edición</h3>
+            <textarea
+              name="observacion"
+              className="textarea textarea-bordered w-full mt-4"
+              placeholder="Escriba la justificación"
+              value={observacion}
+              onChange={(e) => setObservacion(e.target.value)}
+              required
+            />
+            <div className="modal-action">
+              <button
+                type="button"
+                className="btn"
+                onClick={() => document.getElementById("modalObservacion").close()}
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                className="btn btn-success"
+                onClick={enviarFormulario}
+              >
+                Confirmar Actualización
+              </button>
+            </div>
+          </div>
+        </dialog>
+
+     </>
+  
   );
 }

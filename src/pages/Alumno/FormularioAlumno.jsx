@@ -26,6 +26,7 @@ const validarNumeroExacto = (valor, digitos) =>
   /^\d+$/.test(valor) && valor.length === digitos;
 
 export default function FormularioAlumno({ onExito, initialData }) {
+  const [observacion, setObservacion] = useState("");
   const [form, setForm] = useState(inicialForm);
   const [error, setError] = useState(null);
   const [mensajeExito, setMensajeExito] = useState(null);
@@ -127,169 +128,225 @@ export default function FormularioAlumno({ onExito, initialData }) {
       return;
     }
 
+     if (form.id_alumno) {
+      document.getElementById("modalObservacion").showModal(); 
+    } else {
+      await enviarFormulario();
+    }
+ 
+  };
+  
+  const enviarFormulario = async () => { 
     try {
+ 
+       const datos = {
+      ...form,
+      observacion: observacion.trim(),
+      };
+
       if (initialData) {
-        await alumnoService.actualizar(initialData.id_alumno, form);
+          await alumnoService.actualizar(initialData.id_alumno, datos);
         setMensajeExito("Alumno actualizado con éxito");
         onExito("Alumno actualizado con éxito");
       } else {
-        await alumnoService.crear(form);
+        await alumnoService.crear(datos);
         setMensajeExito("Alumno registrado con éxito");
         onExito("Alumno registrado con éxito");
-        setForm(inicialForm);
       }
-    } catch {
-      setError("Error al guardar. Verifique que el DNI no esté duplicado");
+      setForm(inicialForm);
+      setObservacion("");
+      document.getElementById("modalObservacion").close(); 
+      } catch (err) {
+        setError("Error al guardar. Verifique que el alumno no esté duplicado");
+      }
     }
-  };
+
 
   return (
-    <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-    <div className="col-span-2 h-16 relative">
-        {error && (
-          <div className="alert alert-error absolute w-full">
-            <span>{error}</span>
+      <>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="col-span-2 h-16 relative">
+            {error && (
+              <div className="alert alert-error absolute w-full">
+                <span>{error}</span>
+              </div>
+            )}
+            {mensajeExito && (
+              <div className="alert alert-success absolute w-full">
+                <span>{mensajeExito}</span>
+              </div>
+            )}
           </div>
-        )}
-        {mensajeExito && (
-          <div className="alert alert-success absolute w-full">
-            <span>{mensajeExito}</span>
-          </div>
-        )}
-      </div>
-
-      <div>
-        <label className="label">
-          <span className="label-text">Nombres</span>
-        </label>
-        <input
-          name="nombre"
-          className="input input-bordered w-full"
-          value={form.nombre}
-          onChange={handleChange}
-        />
-      </div>
-      <div>
-          <label className="label">
-            <span className="label-text">Apellido Paterno</span>
-          </label>
-          <input
-            name="apellido_paterno"
-            className="input input-bordered w-full"
-            value={form.apellido_paterno}
-            onChange={handleChange}
-          />
-      </div> 
-      <div>
-          <label className="label">
-            <span className="label-text">Apellido Materno</span>
-          </label>
-          <input
-            name="apellido_materno"
-            className="input input-bordered w-full"
-            value={form.apellido_materno}
-            onChange={handleChange}
-          />
-      </div>
-
-      <div>
-          <label className="label">
-            <span className="label-text">Tipo de Documento</span>
-          </label>
-          <select
-            name="tipo_documento"
-            className="select select-bordered w-full"
-            value={form.tipo_documento}
-            onChange={handleChange}
-          >
-            <option value="">Elija un tipo de documento</option>
-            <option value="DNI">DNI</option>
-            <option value="CARNET">Carnet de extranjería</option>
-            <option value="PASAPORTE">Pasaporte</option>
-          </select>
-      </div>
-
-      <div>
-          <label className="label">
-            <span className="label-text">Número de Documento</span>
-          </label>
-          <input
-            name="numero_documento"
-            className="input input-bordered w-full"
-            value={form.numero_documento}
-            onChange={handleChange}
-            maxLength={form.tipo_documento === "DNI" ? 8 : 12}
-            inputMode="numeric"
-            onKeyDown={(e) => e.key === " " && e.preventDefault()}
-          />
-      </div>
- 
-      <div>
-          <label className="label">
-            <span className="label-text">Teléfono</span>
-          </label>
-          <input
-            name="telefono"
-            className="input input-bordered w-full"
-            value={form.telefono}
-            onChange={handleChange}
-            maxLength={9}
-            inputMode="numeric"
-            onKeyDown={(e) => e.key === " " && e.preventDefault()}
-          />
-      </div>
-
-      <div>
-        <label className="label">
-          <span className="label-text">Dirección</span>
-        </label>
-        <input
-          name="direccion"
-          className="input input-bordered w-full"
-          value={form.direccion}
-          onChange={handleChange}
-        />
-      </div>
-
-      <div>
-        <label className="label">
-          <span className="label-text">Fecha de Nacimiento</span>
-        </label>
-        <input
-          name="fecha_nacimiento"
-          type="date"
-          className="input input-bordered w-full"
-          value={form.fecha_nacimiento}
-          onChange={handleChange}
-          max={fechaMaximaNacimiento}
-        />
-      </div>
-     {initialData && (
-        <div className="col-span-2 mt-2">
-          <label className="label cursor-pointer w-full">
-            <span className="label-text">
-              Estado:{" "}
-              <span className={`font-semibold ml-2 ${form.estado ? "text-green-600" : "text-red-600"}`}>
-                {form.estado ? "Activo" : "Inactivo"}
-              </span>
-            </span>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+           
+          <div>
+            <label className="label">
+              <span className="label-text">Nombres</span>
+            </label>
             <input
-              type="checkbox"
-              name="estado"
-              className="toggle toggle-success ml-4"
-              checked={!!form.estado}
+              name="nombre"
+              className="input input-bordered w-full"
+              value={form.nombre}
               onChange={handleChange}
             />
-          </label>
-        </div>
-      )}
-          
+          </div>
+          <div>
+              <label className="label">
+                <span className="label-text">Apellido Paterno</span>
+              </label>
+              <input
+                name="apellido_paterno"
+                className="input input-bordered w-full"
+                value={form.apellido_paterno}
+                onChange={handleChange}
+              />
+          </div> 
+          <div>
+              <label className="label">
+                <span className="label-text">Apellido Materno</span>
+              </label>
+              <input
+                name="apellido_materno"
+                className="input input-bordered w-full"
+                value={form.apellido_materno}
+                onChange={handleChange}
+              />
+          </div>
 
-      <div className="col-span-2 mt-2">
-        <button type="submit" className="btn btn-success">
-          {initialData ? "Actualizar" : "Registrar"} Alumno
-        </button>
-      </div>
-    </form>
+          <div>
+              <label className="label">
+                <span className="label-text">Tipo de Documento</span>
+              </label>
+              <select
+                name="tipo_documento"
+                className="select select-bordered w-full"
+                value={form.tipo_documento}
+                onChange={handleChange}
+              >
+                <option value="">Elija un tipo de documento</option>
+                <option value="DNI">DNI</option>
+                <option value="CARNET">Carnet de extranjería</option>
+                <option value="PASAPORTE">Pasaporte</option>
+              </select>
+          </div>
+
+          <div>
+              <label className="label">
+                <span className="label-text">Número de Documento</span>
+              </label>
+              <input
+                name="numero_documento"
+                className="input input-bordered w-full"
+                value={form.numero_documento}
+                onChange={handleChange}
+                maxLength={form.tipo_documento === "DNI" ? 8 : 12}
+                inputMode="numeric"
+                onKeyDown={(e) => e.key === " " && e.preventDefault()}
+              />
+          </div>
+    
+          <div>
+              <label className="label">
+                <span className="label-text">Teléfono</span>
+              </label>
+              <input
+                name="telefono"
+                className="input input-bordered w-full"
+                value={form.telefono}
+                onChange={handleChange}
+                maxLength={9}
+                inputMode="numeric"
+                onKeyDown={(e) => e.key === " " && e.preventDefault()}
+              />
+          </div>
+
+          <div>
+            <label className="label">
+              <span className="label-text">Dirección</span>
+            </label>
+            <input
+              name="direccion"
+              className="input input-bordered w-full"
+              value={form.direccion}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div>
+            <label className="label">
+              <span className="label-text">Fecha de Nacimiento</span>
+            </label>
+            <input
+              name="fecha_nacimiento"
+              type="date"
+              className="input input-bordered w-full"
+              value={form.fecha_nacimiento}
+              onChange={handleChange}
+              max={fechaMaximaNacimiento}
+            />
+          </div>
+          {initialData && (
+              <div className="col-span-2 mt-2">
+                <label className="label cursor-pointer w-full">
+                  <span className="label-text">
+                    Estado:{" "}
+                    <span className={`font-semibold ml-2 ${form.estado ? "text-green-600" : "text-red-600"}`}>
+                      {form.estado ? "Activo" : "Inactivo"}
+                    </span>
+                  </span>
+                  <input
+                    type="checkbox"
+                    name="estado"
+                    className="toggle toggle-success ml-4"
+                    checked={!!form.estado}
+                    onChange={handleChange}
+                  />
+                </label>
+              </div>
+            )}
+          </div> 
+          <div className="mt-4">
+            <button
+              type="submit"
+              className={`btn ${initialData ? "btn-warning" : "btn-success"}`}
+            >
+              {initialData? "Actualizar " : "Registrar "} Alumno
+            </button>
+          </div>   
+         
+        </form>
+
+          <dialog id="modalObservacion" className="modal">
+          <div className="modal-box">
+            <h3 className="font-bold text-lg">Justifique su edición</h3>
+            <textarea
+              name="observacion"
+              className="textarea textarea-bordered w-full mt-4"
+              placeholder="Escriba la justificación"
+              value={observacion}
+              onChange={(e) => setObservacion(e.target.value)}
+              required
+            />
+            <div className="modal-action">
+              <button
+                type="button"
+                className="btn"
+                onClick={() => document.getElementById("modalObservacion").close()}
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                className="btn btn-success"
+                onClick={enviarFormulario}
+              >
+                Confirmar Actualización
+              </button>
+            </div>
+          </div>
+        </dialog>
+
+      </>
+    
   );
 }

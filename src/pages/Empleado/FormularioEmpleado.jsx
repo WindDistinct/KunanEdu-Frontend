@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { empleadoService, usuarioService } from "../../api/requestApi";
 
 export default function FormularioEmpleado({ onExito, initialData }) {
+    const [obs, setObservacion] = useState("");
   const [form, setForm] = useState({
     nombre_emp: "",
     ape_pat_emp: "",
@@ -11,8 +12,8 @@ export default function FormularioEmpleado({ onExito, initialData }) {
   numero_documento: "",
     telefono: "",
     especialidad: "",
-    cargo: "",
-    observacion: "", 
+    cargo: "", 
+  observacion: "", 
     estado: true,
   });
 
@@ -119,13 +120,28 @@ export default function FormularioEmpleado({ onExito, initialData }) {
       return;
     }
 
-    try {
-      if (form.id_emp) { 
-        await empleadoService.actualizar(form.id_emp, form);
+    if (form.id_emp) {
+      document.getElementById("modalObservacion").showModal(); 
+    } else {
+      await enviarFormulario();
+    }
+  
+  };
+
+   const enviarFormulario = async () => { 
+    try { 
+
+       const datos = {
+      ...form,
+      obs: obs.trim(),
+      };
+
+      if (form.id_emp) {  
+        await empleadoService.actualizar(form.id_emp, datos);
         setMensajeExito("Empleado actualizado con éxito");
         onExito && onExito("Empleado actualizado con éxito");
       } else {
-        await empleadoService.crear(form);
+        await empleadoService.crear(datos);
         setMensajeExito("Empleado registrado con éxito");
         onExito && onExito("Empleado registrado con éxito");
       }
@@ -138,17 +154,20 @@ export default function FormularioEmpleado({ onExito, initialData }) {
         numero_documento: "", 
         telefono: "",
         especialidad: "",
-        cargo: "",
+        cargo: "", 
         observacion: "", 
         estado: true,
       });
+      setObservacion("");
+      document.getElementById("modalObservacion").close(); 
     } catch (err) {
-      setError("Error al guardar. Verifique que los datos sean correctos y no estén duplicados.");
+      setError("Error al guardar. Verifique que el nombre de empleado no esté duplicado");
     }
-  };
+    }
 
   return (
-    <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <>
+        <form onSubmit={handleSubmit} className="space-y-4">
       <div className="col-span-2 h-16 relative">
         {error && (
           <div className="alert alert-error absolute w-full">
@@ -161,20 +180,19 @@ export default function FormularioEmpleado({ onExito, initialData }) {
           </div>
         )}
       </div>
-
-     <div>
-        <label className="label">
-          <span className="label-text">Nombres</span>
-        </label>
-        <input
-          name="nombre_emp"
-          className="input input-bordered w-full"
-          value={form.nombre_emp}
-          onChange={handleChange}
-        />
-      </div>
-
-      <div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+            <label className="label">
+              <span className="label-text">Nombres</span>
+            </label>
+            <input
+              name="nombre_emp"
+              className="input input-bordered w-full"
+              value={form.nombre_emp}
+              onChange={handleChange}
+            />
+        </div>
+             <div>
             <label className="label">
               <span className="label-text">Apellido Paterno</span>
             </label>
@@ -207,7 +225,7 @@ export default function FormularioEmpleado({ onExito, initialData }) {
           className="input input-bordered w-full"
           value={form.fec_nac}
           onChange={handleChange}
-          max={obtenerFechaMaximaNacimiento}
+         max={obtenerFechaMaximaNacimiento()}
         />
       </div>
       
@@ -296,9 +314,10 @@ export default function FormularioEmpleado({ onExito, initialData }) {
             <option value="almacen">Almacén</option>
             <option value="limpieza">Limpieza</option>
           </select>
-      </div>
-   
-      <div>
+      </div> 
+
+  {!initialData && (
+         <div>
             <label className="label">
               <span className="label-text">Observación</span>
             </label>
@@ -310,33 +329,70 @@ export default function FormularioEmpleado({ onExito, initialData }) {
               
             />
       </div>
-      {initialData && (
-        <div className="col-span-2 mt-2">
-          <label className="label cursor-pointer w-full">
-            <span className="label-text">
-              Estado:{" "}
-              <span className={`font-semibold ml-2 ${form.estado ? "text-green-600" : "text-red-600"}`}>
-                {form.estado ? "Activo" : "Inactivo"}
-              </span>
-            </span>
-            <input
-              type="checkbox"
-              name="estado"
-              className="toggle toggle-success ml-4"
-              checked={!!form.estado}
-              onChange={handleChange}
-            />
-          </label>
-        </div>
       )}
 
-    
-
-      <div className="col-span-2">
-        <button type="submit" className="btn btn-success">
-          {form.id_emp ? "Actualizar" : "Registrar"} Empleado
-        </button>
+        {initialData && (
+          <div className="col-span-2 mt-2">
+            <label className="label cursor-pointer w-full">
+              <span className="label-text">
+                Estado:{" "}
+                <span className={`font-semibold ml-2 ${form.estado ? "text-green-600" : "text-red-600"}`}>
+                  {form.estado ? "Activo" : "Inactivo"}
+                </span>
+              </span>
+              <input
+                type="checkbox"
+                name="estado"
+                className="toggle toggle-success ml-4"
+                checked={!!form.estado}
+                onChange={handleChange}
+              />
+            </label>
+          </div>
+        )} 
       </div>
+      <div className="mt-4">
+        <button
+          type="submit"
+          className={`btn ${form.id_emp ? "btn-warning" : "btn-success"}`}
+        >
+          {form.id_emp ? "Actualizar " : "Registrar "} Empleado
+        </button>
+      </div>   
+        
     </form>
+
+      <dialog id="modalObservacion" className="modal">
+          <div className="modal-box">
+            <h3 className="font-bold text-lg">Justifique su edición</h3>
+            <textarea
+              name="obs"
+              className="textarea textarea-bordered w-full mt-4"
+              placeholder="Escriba la justificación"
+              value={obs}
+              onChange={(e) => setObservacion(e.target.value)}
+              required
+            />
+            <div className="modal-action">
+              <button
+                type="button"
+                className="btn"
+                onClick={() => document.getElementById("modalObservacion").close()}
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                className="btn btn-success"
+                onClick={enviarFormulario}
+              >
+                Confirmar Actualización
+              </button>
+            </div>
+          </div>
+        </dialog>
+        
+      </>
+  
   );
 }
