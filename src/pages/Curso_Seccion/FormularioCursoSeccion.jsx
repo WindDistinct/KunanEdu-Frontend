@@ -8,6 +8,7 @@ import {
 } from "../../api/requestApi";
 
 export default function FormularioCursoSeccion({ onExito, initialData }) {
+  const [observacion, setObservacion] = useState("");
   const [bloquearSubmit, setBloquearSubmit] = useState(false);
   const [periodos, setPeriodos] = useState([]);
   const [secciones, setSecciones] = useState([]);
@@ -83,8 +84,7 @@ export default function FormularioCursoSeccion({ onExito, initialData }) {
       }
 
       const cursosData = await cursoGradoService.obtenerCursosPorGrado(seccion.id_grado);
-      
-            console.log(cursosData)
+     
       if (!cursosData.length) {
         setCursosDelGrado([]);
          setSeleccionDocentes({});
@@ -127,36 +127,53 @@ export default function FormularioCursoSeccion({ onExito, initialData }) {
     const errorValidacion = validarFormulario();
     if (errorValidacion) return setError(errorValidacion);
 
-   
+  
+     if (esEdicion) {
+      document.getElementById("modalObservacion").showModal(); 
+    } else {
+      await enviarFormulario();
+    }
 
-    try {
+ 
+  };
+
+   const enviarFormulario = async () => {
+   
+      try {
+    
       if(esEdicion){   
         const payload = {
           curso: parseInt(initialData.curso),
           seccion: parseInt(initialData.seccion),
           estado: estado,
           docente: parseInt(seleccionDocentes[initialData.curso]),
+           observacion: observacion.trim()
         };
         await cursoSeccionService.actualizar(initialData.id_curso_seccion,payload)
-      }else{
-
-         const payload = Object.entries(seleccionDocentes).map(([idCurso, idDocente]) => ({
-          curso: parseInt(idCurso),
-          seccion: esEdicion ? initialData.seccion : parseInt(seccionSeleccionada),
-          docente: parseInt(idDocente),
-        }));
-        await cursoSeccionService.envioListaCursosYdocentes(payload);
-        setMensajeExito("Registro exitoso.");
+        setMensajeExito("Curso-Seccion actualizado con éxito");
+        onExito("Curso-Seccion actualizado con éxito");
+      } else {
+          const payload = Object.entries(seleccionDocentes).map(([idCurso, idDocente]) => ({
+            curso: parseInt(idCurso),
+            seccion: esEdicion ? initialData.seccion : parseInt(seccionSeleccionada),
+            docente: parseInt(idDocente),
+          }));
+          await cursoSeccionService.envioListaCursosYdocentes(payload);
+           setMensajeExito("Curso-Seccion registrado con éxito");
+        onExito("Curso-Seccion registrado con éxito");
       }
-     
-      onExito("Operación completada con éxito");
-    } catch {
-      setError("Error al registrar la información.");
-    }
-  };
+   
+        setObservacion("");
+        document.getElementById("modalObservacion").close(); // Cerrar modal
+      } catch (err) {
+        setError("Error al guardar. Verifique que el número de aula no esté duplicado");
+      }
+  }
+
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+      <>
+      <form onSubmit={handleSubmit} className="space-y-4">
       {error && <div className="alert alert-error">{error}</div>}
       {mensajeExito && <div className="alert alert-success">{mensajeExito}</div>}
 
@@ -244,11 +261,48 @@ export default function FormularioCursoSeccion({ onExito, initialData }) {
         </label>
       )}
 
-     <div>
-       <button type="submit" className="btn btn-primary" disabled={bloquearSubmit}>
-        {esEdicion ? "Guardar Cambios" : "Registrar"}
-      </button>
-     </div>
+    <div className="mt-4">
+        <button
+          type="submit"
+          className={`btn ${esEdicion ? "btn-warning" : "btn-success"}`} disabled={bloquearSubmit}
+        >
+          {esEdicion ? "Actualizar " : "Registrar "} Curso_Seccion
+        </button>
+      </div>   
+
+    
     </form>
+
+     <dialog id="modalObservacion" className="modal">
+          <div className="modal-box">
+            <h3 className="font-bold text-lg">Justifique su edición</h3>
+            <textarea
+              name="observacion"
+              className="textarea textarea-bordered w-full mt-4"
+              placeholder="Escriba la justificación"
+              value={observacion}
+              onChange={(e) => setObservacion(e.target.value)}
+              required
+            />
+            <div className="modal-action">
+              <button
+                type="button"
+                className="btn"
+                onClick={() => document.getElementById("modalObservacion").close()}
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                className="btn btn-success"
+                onClick={enviarFormulario}
+              >
+                Confirmar Actualización
+              </button>
+            </div>
+          </div>
+        </dialog>
+      </>
+    
   );
 }

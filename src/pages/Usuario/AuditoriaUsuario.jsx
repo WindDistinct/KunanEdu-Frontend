@@ -34,6 +34,7 @@ export default function AuditoriaUsuario() {
           { key: "rol_nuevo", label: "Rol Nuevo" },
            { key: "empleado_anterior", label: "Empleado Anterior" },
           { key: "empleado_nuevo", label: "Empleado Nuevo" },  
+           { key: "observacion", label: "Observacion" },
           { key: "operacion", label: "Operación" },
           { key: "fecha_modificacion", label: "Fecha Modificación" },
           { key: "usuario_modificador", label: "Usuario Modificador" }

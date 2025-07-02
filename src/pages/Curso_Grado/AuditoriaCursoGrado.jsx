@@ -40,6 +40,7 @@ export default function AuditoriaCursoGrado() {
           { key: "curso_nuevo", label: "N° Curso Nuevo" },
           { key: "grado_anterior", label: "Grado Anterior" },
           { key: "grado_nuevo", label: "Grado Nuevo" }, 
+            { key: "observacion", label: "Observacion" },
           { key: "operacion", label: "Operación" },
           { key: "fecha_modificacion", label: "Fecha Modificación" },
           { key: "usuario_modificador", label: "Usuario Modificador" },

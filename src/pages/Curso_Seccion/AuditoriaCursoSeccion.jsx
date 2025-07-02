@@ -40,6 +40,7 @@ export default function AuditoriaCursoSeccion() {
           { key: "seccion_nuevo", label: "Sección Nueva" },
           { key: "docente_anterior", label: "Docente Anterior" },
           { key: "docente_nuevo", label: "Docente Nuevo" }, 
+               { key: "observacion", label: "Observacion" },
           { key: "operacion", label: "Operación" },
           { key: "fecha_modificacion", label: "Fecha Modificación" },
           { key: "usuario_modificador", label: "Usuario Modificador" },

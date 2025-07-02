@@ -37,6 +37,7 @@ export default function AuditoriaSeccion() {
           { key: "periodo_anterior", label: "Periodo Anterior" },
           { key: "periodo_nuevo", label: "Periodo Nuevo" },
           { key: "operacion", label: "Operación" },
+             { key: "observacion", label: "Observacion" },
           { key: "fecha_modificacion", label: "Fecha Modificación" },
           { key: "usuario_modificador", label: "Usuario Modificador" },
         ]}

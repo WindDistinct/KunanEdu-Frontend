@@ -197,7 +197,7 @@ export default function FormularioAula({ onExito, initialData }) {
             type="submit"
             className={`btn ${form.id_aula ? "btn-warning" : "btn-success"}`}
           >
-            {form.id_aula ? "Actualizar Grado" : "Registrar Grado"}
+            {form.id_aula ? "Actualizar Aula" : "Registrar Aula"}
           </button>
         </div> 
       </form>

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { usuarioService, empleadoService } from "../../api/requestApi";
 
 export default function FormularioUsuario({ onExito, initialData }) {
+ const [observacion, setObservacion] = useState("");
   const [form, setForm] = useState({
     username: "",
     password: "",
@@ -66,19 +67,30 @@ export default function FormularioUsuario({ onExito, initialData }) {
       return;
     }
 
-    const datos = {
+      if (form.id_usuario) {
+      document.getElementById("modalObservacion").showModal(); 
+    } else {
+      await enviarFormulario();
+    }
+ 
+  };
+
+   const enviarFormulario = async () => {
+ 
+    try {
+
+      const datos = {
       username: form.username.trim(),
       rol: form.rol,
       empleado: parseInt(form.empleado),
       estado: form.estado,
-    };
-
-    if (!initialData) {
-      datos.password = form.password;
-    }
-
-    try {
-      if (initialData) {
+      observacion: observacion.trim(),
+      };
+      if (!initialData) {
+        datos.password = form.password;
+      }
+    
+     if (initialData) {
         await usuarioService.actualizar(initialData.id_usuario, datos);
         setMensajeExito("Usuario actualizado con éxito");
         onExito("Usuario actualizado con éxito");
@@ -88,20 +100,23 @@ export default function FormularioUsuario({ onExito, initialData }) {
         onExito("Usuario registrado con éxito");
       }
 
-      setForm({
+       setForm({
         username: "",
         password: "",
         rol: "",
         empleado: "",
         estado: true,
       });
+      setObservacion("");
+      document.getElementById("modalObservacion").close(); // Cerrar modal
     } catch (err) {
-      setError("Error al guardar. Verifique que el usuario no esté duplicado");
+      setError("Error al guardar. Verifique que el número de aula no esté duplicado");
     }
-  };
+    }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+     <>
+      <form onSubmit={handleSubmit} className="space-y-4">
       <div className="col-span-2 h-16 relative">
         {error && (
           <div className="alert alert-error absolute w-full">
@@ -182,11 +197,45 @@ export default function FormularioUsuario({ onExito, initialData }) {
         )}
       </div>
 
-      <div>
-        <button type="submit" className="btn btn-success">
-          {initialData ? "Actualizar" : "Registrar"} Usuario
-        </button>
-      </div>
+      <div className="mt-4">
+          <button
+            type="submit"
+            className={`btn ${initialData ? "btn-warning" : "btn-success"}`}
+          >
+            {initialData ? "Actualizar Grado" : "Registrar Grado"}
+          </button>
+        </div> 
     </form>
+       <dialog id="modalObservacion" className="modal">
+          <div className="modal-box">
+            <h3 className="font-bold text-lg">Justifique su edición</h3>
+            <textarea
+              name="observacion"
+              className="textarea textarea-bordered w-full mt-4"
+              placeholder="Escriba la justificación"
+              value={observacion}
+              onChange={(e) => setObservacion(e.target.value)}
+              required
+            />
+            <div className="modal-action">
+              <button
+                type="button"
+                className="btn"
+                onClick={() => document.getElementById("modalObservacion").close()}
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                className="btn btn-success"
+                onClick={enviarFormulario}
+              >
+                Confirmar Actualización
+              </button>
+            </div>
+          </div>
+        </dialog>
+     </>
+   
   );
 }

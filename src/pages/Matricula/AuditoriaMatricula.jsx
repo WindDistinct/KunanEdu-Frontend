@@ -28,15 +28,14 @@ export default function AuditoriaMatricula() {
         columnas={[
           { key: "id_audit_matricula", label: "ID Auditoría" },
           { key: "id_matricula", label: "ID Matrícula" },
-          
-          { key: "observacion_anterior", label: "Observación Anterior" },
-          { key: "observacion_nuevo", label: "Observación Nuevo" },
+           
           { key: "alumno_anterior", label: "Alumno Anterior (ID)" },
           { key: "alumno_nuevo", label: "Alumno Nuevo (ID)" },
           { key: "condicion_anterior", label: "Condición Anterior" },
           { key: "condicion_nuevo", label: "Condición Nuevo" }, 
           { key: "seccion_anterior", label: "Sección Anterior (ID)" },
           { key: "seccion_nuevo", label: "Sección Nuevo (ID)" },
+             { key: "observacion", label: "Observacion" },
           { key: "operacion", label: "Operación" },
           { key: "fecha_modificacion", label: "Fecha Modificación" },
           { key: "usuario_modificador", label: "Usuario Modificador" },

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { seccionService, periodoService, aulaService, gradoService } from "../../api/requestApi";
 
 export default function FormularioSeccion({ onExito, initialData }) {
+   const [observacion, setObservacion] = useState("");
   const [form, setForm] = useState({
     nombre: "",
     aula: "",
@@ -95,15 +96,26 @@ export default function FormularioSeccion({ onExito, initialData }) {
       return;
     }
 
-    const datos = {
+    if (form.id_seccion) {
+      document.getElementById("modalObservacion").showModal(); 
+    } else {
+      await enviarFormulario();
+    }
+ 
+  };
+
+    const enviarFormulario = async () => {
+  
+      try {
+
+      const datos = {
       nombre: form.nombre.trim(),
       aula: parseInt(form.aula),
       grado: parseInt(form.grado),
       periodo: parseInt(form.periodo),
-      ...(initialData && { estado: form.estado }),
-    };
-
-    try {
+      ...(initialData && { estado: form.estado }), 
+        observacion: observacion.trim()
+      };
 
       const seccionesExistentes = await seccionService.obtenerPorGradoYPeriodo(datos.grado, datos.periodo);
       const duplicado = seccionesExistentes.find(
@@ -118,7 +130,7 @@ export default function FormularioSeccion({ onExito, initialData }) {
         return;
       }
 
-
+   
       if (form.id_seccion) {
         await seccionService.actualizar(form.id_seccion, datos);
         setMensajeExito("Sección actualizada con éxito");
@@ -136,13 +148,18 @@ export default function FormularioSeccion({ onExito, initialData }) {
         periodo: "",
         estado: true,
       });
-    } catch (err) {
-      setError("Error al guardar. Verifique que no exista una seccion activa ocupando esa aula en un mismo periodo");
-    }
-  };
+        setObservacion("");
+        document.getElementById("modalObservacion").close(); // Cerrar modal
+      } catch (err) {
+        setError("Error al guardar. Verifique que el número de aula no esté duplicado");
+      }
+  }
+  
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+
+     <>
+      <form onSubmit={handleSubmit} className="space-y-4">
       <div className="col-span-2 h-16 relative">
         {error && (
           <div className="alert alert-error absolute w-full">
@@ -226,12 +243,46 @@ export default function FormularioSeccion({ onExito, initialData }) {
           </label>
         )}
       </div>
-
-      <div>
-        <button type="submit" className="btn btn-success">
-          {form.id_seccion ? "Actualizar" : "Registrar"} Sección
-        </button>
-      </div>
+       <div className="mt-4">
+          <button
+            type="submit"
+            className={`btn ${form.id_seccion ? "btn-warning" : "btn-success"}`}
+          >
+            {form.id_seccion ? "Actualizar" : "Registrar"} Sección
+          </button>
+        </div>  
     </form>
+       <dialog id="modalObservacion" className="modal">
+          <div className="modal-box">
+            <h3 className="font-bold text-lg">Justifique su edición</h3>
+            <textarea
+              name="observacion"
+              className="textarea textarea-bordered w-full mt-4"
+              placeholder="Escriba la justificación"
+              value={observacion}
+              onChange={(e) => setObservacion(e.target.value)}
+              required
+            />
+            <div className="modal-action">
+              <button
+                type="button"
+                className="btn"
+                onClick={() => document.getElementById("modalObservacion").close()}
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                className="btn btn-success"
+                onClick={enviarFormulario}
+              >
+                Confirmar Actualización
+              </button>
+            </div>
+          </div>
+        </dialog>
+        
+     </>
+   
   );
 }

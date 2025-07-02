@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { cursoGradoService, cursoService, gradoService } from "../../api/requestApi";
 
 export default function FormularioCursoGrado({ onExito, initialData }) {
+   const [observacion, setObservacion] = useState("");
   const [form, setForm] = useState({
     curso: "",
     grado: "",
@@ -64,15 +65,27 @@ export default function FormularioCursoGrado({ onExito, initialData }) {
       return;
     }
 
-    const datos = {
+    if (form.id_curso_grado) {
+      document.getElementById("modalObservacion").showModal(); 
+    } else {
+      await enviarFormulario();
+    }
+ 
+  };
+
+   const enviarFormulario = async () => {
+ 
+    try {
+
+       const datos = {
       curso: parseInt(form.curso),
       grado: parseInt(form.grado),
       ...(initialData && { estado: form.estado }),
+       observacion: observacion.trim()
     };
 
-    try {
-      if (form.id_curso_grado) { 
-        console.log(datos)
+        
+     if (form.id_curso_grado) {  
         await cursoGradoService.actualizar(form.id_curso_grado, datos);
         setMensajeExito("Curso-Grado actualizado con éxito");
         onExito("Curso-Grado actualizado con éxito");
@@ -87,13 +100,19 @@ export default function FormularioCursoGrado({ onExito, initialData }) {
         grado: "",
         estado: true,
       });
+      setObservacion("");
+      document.getElementById("modalObservacion").close(); // Cerrar modal
     } catch (err) {
-      setError("Error al guardar. Verifique que el curso no se repita en el mismo grado");
+      setError("Error al guardar. Verifique que el número de aula no esté duplicado");
     }
-  };
+    }
+
+
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+
+      <>
+       <form onSubmit={handleSubmit} className="space-y-4">
       <div className="col-span-2 h-16 relative">
         {error && (
           <div className="alert alert-error absolute w-full">
@@ -153,12 +172,47 @@ export default function FormularioCursoGrado({ onExito, initialData }) {
           </label>
         )}
       </div>
-
-      <div>
-        <button type="submit" className="btn btn-success">
-          {form.id_curso_grado ? "Actualizar" : "Registrar"} Curso-Grado
+      <div className="mt-4">
+        <button
+          type="submit"
+          className={`btn ${form.id_curso_grado ? "btn-warning" : "btn-success"}`}
+        >
+          {form.id_curso_grado ? "Actualizar " : "Registrar "} Curso_Grado
         </button>
-      </div>
+      </div>   
+   
     </form>
+       <dialog id="modalObservacion" className="modal">
+          <div className="modal-box">
+            <h3 className="font-bold text-lg">Justifique su edición</h3>
+            <textarea
+              name="observacion"
+              className="textarea textarea-bordered w-full mt-4"
+              placeholder="Escriba la justificación"
+              value={observacion}
+              onChange={(e) => setObservacion(e.target.value)}
+              required
+            />
+            <div className="modal-action">
+              <button
+                type="button"
+                className="btn"
+                onClick={() => document.getElementById("modalObservacion").close()}
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                className="btn btn-success"
+                onClick={enviarFormulario}
+              >
+                Confirmar Actualización
+              </button>
+            </div>
+          </div>
+        </dialog>
+
+      </>
+   
   );
 }
