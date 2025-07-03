@@ -31,6 +31,11 @@ export default function MenuPrincipal() {
     { path: "/notas", nombre: "Mis cursos" },
     { path: "/nota_curso", nombre: "Mantenimiento Notas" },
   ];
+  const menuAsistencia= [
+    { path: "/asistencias", nombre: "Mis Alumnos" },
+    { path: "/asistencia_alumno", nombre: "Mantenimiento Asistencia" },
+  ];
+
 
   const menuAuditoria = [
     ...menuItemsEstaticos.map(({ path, nombre }) => ({
@@ -128,7 +133,18 @@ export default function MenuPrincipal() {
               </div>
             </details>
           )}
-
+          {puedeVerNotas && (
+            <details className="collapse collapse-arrow bg-base-100 shadow">
+              <summary className="collapse-title text-xl font-medium">Gestión Asistencia</summary>
+              <div className="collapse-content grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                {menuAsistencia.map(({ path, nombre }) => (
+                  <Link key={path} to={path} className="btn btn-accent w-full">
+                    {nombre}
+                  </Link>
+                ))}
+              </div>
+            </details>
+          )}
           
           {puedeVerAuditoria && (
             <details className="collapse collapse-arrow bg-base-100 shadow">

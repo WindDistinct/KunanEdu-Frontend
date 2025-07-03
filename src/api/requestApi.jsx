@@ -78,10 +78,20 @@ const examenService = {
   obtenerNotasCurso: (docente, periodo, cursoseccion) => axiosInstance.get(`/api/examen/notas-curso/${docente}/${periodo}/${cursoseccion}`).then(r => r.data)
 };
 
+const asistenciaService = {
+  ...createApiService("asistencia"),
+guardarListado: (data) => axiosInstance.post(`/api/asistencia/multiple`, data).then(r => r.data),
+  obtenerPorFechaYCurso: (cursoSeccion, fecha) =>
+    axiosInstance
+      .get(`/api/asistencia/por-fecha`, {
+        params: { cursoSeccion, fecha },
+      })
+      .then((r) => r.data),
+}
+
 const notaService = {
   ...createApiService("nota"),
-
-  // ✅ Corregido: solo usa periodo y alumno
+ 
   generarReporte: (periodo, alumnoId) =>
     axiosInstance
       .get(`/api/nota/generar-reporte/${periodo}/${alumnoId}`)
@@ -89,7 +99,7 @@ const notaService = {
 };
 
 export {
-  notaService,
+  notaService,asistenciaService,
   examenService,
   aulaService,
   matriculaService,

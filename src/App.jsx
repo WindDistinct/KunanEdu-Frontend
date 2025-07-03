@@ -32,6 +32,7 @@ import ListadoCursoSeccion from "./pages/Curso_Seccion/ListadoCursoSeccion";
 import AuditoriaCursoSeccion from "./pages/Curso_Seccion/AuditoriaCursoSeccion";
 import AuditoriaNota from "./pages/Examen/AuditoriaNota";
 import ListadoNotasPorCurso from "./pages/Examen/ListadoNotaCurso";
+import ListadoCursosAsistencia from "./pages/Asistencia/ListadoCursosAsistencia";
 
 
 function App() {
@@ -77,7 +78,7 @@ function App() {
               <Route path="/matricula" element={<ListadoMatricula />} />
               <Route path="/curso_seccion" element={<ListadoCursoSeccion />} />
               <Route path="/nota_curso" element={<ListadoNotasPorCurso/>} />
- 
+              <Route path="/asistencias" element={<ListadoCursosAsistencia />} />
 
               <Route path="/auditoria/aulas" element={<AuditoriaAula />} />
               <Route path="/auditoria/alumnos" element={<AuditoriaAlumno />} />
