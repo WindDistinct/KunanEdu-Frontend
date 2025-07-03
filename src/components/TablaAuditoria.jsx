@@ -23,7 +23,11 @@ export default function TablaAuditoria({
   };
 
   const formatearCampo = (key, valor) => {
-    if (!valor) return "";
+     if (valor === null || valor === undefined) return "";
+
+  if (typeof valor === "boolean") {
+    return valor ? "Sí" : "No";
+  }
 
     if (camposFechaConHora.includes(key)) {
       return new Intl.DateTimeFormat("es-PE", {

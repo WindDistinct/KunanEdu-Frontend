@@ -27,14 +27,12 @@ export default function FormularioAsistencia({ initialData, onCerrar, onExito })
       setError("Error al cargar alumnos.");
     }
   };
-
-  // 🆕 Cuando cambia la fecha y ya hay alumnos cargados
+ 
   useEffect(() => {
     if (!fecha || alumnos.length === 0) return;
     cargarAsistenciasExistentes();
   }, [fecha, alumnos]);
-
-  // ✅ Obtener nombre del día sin desfase
+ 
   const obtenerNombreDia = (fechaTexto) => {
     const [year, month, day] = fechaTexto.split("-").map(Number);
     const fechaLocal = new Date(year, month - 1, day);
@@ -46,23 +44,19 @@ export default function FormularioAsistencia({ initialData, onCerrar, onExito })
       const response = await asistenciaService.obtenerPorFechaYCurso(
         initialData.id_curso_seccion,
         fecha
-      );
-      console.log(initialData.id_curso_seccion)
+      ); 
  
-      const asistenciasMap = {};
-      // Llenar según lo que vino del backend
+      const asistenciasMap = {}; 
       response.forEach((a) => {
         asistenciasMap[a.id_matricula] = a.asistio;
       });
-
-      // Asegurar que todos los alumnos tengan valor aunque no exista registro aún
+ 
       alumnos.forEach((a) => {
         if (!(a.id_matricula in asistenciasMap)) {
           asistenciasMap[a.id_matricula] = false;
             console.log(asistenciasMap[a.id_matricula])
         }
-      });
-      console.log(asistenciasMap)
+      }); 
       setAsistencias(asistenciasMap);
     } catch (err) {
       console.error("Error al obtener asistencias existentes:", err);
@@ -88,8 +82,7 @@ export default function FormularioAsistencia({ initialData, onCerrar, onExito })
         fecha,
         dia,
         asistio: asistencias[a.id_matricula],
-      }));
-console.log(payload)
+      })); 
       await asistenciaService.guardarListado(payload);
       setMensajeExito("Asistencia registrada correctamente.");
       onExito("Asistencia registrada.");
@@ -102,8 +95,7 @@ console.log(payload)
     <div className="space-y-4">
       {error && <div className="alert alert-error">{error}</div>}
       {mensajeExito && <div className="alert alert-success">{mensajeExito}</div>}
-
-      {/* Selector de fecha */}
+ 
       <div>
         <label className="label">Seleccionar fecha:</label>
         <input
@@ -113,8 +105,7 @@ console.log(payload)
           onChange={(e) => setFecha(e.target.value)}
         />
       </div>
-
-      {/* Lista de alumnos con checkbox */}
+ 
       <div>
         <h4 className="font-semibold mb-2">Alumnos:</h4>
         {alumnos.map((alumno) => (
@@ -133,10 +124,7 @@ console.log(payload)
       <div className="flex gap-4">
         <button className="btn btn-success" onClick={handleGuardar}>
           Guardar Asistencia
-        </button>
-        <button className="btn btn-error" onClick={onCerrar}>
-          Cancelar
-        </button>
+        </button> 
       </div>
     </div>
   );

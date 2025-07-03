@@ -17,6 +17,7 @@ export default function MenuPrincipal() {
     { path: "/cursos", nombre: "Cursos" },
     { path: "/periodos", nombre: "Periodos" },
     { path: "/alumnos", nombre: "Alumnos" },
+     
   ];
 
   const menuItems = [
@@ -25,6 +26,7 @@ export default function MenuPrincipal() {
     { path: "/curso_seccion", nombre: "CursoSeccion" },
     { path: "/seccion", nombre: "Sección" },
     { path: "/matricula", nombre: "Matrícula" },
+    { path: "/asistencias", nombre: "Asistencia" },
   ];
 
   const menuNotas = [
@@ -32,8 +34,8 @@ export default function MenuPrincipal() {
     { path: "/nota_curso", nombre: "Mantenimiento Notas" },
   ];
   const menuAsistencia= [
-    { path: "/asistencias", nombre: "Mis Alumnos" },
-    { path: "/asistencia_alumno", nombre: "Mantenimiento Asistencia" },
+    { path: "/asistencias", nombre: "Mantenimiento Asistencia" },
+    { path: "/asistencia_alumno", nombre: "Reporte Asistencia" },
   ];
 
 

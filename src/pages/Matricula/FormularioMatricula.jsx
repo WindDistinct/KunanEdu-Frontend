@@ -107,17 +107,8 @@ export default function FormularioMatricula({ onExito, initialData }) {
       await enviarFormulario();
     }
   
-
-
-    
-
-    try {
-    
-
-     
-    } catch (err) {
-      setError("Error al guardar. Verifique que el alumno no este matriculado en la misma seccion o en el mismo periodo");
-    }
+ 
+ 
   };
 
     const enviarFormulario = async () => { 
@@ -156,7 +147,7 @@ export default function FormularioMatricula({ onExito, initialData }) {
       setObservacion("");
       document.getElementById("modalObservacion").close(); 
     } catch (err) {
-      setError("Error al guardar. Verifique que el nombre de empleado no esté duplicado");
+      setError("Error al guardar. Verifique que el alumno no este matriculado en la misma seccion o en el mismo periodo");
     }
     }
 

@@ -33,8 +33,7 @@ export default function ListadoCursosAsistencia() {
   const cargarPeriodos = async () => {
     try { 
      const data=await periodoService.obtener() 
-      setPeriodosDisponibles(data);
-      setCursos(data);
+      setPeriodosDisponibles(data); 
     } catch (error) {
       setMensaje({ tipo: "error", texto: "Error al cargar los periodo: " + error });
     }
