@@ -80,13 +80,24 @@ const examenService = {
 
 const asistenciaService = {
   ...createApiService("asistencia"),
-guardarListado: (data) => axiosInstance.post(`/api/asistencia/multiple`, data).then(r => r.data),
+  
+  guardarListado: (data) => axiosInstance.post(`/api/asistencia/multiple`, data).then(r => r.data),
+  
   obtenerPorFechaYCurso: (cursoSeccion, fecha) =>
     axiosInstance
       .get(`/api/asistencia/por-fecha`, {
         params: { cursoSeccion, fecha },
       })
       .then((r) => r.data),
+
+  reporteAsistencia: ({ cursoSeccion, periodo, mes }) =>
+  axiosInstance
+    .post(`/api/asistencia/reporte`, {
+      cursoSeccion,
+      periodo,
+      mes,
+    })
+    .then((r) => r.data),
 }
 
 const notaService = {
