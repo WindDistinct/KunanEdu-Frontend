@@ -26,7 +26,11 @@ export default function MenuPrincipal() {
     { path: "/curso_seccion", nombre: "CursoSeccion" },
     { path: "/seccion", nombre: "Sección" },
     { path: "/matricula", nombre: "Matrícula" },
-    { path: "/asistencias", nombre: "Asistencia" },
+    { path: "/asistencias", nombre: "Asistencia" }, 
+  ];
+  const menuReportes = [
+    { path: "/asistencia_reporte", nombre: "Asistencia" },
+     
   ];
 
   const menuNotas = [
@@ -35,7 +39,7 @@ export default function MenuPrincipal() {
   ];
   const menuAsistencia= [
     { path: "/asistencias", nombre: "Mantenimiento Asistencia" },
-    { path: "/asistencia_alumno", nombre: "Reporte Asistencia" },
+    { path: "/asistencia_alumno", nombre: "Listado Asistencia" },
   ];
 
 
@@ -121,8 +125,7 @@ export default function MenuPrincipal() {
               </details>
             </>
           )}
-
-          
+ 
           {puedeVerNotas && (
             <details className="collapse collapse-arrow bg-base-100 shadow">
               <summary className="collapse-title text-xl font-medium">Gestión de Notas</summary>
@@ -146,6 +149,20 @@ export default function MenuPrincipal() {
                 ))}
               </div>
             </details>
+          )}
+          {rol === "administrador"  && (
+            <>
+              <details className="collapse collapse-arrow bg-base-100 shadow">
+                <summary className="collapse-title text-xl font-medium">Reportes Entidades</summary>
+                <div className="collapse-content grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                  {menuReportes.map(({ path, nombre }) => (
+                    <Link key={path} to={path} className="btn btn-outline w-full">
+                      {`Reporte ${nombre}`}
+                    </Link>
+                  ))}
+                </div>
+              </details> 
+            </>
           )}
           
           {puedeVerAuditoria && (

@@ -31,7 +31,9 @@ const usuarioService = {
 
 const seccionService = {
   ...createApiService("seccion"),
-  obtenerPorGradoYPeriodo: (grado, periodo) => axiosInstance.get(`/api/seccion/grado-periodo/${grado}/${periodo}`).then(r => r.data)
+  obtenerPorGradoYPeriodo: (grado, periodo) => axiosInstance.get(`/api/seccion/grado-periodo/${grado}/${periodo}`).then(r => r.data),
+ obtenerPorPeriodo: (idPeriodo) => axiosInstance.get(`/api/seccion/por_periodo/${idPeriodo}`).then(r => r.data)
+ 
 };
 
 const gradoService = {
@@ -50,8 +52,10 @@ const empleadoService = {
   obtenerCursosPorUsuario: (idDocente, periodo) =>
     axiosInstance.get(`/api/empleado/cursos-periodo/${idDocente}/${periodo}`).then(r => r.data)
 };
-
-const cursoService = createApiService("curso");
+const cursoService = {
+  ...createApiService("curso"),
+  obtenerPorSeccion: (idSeccion) => axiosInstance.get(`/api/curso/cursos_seccion/${idSeccion}`).then(r => r.data)
+}; 
 const aulaService = createApiService("aula");
 
 const cursoGradoService = {
