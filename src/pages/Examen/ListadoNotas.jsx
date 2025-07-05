@@ -23,16 +23,16 @@ export default function ListadoUsuario() {
       const data = await empleadoService.obtenerCursosPorUsuario(
         id_usuario,
         periodoSeleccionado
-      ); 
+      );
       setCursos(data);
     } catch (error) {
       setMensaje({ tipo: "error", texto: "Error al cargar los cursos: " + error });
     }
-    }, [id_usuario, periodoSeleccionado]);
+  }, [id_usuario, periodoSeleccionado]);
 
   const cargarPeriodos = async () => {
-    try { 
-     const data=await periodoService.obtener() 
+    try {
+      const data = await periodoService.obtener()
       setPeriodosDisponibles(data);
       setCursos(data);
     } catch (error) {
@@ -67,6 +67,8 @@ export default function ListadoUsuario() {
   const handleEditar = (curso) => {
     setFormData(curso);
     setMostrarFormulario(true);
+    console.log(curso);
+
   };
   const handleCancelar = () => {
     setFormData(null);
@@ -96,7 +98,7 @@ export default function ListadoUsuario() {
           ))}
         </select>
       </div>
-           
+
       {mostrarFormulario && (
         <dialog id="modalNota" className="modal modal-open">
           <div className="modal-box w-11/12 max-w-4xl">
@@ -132,12 +134,12 @@ export default function ListadoUsuario() {
             { key: "grado", label: "Grado" },
             { key: "periodo", label: "Periodo" },
           ]}
-         datos={cursos}
-  onEditar={handleEditar}
-  idKey="id_curso_seccion"
-  mostrarAcciones={true}
-  textoBotonAccion="Ingresar Nota"  
-  soloBotonEditar={true}  
+          datos={cursos}
+          onEditar={handleEditar}
+          idKey="id_curso_seccion"
+          mostrarAcciones={true}
+          textoBotonAccion="Ingresar Nota"
+          soloBotonEditar={true}
         />
       )}
     </div>

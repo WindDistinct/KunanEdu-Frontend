@@ -8,7 +8,30 @@ export default function FormularioNota({ initialData, onCerrar, onExito }) {
   const [notasCargadas, setNotasCargadas] = useState({});
   const [error, setError] = useState(null);
   const [mensajeExito, setMensajeExito] = useState(null);
+  const [idExamen, setIdExamen] = useState(null);
 
+  useEffect(() => {
+    const cargarExamen = async () => {
+      if (!bimestre || !initialData?.id_curso_seccion) return;
+
+      try {
+        const examen = await examenService.obtenerExamenPorCursoYBimestre(
+          initialData.id_curso_seccion,
+          bimestre
+        );
+        setIdExamen(examen.id_examen);
+      } catch (err) {
+        setIdExamen(null);
+        setError("No se encontró un examen para este bimestre.");
+      }
+    };
+
+    cargarExamen();
+  }, [bimestre, initialData]);
+
+  useEffect(() => {
+    console.log("✅ ID del examen actualizado:", idExamen);
+  }, [idExamen]);
 
   useEffect(() => {
     console.log(initialData)
@@ -89,8 +112,7 @@ export default function FormularioNota({ initialData, onCerrar, onExito }) {
   };
   const handleGuardar = async () => {
     try {
-
-      if (!initialData || !initialData.id_examen) {
+      if (!idExamen) {
         console.error("❌ No se puede guardar porque falta el ID del examen.");
         setError("Error interno: examen no definido.");
         return;
@@ -98,13 +120,9 @@ export default function FormularioNota({ initialData, onCerrar, onExito }) {
 
       const payload = alumnos
         .filter((alumno) => !notasCargadas.hasOwnProperty(alumno.id_alumno))
-        .filter(
-          (alumno) =>
-            notas[alumno.id_alumno] !== undefined &&
-            notas[alumno.id_alumno] !== ""
-        )
+        .filter((alumno) => notas[alumno.id_alumno] !== undefined && notas[alumno.id_alumno] !== "")
         .map((alumno) => ({
-          id_examen: initialData.id_examen,
+          id_examen: idExamen,
           id_matricula: alumno.id_matricula,
           nota: parseFloat(notas[alumno.id_alumno]),
         }));

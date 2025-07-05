@@ -33,7 +33,7 @@ const seccionService = {
   ...createApiService("seccion"),
   obtenerPorGradoYPeriodo: (grado, periodo) => axiosInstance.get(`/api/seccion/grado-periodo/${grado}/${periodo}`).then(r => r.data)
 };
- 
+
 const gradoService = {
   ...createApiService("grado")
 };
@@ -75,12 +75,13 @@ const examenService = {
   obtenerNotasporAlumno: (idAlumno) => axiosInstance.get(`/api/examen/notas-alum/${idAlumno}`).then(r => r.data),
   registrarNotas: (data) => axiosInstance.post(`/api/examen/multiple`, data).then(r => r.data),
   obtenerNotasBimestre: (aula, bimestre, cursoseccion) => axiosInstance.get(`/api/examen/nota-bimestre/${aula}/${bimestre}/${cursoseccion}`).then(r => r.data),
-  obtenerNotasCurso: (docente, periodo, cursoseccion) => axiosInstance.get(`/api/examen/notas-curso/${docente}/${periodo}/${cursoseccion}`).then(r => r.data)
-};
+  obtenerNotasCurso: (docente, periodo, cursoseccion) => axiosInstance.get(`/api/examen/notas-curso/${docente}/${periodo}/${cursoseccion}`).then(r => r.data),
+  obtenerExamenPorCursoYBimestre: (curso_seccion, bimestre) => axiosInstance.get(`api/examen/examen-curso/${curso_seccion}/${bimestre}`).then(r => r.data),
+}
 
 const asistenciaService = {
   ...createApiService("asistencia"),
-guardarListado: (data) => axiosInstance.post(`/api/asistencia/multiple`, data).then(r => r.data),
+  guardarListado: (data) => axiosInstance.post(`/api/asistencia/multiple`, data).then(r => r.data),
   obtenerPorFechaYCurso: (cursoSeccion, fecha) =>
     axiosInstance
       .get(`/api/asistencia/por-fecha`, {
@@ -91,7 +92,7 @@ guardarListado: (data) => axiosInstance.post(`/api/asistencia/multiple`, data).t
 
 const notaService = {
   ...createApiService("nota"),
- 
+
   generarReporte: (periodo, alumnoId) =>
     axiosInstance
       .get(`/api/nota/generar-reporte/${periodo}/${alumnoId}`)
@@ -99,7 +100,7 @@ const notaService = {
 };
 
 export {
-  notaService,asistenciaService,
+  notaService, asistenciaService,
   examenService,
   aulaService,
   matriculaService,
