@@ -8,17 +8,19 @@ export default function Tabla({
   idKey = "id",
   mostrarAcciones = true,
   filasPorPagina = 5,
-   textoBotonAccion = "Editar", // NUEVO: texto por defecto
+   textoBotonAccion = "Editar",  
   soloBotonEditar = false, 
 }) {
   const [paginaActual, setPaginaActual] = useState(1);
 
-  const totalPaginas = Math.ceil(datos.length / filasPorPagina);
+  const filasPorPaginaCalculadas = datos.length > 50 ? 20 : filasPorPagina;
 
-  const datosPaginados = datos.slice(
-    (paginaActual - 1) * filasPorPagina,
-    paginaActual * filasPorPagina
-  );
+const totalPaginas = Math.ceil(datos.length / filasPorPaginaCalculadas);
+
+const datosPaginados = datos.slice(
+  (paginaActual - 1) * filasPorPaginaCalculadas,
+  paginaActual * filasPorPaginaCalculadas
+);
 
   const cambiarPagina = (nuevaPagina) => {
     if (nuevaPagina < 1 || nuevaPagina > totalPaginas) return;
@@ -29,11 +31,23 @@ export default function Tabla({
     if (key === "estado") {
       return valor === true ? "Activo" : "Inactivo";
     }
+     if (typeof valor === "boolean") {
+    return valor ? "Sí" : "No";
+  }
 
-    if (typeof valor === "string" && (key.includes("fec") || key.includes("fecha") || key.includes("fecha_matricula"))) {
-      const [año, mes, dia] = valor.split("-");
-      return `${dia}/${mes}/${año}`;
+    if ((key.includes("fec") || key.includes("fecha") || key.includes("fecha_matricula")) && valor) {
+    try {
+      const fechaObj = new Date(valor);
+      if (!isNaN(fechaObj)) {
+        const dia = String(fechaObj.getDate()).padStart(2, "0");
+        const mes = String(fechaObj.getMonth() + 1).padStart(2, "0");
+        const año = fechaObj.getFullYear();
+        return `${dia}/${mes}/${año}`;
+      }
+    } catch {
+      return valor;
     }
+  }
     return valor;
   };
 
@@ -79,8 +93,7 @@ export default function Tabla({
           </tbody>
         </table>
       </div>
-
-      {/* Paginación DaisyUI */}
+ 
       <div className="flex justify-center mt-4">
         <div className="join">
           <button
