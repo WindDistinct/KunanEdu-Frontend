@@ -1,12 +1,38 @@
-# React + Vite
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+# Kunan Edu
 
-Currently, two official plugins are available:
+Kunan Edu es un software de gestión educativa para escuelas de bajos recursos. 
+Su principal propósito es ser desplegada en equipos administrativos para llevar seguimiento de las actividades comunes dentro de una escuela pequeña y/o sin digitalizar.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-## Expanding the ESLint configuration
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+
+## Variables de entorno
+
+Para correr este proyecto, necesitarás añadir las siguientes variables de entorno a tu .env
+
+`VITE_API_URL=https://kunanedu-backend.onrender.com`
+
+
+
+## Run Locally
+
+Para desplegar este proyecto en local, ejecuta en la terminal
+
+```bash
+  npm run dev
+```
+
+
+## Demo
+
+https://kunanedu-frontend.onrender.com/
+
+
+## Authors
+
+- [@WindDistinct](https://github.com/WindDistinct)
+- [@DonFide](https://github.com/DonFide)
+- [@jorcasb](https://github.com/jorcasb)
+- [@OctoBeep](https://github.com/OctoBeep)
+
