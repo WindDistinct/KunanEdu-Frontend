@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { periodoService, alumnoService, notaService } from "../../api/requestApi";
 import { useNavigate } from "react-router-dom";
 import Notificacion from "../../components/Notificacion";
+import * as XLSX from "xlsx";
 
 export default function ListadoNotasPorCurso() {
   const [periodos, setPeriodos] = useState([]);
@@ -12,8 +13,9 @@ export default function ListadoNotasPorCurso() {
   const [mensaje, setMensaje] = useState(null);
   const [infoAlumno, setInfoAlumno] = useState(null);
   const [infoPeriodo, setInfoPeriodo] = useState(null);
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
+  // Cargar periodos
   const cargarPeriodos = async () => {
     try {
       const data = await periodoService.obtener();
@@ -23,6 +25,7 @@ export default function ListadoNotasPorCurso() {
     }
   };
 
+  // Cargar alumnos según periodo
   const cargarAlumnos = async (periodoId) => {
     try {
       const data = await alumnoService.obtenerPorPeriodo(periodoId);
@@ -35,6 +38,7 @@ export default function ListadoNotasPorCurso() {
     }
   };
 
+  // Generar el reporte en pantalla
   const handleGenerarReporte = async () => {
     try {
       const data = await notaService.generarReporte(periodoSeleccionado, alumnoSeleccionado);
@@ -50,16 +54,75 @@ export default function ListadoNotasPorCurso() {
     }
   };
 
-  useEffect(() => {
-    cargarPeriodos();
+  const exportarAExcel = () => {
+  if (!reporte) return;
+
+  const rows = [];
+
+  // Info del alumno y periodo
+  rows.push([
+    "Alumno",
+    `${infoAlumno?.nombre} ${infoAlumno?.apellido_paterno} ${infoAlumno?.apellido_materno}`,
+    "Periodo",
+    `${infoPeriodo?.anio} ${infoPeriodo?.descripcion}`,
+    "Fecha",
+    new Date().toLocaleDateString()
+  ]);
+
+  rows.push([]); // línea vacía
+
+  // Cabecera de tabla
+  rows.push(["Curso", "Bimestre", "Nota", "Promedio Curso", "Estado"]);
+
+  // Datos
+  Object.entries(reporte.Curso).forEach(([curso, datos]) => {
+    Object.entries(datos.Notas).forEach(([bim, nota], idx) => {
+      rows.push([
+        idx === 0 ? curso : "",
+        bim,
+        nota,
+        idx === 0 ? datos.Promedio : "",
+        idx === 0 ? datos.Estado : ""
+      ]);
+    });
+  });
+
+  rows.push([]); // línea vacía
+
+  // Promedios Generales
+  rows.push(["Promedios Generales por Bimestre"]);
+  Object.entries(reporte["Promedios Generales"]["Por Bimestre"]).forEach(([b, p]) => {
+    rows.push([b, p]);
+  });
+
+  rows.push(["Promedio Total", reporte["Promedios Generales"]["Promedio Total"]]);
+
+  // Crear hoja
+  const worksheet = XLSX.utils.aoa_to_sheet(rows);
+
+  // AUTOAJUSTAR columnas (auto width)
+  const colWidths = rows.reduce((widths, row) => {
+    row.forEach((cell, i) => {
+      const cellLength = cell ? cell.toString().length : 10;
+      widths[i] = Math.max(widths[i] || 10, cellLength);
+    });
+    return widths;
   }, []);
+  worksheet['!cols'] = colWidths.map(w => ({ wch: w + 5 }));
 
+  // Crear libro
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, "ReporteNotas");
+
+  // Descargar
+  XLSX.writeFile(workbook, `ReporteNotas_${infoAlumno?.nombre}_${new Date().toLocaleDateString()}.xlsx`);
+};
+
+  // Effects
+  useEffect(() => { cargarPeriodos(); }, []);
   useEffect(() => {
-    if (periodoSeleccionado) {
-      cargarAlumnos(periodoSeleccionado);
-    }
+    if (periodoSeleccionado) cargarAlumnos(periodoSeleccionado);
   }, [periodoSeleccionado]);
-
   useEffect(() => {
     if (mensaje) {
       const timer = setTimeout(() => setMensaje(null), 3000);
@@ -76,11 +139,9 @@ export default function ListadoNotasPorCurso() {
             body * {
               visibility: hidden;
             }
-
             .print-area, .print-area * {
               visibility: visible;
             }
-
             .print-area {
               position: absolute;
               left: 0;
@@ -88,7 +149,6 @@ export default function ListadoNotasPorCurso() {
               width: 100%;
               padding: 20px;
             }
-
             button, select {
               display: none !important;
             }
@@ -97,9 +157,10 @@ export default function ListadoNotasPorCurso() {
       </style>
 
       <h1 className="text-3xl font-bold mb-6">Reporte de Notas por Alumno</h1>
-          <button onClick={() => navigate("/")} className="btn btn-secondary mb-4">
+      <button onClick={() => navigate("/")} className="btn btn-secondary mb-4">
         ← Volver al Menú
       </button>
+
       <div className="flex flex-wrap gap-4 mb-6">
         <div>
           <label className="block font-medium mb-1">Periodo</label>
@@ -141,9 +202,14 @@ export default function ListadoNotasPorCurso() {
               Generar Reporte
             </button>
             {reporte && (
-              <button className="btn btn-outline" onClick={() => window.print()}>
-                Exportar a PDF
-              </button>
+              <>
+                <button className="btn btn-outline" onClick={() => window.print()}>
+                  Exportar a PDF
+                </button>
+                <button className="btn btn-success" onClick={exportarAExcel}>
+                  Exportar a Excel
+                </button>
+              </>
             )}
           </div>
         )}
@@ -155,38 +221,62 @@ export default function ListadoNotasPorCurso() {
 
       {reporte && (
         <div className="border p-6 rounded-lg bg-white print-area">
-          <h2 className="text-xl font-semibold mb-4">Resultado Académico</h2>
+          <h2 className="text-xl font-semibold mb-4 text-center">Resultado Académico</h2>
 
-          <div className="mb-4 text-sm">
+          <div className="mb-4 text-sm text-center">
             <p><strong>Alumno:</strong> {infoAlumno?.nombre} {infoAlumno?.apellido_paterno} {infoAlumno?.apellido_materno}</p>
             <p><strong>Periodo:</strong> {infoPeriodo?.anio} {infoPeriodo?.descripcion}</p>
             <p><strong>Fecha:</strong> {new Date().toLocaleDateString()}</p>
           </div>
 
-          {Object.entries(reporte.Curso).map(([curso, datos]) => (
-            <div key={curso} className="mb-4 border-b pb-2">
-              <h3 className="font-bold">{curso}</h3>
-              <ul className="ml-4">
-                {Object.entries(datos.Notas).map(([bim, nota]) => (
-                  <li key={bim}>{bim}: {nota}</li>
-                ))}
-                <li><strong>Promedio:</strong> {datos.Promedio}</li>
-                <li><strong>Estado:</strong> {datos.Estado}</li>
-              </ul>
-            </div>
-          ))}
-
-          <div className="mt-6">
-            <h3 className="font-semibold">Promedios Generales</h3>
-            <ul>
-              {Object.entries(reporte["Promedios Generales"]["Por Bimestre"]).map(([b, p]) => (
-                <li key={b}>{b}: {p}</li>
-              ))}
-              <li className="font-bold mt-2">
-                Promedio Total: {reporte["Promedios Generales"]["Promedio Total"]}
-              </li>
-            </ul>
-          </div>
+          <table className="min-w-full border-collapse border border-gray-400 mb-6 text-sm">
+            <thead className="bg-gray-200">
+              <tr>
+                <th className="border border-gray-400 px-4 py-2">Curso</th>
+                <th className="border border-gray-400 px-4 py-2">Bimestre</th>
+                <th className="border border-gray-400 px-4 py-2">Nota</th>
+                <th className="border border-gray-400 px-4 py-2">Promedio Curso</th>
+                <th className="border border-gray-400 px-4 py-2">Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              {Object.entries(reporte.Curso).map(([curso, datos]) =>
+                Object.entries(datos.Notas).map(([bim, nota], idx) => (
+                  <tr key={`${curso}-${bim}`} className="hover:bg-gray-50">
+                    <td className="border border-gray-400 px-4 py-2">
+                      {idx === 0 ? curso : ""}
+                    </td>
+                    <td className="border border-gray-400 px-4 py-2">{bim}</td>
+                    <td className="border border-gray-400 px-4 py-2">{nota}</td>
+                    <td className="border border-gray-400 px-4 py-2">
+                      {idx === 0 ? datos.Promedio : ""}
+                    </td>
+                    <td className="border border-gray-400 px-4 py-2">
+                      {idx === 0 ? datos.Estado : ""}
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+            <tfoot>
+              <tr className="bg-gray-100 font-semibold">
+                <td className="border border-gray-400 px-4 py-2" colSpan="2">
+                  Promedios Generales
+                </td>
+                <td className="border border-gray-400 px-4 py-2" colSpan="3">
+                  {Object.entries(reporte["Promedios Generales"]["Por Bimestre"]).map(([b, p]) => (
+                    <span key={b} className="mr-4">{b}: {p}</span>
+                  ))}
+                </td>
+              </tr>
+              <tr className="bg-gray-300 font-bold">
+                <td className="border border-gray-400 px-4 py-2" colSpan="4">Promedio Total</td>
+                <td className="border border-gray-400 px-4 py-2">
+                  {reporte["Promedios Generales"]["Promedio Total"]}
+                </td>
+              </tr>
+            </tfoot>
+          </table>
         </div>
       )}
     </div>

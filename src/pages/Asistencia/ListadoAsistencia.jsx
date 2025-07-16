@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { asistenciaService, periodoService, empleadoService } from "../../api/requestApi";
 import Tabla from "../../components/Tabla";
 import Notificacion from "../../components/Notificacion";
-
 import { useNavigate } from "react-router-dom"; 
 
 const MESES = [
@@ -21,7 +20,7 @@ const MESES = [
 ];
 
 export default function ListadoAsistenciaAlumno() {
-const navigate = useNavigate();
+  const navigate = useNavigate();
   const [periodos, setPeriodos] = useState([]);
   const [secciones, setSecciones] = useState([]);
   const [resultados, setResultados] = useState([]);
@@ -40,10 +39,12 @@ const navigate = useNavigate();
         const periodosResp = await periodoService.obtener();
         setPeriodos(periodosResp);
 
-        const cursosResp = await empleadoService.obtenerCursosPorUsuario(id_usuario, periodosResp[0]?.id_periodo);
-        setSecciones(cursosResp);
+        if (periodosResp.length > 0) {
+          const cursosResp = await empleadoService.obtenerCursosPorUsuario(id_usuario, periodosResp[0].id_periodo);
+          setSecciones(cursosResp);
+        }
       } catch (error) {
-        setMensaje({ tipo: "error", texto: "Error al cargar los datos iniciales" });
+        setMensaje({ tipo: "error", texto: "Error al cargar datos iniciales" });
       }
     };
     cargarDatosIniciales();
@@ -63,14 +64,12 @@ const navigate = useNavigate();
     cargarSecciones();
   }, [periodoSeleccionado, id_usuario]);
 
-   useEffect(() => {
-      if (mensaje) {
-        const timer = setTimeout(() => {
-          setMensaje(null);
-        }, 3000);
-        return () => clearTimeout(timer);
-      }
-    }, [mensaje]);
+  useEffect(() => {
+    if (mensaje) {
+      const timer = setTimeout(() => setMensaje(null), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [mensaje]);
 
   const buscarAsistencia = async () => {
     try {
@@ -80,8 +79,8 @@ const navigate = useNavigate();
         mes: mesSeleccionado,
       });
       
-      if(data.length === 0){
-        setMensaje({ tipo: "success", texto: "No hay registros" });
+      if (data.length === 0) {
+        setMensaje({ tipo: "success", texto: "No hay registros para el filtro" });
       }
       setResultados(data);
     } catch (error) {
@@ -90,13 +89,12 @@ const navigate = useNavigate();
   };
 
   return (
-    <div className="container mt-4  mb-4">
-        <h1 className="text-3xl font-bold mb-4">Listado de Asistencia</h1>
-        <button onClick={() => navigate("/")} className="btn btn-secondary mb-3">
-            Volver al Menú
-        </button>
-      <br />
-      <br />
+    <div className="container mt-4 mb-4">
+      <h1 className="text-3xl font-bold mb-4">Mantenimiento de Asistencias</h1>
+      <button onClick={() => navigate("/")} className="btn btn-secondary mb-3">
+        ← Volver al Menú
+      </button>
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
         <div>
           <label className="block font-medium">Periodo:</label>
@@ -120,12 +118,12 @@ const navigate = useNavigate();
             className="select select-bordered w-full"
             value={cursoSeccionSeleccionado}
             onChange={(e) => setCursoSeccionSeleccionado(e.target.value)}
-             disabled={!periodoSeleccionado}
+            disabled={!periodoSeleccionado}
           >
             <option value="">-- Selecciona --</option>
             {secciones.map((s) => (
               <option key={s.id_curso_seccion} value={s.id_curso_seccion}>
-                {s.nombre_curso} - {s.numero_aula} - {s.seccion}
+                {s.nombre_curso} - Aula {s.numero_aula} - {s.seccion}
               </option>
             ))}
           </select>
@@ -137,7 +135,7 @@ const navigate = useNavigate();
             className="select select-bordered w-full"
             value={mesSeleccionado}
             onChange={(e) => setMesSeleccionado(e.target.value)}
-              disabled={!cursoSeccionSeleccionado}
+            disabled={!cursoSeccionSeleccionado}
           >
             <option value="">-- Selecciona --</option>
             {MESES.map((m) => (
@@ -147,8 +145,8 @@ const navigate = useNavigate();
         </div>
       </div>
 
-      <button className="btn btn-primary mb-4" onClick={buscarAsistencia}  disabled={!mesSeleccionado}>
-        Buscar
+      <button className="btn btn-primary mb-4" onClick={buscarAsistencia} disabled={!mesSeleccionado}>
+        Buscar Asistencias
       </button>
 
       {mensaje && <Notificacion tipo={mensaje.tipo} mensaje={mensaje.texto} />}
