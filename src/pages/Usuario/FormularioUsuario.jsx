@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { usuarioService, empleadoService } from "../../api/requestApi";
 
 export default function FormularioUsuario({ onExito, initialData }) {
- const [observacion, setObservacion] = useState("");
+  const [observacion, setObservacion] = useState("");
   const [form, setForm] = useState({
     username: "",
     password: "",
@@ -19,7 +19,9 @@ export default function FormularioUsuario({ onExito, initialData }) {
     const cargarEmpleados = async () => {
       try {
         const data = await empleadoService.obtenerEmpleadoUsuarios();
-        setEmpleados(data); 
+        console.log(data);
+
+        setEmpleados(data);
       } catch (e) {
         setError("Error al cargar los empleados");
       }
@@ -67,30 +69,30 @@ export default function FormularioUsuario({ onExito, initialData }) {
       return;
     }
 
-      if (form.id_usuario) {
-      document.getElementById("modalObservacion").showModal(); 
+    if (form.id_usuario) {
+      document.getElementById("modalObservacion").showModal();
     } else {
       await enviarFormulario();
     }
- 
+
   };
 
-   const enviarFormulario = async () => {
- 
+  const enviarFormulario = async () => {
+
     try {
 
       const datos = {
-      username: form.username.trim(),
-      rol: form.rol,
-      empleado: parseInt(form.empleado),
-      estado: form.estado,
-      observacion: observacion.trim(),
+        username: form.username.trim(),
+        rol: form.rol,
+        empleado: parseInt(form.empleado),
+        estado: form.estado,
+        observacion: observacion.trim(),
       };
       if (!initialData) {
         datos.password = form.password;
       }
-    
-     if (initialData) {
+
+      if (initialData) {
         await usuarioService.actualizar(initialData.id_usuario, datos);
         setMensajeExito("Usuario actualizado con éxito");
         onExito("Usuario actualizado con éxito");
@@ -100,7 +102,7 @@ export default function FormularioUsuario({ onExito, initialData }) {
         onExito("Usuario registrado con éxito");
       }
 
-       setForm({
+      setForm({
         username: "",
         password: "",
         rol: "",
@@ -112,130 +114,130 @@ export default function FormularioUsuario({ onExito, initialData }) {
     } catch (err) {
       setError("Error al guardar. Verifique que el número de aula no esté duplicado");
     }
-    }
+  }
 
   return (
-     <>
+    <>
       <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="col-span-2 h-16 relative">
-        {error && (
-          <div className="alert alert-error absolute w-full">
-            <span>{error}</span>
-          </div>
-        )}
-        {mensajeExito && (
-          <div className="alert alert-success absolute w-full">
-            <span>{mensajeExito}</span>
-          </div>
-        )}
-      </div>
+        <div className="col-span-2 h-16 relative">
+          {error && (
+            <div className="alert alert-error absolute w-full">
+              <span>{error}</span>
+            </div>
+          )}
+          {mensajeExito && (
+            <div className="alert alert-success absolute w-full">
+              <span>{mensajeExito}</span>
+            </div>
+          )}
+        </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <input
-          name="username"
-          placeholder="Usuario"
-          className="input input-bordered w-full"
-          value={form.username}
-          onChange={handleChange}
-          onKeyDown={(e) => {
-            if (/\d/.test(e.key) || e.key === " ") e.preventDefault();
-          }}
-        />
-
-        {!initialData && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <input
-            name="password"
-            type="password"
-            placeholder="Contraseña"
+            name="username"
+            placeholder="Usuario"
             className="input input-bordered w-full"
-            value={form.password}
+            value={form.username}
             onChange={handleChange}
             onKeyDown={(e) => {
-              if (e.key === " ") e.preventDefault();
+              if (/\d/.test(e.key) || e.key === " ") e.preventDefault();
             }}
           />
-        )}
 
-        <select
-          name="rol"
-          className="select select-bordered w-full"
-          value={form.rol}
-          onChange={handleChange}
-        >
-          <option value="" disabled>Seleccione Rol</option>
-          <option value="administrador">Administrador</option>
-          <option value="usuario">Usuario</option>
-          <option value="profesor">Profesor</option>
-          <option value="auditor">Auditor</option>
-        </select>
-
-        <select
-          name="empleado"
-          className="select select-bordered w-full"
-          value={form.empleado}
-          onChange={handleChange}
-        >
-          <option value="" disabled>Seleccione Empleado</option>
-          {empleados.map((emp) => (
-            <option key={emp.id_emp} value={emp.id_emp}>
-              {emp.nombre_completo}    
-            </option>
-          ))}
-        </select>
-
-        {initialData && (
-          <label className="label cursor-pointer gap-4">
-            <span className="label-text">Activo</span>
+          {!initialData && (
             <input
-              type="checkbox"
-              className="toggle toggle-success"
-              name="estado"
-              checked={!!form.estado}
+              name="password"
+              type="password"
+              placeholder="Contraseña"
+              className="input input-bordered w-full"
+              value={form.password}
               onChange={handleChange}
+              onKeyDown={(e) => {
+                if (e.key === " ") e.preventDefault();
+              }}
             />
-          </label>
-        )}
-      </div>
+          )}
 
-      <div className="mt-4">
+          <select
+            name="rol"
+            className="select select-bordered w-full"
+            value={form.rol}
+            onChange={handleChange}
+          >
+            <option value="" disabled>Seleccione Rol</option>
+            <option value="administrador">Administrador</option>
+            <option value="usuario">Usuario</option>
+            <option value="profesor">Profesor</option>
+            <option value="auditor">Auditor</option>
+          </select>
+
+          <select
+            name="empleado"
+            className="select select-bordered w-full"
+            value={form.empleado}
+            onChange={handleChange}
+          >
+            <option value="" disabled>Seleccione Empleado</option>
+            {empleados.map((emp) => (
+              <option key={emp.id_emp} value={emp.id_emp}>
+                {emp.nombre_completo}
+              </option>
+            ))}
+          </select>
+
+          {initialData && (
+            <label className="label cursor-pointer gap-4">
+              <span className="label-text">Activo</span>
+              <input
+                type="checkbox"
+                className="toggle toggle-success"
+                name="estado"
+                checked={!!form.estado}
+                onChange={handleChange}
+              />
+            </label>
+          )}
+        </div>
+
+        <div className="mt-4">
           <button
             type="submit"
             className={`btn ${initialData ? "btn-warning" : "btn-success"}`}
           >
-            {initialData ? "Actualizar Grado" : "Registrar Grado"}
+            {initialData ? "Actualizar Usuario" : "Registrar Usuario"}
           </button>
-        </div> 
-    </form>
-       <dialog id="modalObservacion" className="modal">
-          <div className="modal-box">
-            <h3 className="font-bold text-lg">Justifique su edición</h3>
-            <textarea
-              name="observacion"
-              className="textarea textarea-bordered w-full mt-4"
-              placeholder="Escriba la justificación"
-              value={observacion}
-              onChange={(e) => setObservacion(e.target.value)}
-              required
-            />
-            <div className="modal-action">
-              <button
-                type="button"
-                className="btn"
-                onClick={() => document.getElementById("modalObservacion").close()}
-              >
-                Cancelar
-              </button>
-              <button
-                type="button"
-                className="btn btn-success"
-                onClick={enviarFormulario}
-              >
-                Confirmar Actualización
-              </button>
-            </div>
+        </div>
+      </form>
+      <dialog id="modalObservacion" className="modal">
+        <div className="modal-box">
+          <h3 className="font-bold text-lg">Justifique su edición</h3>
+          <textarea
+            name="observacion"
+            className="textarea textarea-bordered w-full mt-4"
+            placeholder="Escriba la justificación"
+            value={observacion}
+            onChange={(e) => setObservacion(e.target.value)}
+            required
+          />
+          <div className="modal-action">
+            <button
+              type="button"
+              className="btn"
+              onClick={() => document.getElementById("modalObservacion").close()}
+            >
+              Cancelar
+            </button>
+            <button
+              type="button"
+              className="btn btn-success"
+              onClick={enviarFormulario}
+            >
+              Confirmar Actualización
+            </button>
           </div>
-        </dialog>
-     </>
-   
+        </div>
+      </dialog>
+    </>
+
   );
 }
