@@ -2,14 +2,18 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { alumnoService } from "../../api/requestApi";
 import Tabla from "../../components/TablaAuditoria";
+import FiltroTabla from "../../components/FiltroTabla";     ///////////////////////////////////////
 
 export default function AuditoriaAlumno() {
   const [auditorias, setAuditorias] = useState([]);
   const navigate = useNavigate();
+  const [auditoriasFiltradas, setAuditoriasFiltradas] = useState([]);   ///////////////////////////////////////
+  const [textoFiltro, setTextoFiltro] = useState("");                   ///////////////////////////////////////
 
   const cargarAuditorias = async () => {
     const data = await alumnoService.auditar();
     setAuditorias(data);
+    setAuditoriasFiltradas(data);     ///////////////////////////////////////
   };
 
   useEffect(() => {
@@ -21,11 +25,34 @@ export default function AuditoriaAlumno() {
       <h1 className="text-3xl font-bold mb-6 text-primary">Auditoría de Alumnos</h1>
 
       <button
-        onClick={() => navigate("/")}
+        type="button"
+        onClick={() => {setTextoFiltro(""); navigate("/");}}    ///////////////////////////////////////
         className="btn btn-secondary mb-6"
       >
         Volver al Menú
       </button> 
+
+      {/*/////////////////////////////////////*/}
+      <FiltroTabla
+          datos={auditorias}
+          clavesFiltro={[
+            "nombre_anterior",
+            "nombre_nuevo",
+            "apellido_paterno_anterior",
+            "apellido_paterno_nuevo",
+            "apellido_materno_anterior",
+            "apellido_materno_nuevo",
+            "numero_documento_anterior",
+            "numero_documento_nuevo",
+            "usuario_modificador",
+            "observacion"
+           ]}
+          onFiltrar={setAuditoriasFiltradas}
+          placeholder="Buscar cualquier dato..."
+          texto={textoFiltro}
+          setTexto={setTextoFiltro}
+      />
+
       <Tabla
           columnas={[
             { key: "id_audit_alumno", label: "ID Auditoría" },
@@ -49,7 +76,7 @@ export default function AuditoriaAlumno() {
             { key: "fecha_modificacion", label: "Fecha Modificación" },
             { key: "usuario_modificador", label: "Usuario Modificador" }
           ]}
-          datos={auditorias}
+          datos={auditoriasFiltradas}       /////////////////////////
           idKey="id_audit_alumno"
         /> 
     </div>

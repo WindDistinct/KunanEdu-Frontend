@@ -4,6 +4,7 @@ import { seccionService } from "../../api/requestApi";
 import Tabla from "../../components/Tabla";
 import FormularioSeccion from "./FormularioSeccion";
 import Notificacion from "../../components/Notificacion";
+import FiltroTabla from "../../components/FiltroTabla"; 
 
 export default function ListadoSeccion() {
   const [secciones, setSecciones] = useState([]);
@@ -11,6 +12,8 @@ export default function ListadoSeccion() {
   const [mensaje, setMensaje] = useState(null);
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
   const navigate = useNavigate();
+  const [datosFiltrados, setDatosFiltrados] = useState([]);
+  const [textoFiltro, setTextoFiltro] = useState("");      
 
   const [rol] = useState(() => localStorage.getItem("rol"));
   const puedeAdministrar = rol === "administrador";
@@ -24,6 +27,7 @@ export default function ListadoSeccion() {
 
       const ordenadas = data.sort((a, b) => a.id_seccion - b.id_seccion);
       setSecciones(data);
+      setDatosFiltrados(data);
     } catch (err) {
       setMensaje({ tipo: "error", texto: "Error al cargar las secciones: " + err });
     }
@@ -79,7 +83,7 @@ export default function ListadoSeccion() {
         {puedeAdministrar ? "Gestión de Secciones" : "Listado de Secciones"}
       </h1>
 
-      <button onClick={() => navigate("/")} className="btn btn-secondary mb-4">
+      <button onClick={() => {setTextoFiltro(""); navigate("/");}} className="btn btn-secondary mb-4">
         ← Volver al Menú
       </button>
 
@@ -116,6 +120,16 @@ export default function ListadoSeccion() {
         <Notificacion mensaje={mensaje?.texto} tipo={mensaje?.tipo} />
       </div>
 
+      {/* Filtro */}        
+            <FiltroTabla
+              datos={secciones}
+              clavesFiltro={["nombre", "grado", "aula", "periodo"]}
+              onFiltrar={setDatosFiltrados}
+              placeholder="Buscar cualquier dato..."
+              texto={textoFiltro}
+              setTexto={setTextoFiltro}
+            />
+
       <Tabla
         columnas={[
           { key: "nombre", label: "Nombre" },
@@ -124,7 +138,7 @@ export default function ListadoSeccion() {
           { key: "periodo", label: "Periodo" },
           ...(puedeAdministrar ? [{ key: "estado", label: "Estado" }] : []),
         ]}
-        datos={secciones}
+        datos={datosFiltrados}
         onEditar={handleEditar}
         onEliminar={handleEliminar}
         idKey="id_seccion"

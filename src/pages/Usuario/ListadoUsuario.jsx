@@ -4,6 +4,7 @@ import { usuarioService } from "../../api/requestApi";
 import Tabla from "../../components/Tabla";
 import FormularioUsuario from "./FormularioUsuario";
 import Notificacion from "../../components/Notificacion";
+import FiltroTabla from "../../components/FiltroTabla";   
 
 export default function ListadoUsuario() {
   const [usuarios, setUsuarios] = useState([]);
@@ -11,6 +12,8 @@ export default function ListadoUsuario() {
   const [mensaje, setMensaje] = useState(null);
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
   const navigate = useNavigate();
+  const [datosFiltrados, setDatosFiltrados] = useState([]);
+  const [textoFiltro, setTextoFiltro] = useState("");      
 
   const [rol] = useState(() => localStorage.getItem("rol"));
   const puedeAdministrar = rol === "administrador";
@@ -24,6 +27,7 @@ export default function ListadoUsuario() {
 
       const usuariosOrdenados = data.sort((a, b) => a.id_usuario - b.id_usuario);
       setUsuarios(usuariosOrdenados);
+      setDatosFiltrados(usuariosOrdenados); 
     } catch (error) {
       setMensaje({ tipo: "error", texto: "Error al cargar los usuarios: " + error });
     }
@@ -73,7 +77,7 @@ export default function ListadoUsuario() {
         {puedeAdministrar ? "Gestión de Usuarios" : "Listado de Usuarios"}
       </h1>
 
-      <button onClick={() => navigate("/")} className="btn btn-secondary mb-4">
+      <button onClick={() => {setTextoFiltro(""); navigate("/");}} className="btn btn-secondary mb-4">
         ← Volver al Menú
       </button>
 
@@ -110,6 +114,16 @@ export default function ListadoUsuario() {
         <Notificacion mensaje={mensaje?.texto} tipo={mensaje?.tipo} />
       </div>
 
+      {/* Filtro */}        
+            <FiltroTabla
+              datos={usuarios}
+              clavesFiltro={["username", "rol", "empleado"]}
+              onFiltrar={setDatosFiltrados}
+              placeholder="Buscar cualquier dato..."
+              texto={textoFiltro}
+              setTexto={setTextoFiltro}
+            />
+
       <Tabla
         columnas={[
           { key: "username", label: "Nombre de Usuario" },
@@ -117,7 +131,7 @@ export default function ListadoUsuario() {
            { key: "empleado", label: "Id empleado" },
           ...(puedeAdministrar ? [{ key: "estado", label: "Estado" }] : []),
         ]}
-        datos={usuarios}
+        datos={datosFiltrados}
         onEditar={handleEditar}
         onEliminar={handleEliminar}
         idKey="id_usuario"

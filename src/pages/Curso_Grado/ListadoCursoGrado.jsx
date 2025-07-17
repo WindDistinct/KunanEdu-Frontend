@@ -4,6 +4,7 @@ import { cursoGradoService } from "../../api/requestApi";
 import Tabla from "../../components/Tabla";
 import FormularioCursoGrado from "./FormularioCursoGrado";
 import Notificacion from "../../components/Notificacion";
+import FiltroTabla from "../../components/FiltroTabla"; 
 
 export default function ListadoCursoGrado() {
   const [lista, setLista] = useState([]);
@@ -11,6 +12,9 @@ export default function ListadoCursoGrado() {
   const [mensaje, setMensaje] = useState(null);
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
   const navigate = useNavigate();
+
+  const [datosFiltrados, setDatosFiltrados] = useState([]);
+  const [textoFiltro, setTextoFiltro] = useState("");      
 
   const [rol] = useState(() => localStorage.getItem("rol"));
   const puedeAdministrar = rol === "administrador";
@@ -23,6 +27,7 @@ export default function ListadoCursoGrado() {
           : await cursoGradoService.obtener(); 
       const ordenados = datos.sort((a, b) => a.id_curso_grado - b.id_curso_grado);
       setLista(ordenados);
+      setDatosFiltrados(ordenados); 
     } catch (error) {
       setMensaje({ tipo: "error", texto: "Error al cargar los datos: " + error });
     }
@@ -76,7 +81,7 @@ export default function ListadoCursoGrado() {
         {puedeAdministrar ? "Plan Curricular por grado" : "Listado Curso-Grado"}
       </h1>
 
-      <button onClick={() => navigate("/")} className="btn btn-secondary mb-4">
+      <button onClick={() => {setTextoFiltro(""); navigate("/");}} className="btn btn-secondary mb-4">
         ← Volver al Menú
       </button>
 
@@ -113,13 +118,23 @@ export default function ListadoCursoGrado() {
         <Notificacion mensaje={mensaje?.texto} tipo={mensaje?.tipo} />
       </div>
 
+      {/* Filtro */}        
+            <FiltroTabla
+              datos={lista}
+              clavesFiltro={["curso", "grado"]}
+              onFiltrar={setDatosFiltrados}
+              placeholder="Buscar cualquier dato..."
+              texto={textoFiltro}
+              setTexto={setTextoFiltro}
+            />
+
       <Tabla
         columnas={[
           { key: "curso", label: "Curso" },
           { key: "grado", label: "Grado" },
           ...(puedeAdministrar ? [{ key: "estado", label: "Estado" }] : []),
         ]}
-        datos={lista}
+        datos={datosFiltrados}
         onEditar={handleEditar}
         onEliminar={handleEliminar}
         idKey="id_curso_grado"

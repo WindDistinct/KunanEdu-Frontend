@@ -3,14 +3,18 @@ import { useNavigate } from "react-router-dom";
 import { examenService } from "../../api/requestApi";
 import Tabla from "../../components/TablaAuditoria";
 import "../../styles/Botones.css";
+import FiltroTabla from "../../components/FiltroTabla";
 
 export default function AuditoriaNota() {
   const [auditorias, setAuditorias] = useState([]);
   const navigate = useNavigate();
+  const [auditoriasFiltradas, setAuditoriasFiltradas] = useState([]);
+  const [textoFiltro, setTextoFiltro] = useState("");                
 
   const cargarAuditorias = async () => {
     const data = await examenService.auditar();
     setAuditorias(data);
+    setAuditoriasFiltradas(data);
   };
 
   useEffect(() => {
@@ -21,10 +25,25 @@ export default function AuditoriaNota() {
     <div className="container mt-4">
       <h1 className="text-4xl font-semibold mb-4">Auditoría de Notas</h1>
 
-      <button onClick={() => navigate("/")} className="btn btn-secondary mb-3">
+      <button onClick={() => {setTextoFiltro(""); navigate("/");}} className="btn btn-secondary mb-3">
         Volver al Menú
       </button>
       <br />
+
+      <FiltroTabla
+                datos={auditorias}
+                clavesFiltro={[
+                  "bimestre_anterior",
+                  "bimestre_nuevo",
+                  "nota_anterior",
+                  "nota_nuevo",
+                  "usuario_modificador",
+                 ]}
+                onFiltrar={setAuditoriasFiltradas}
+                placeholder="Buscar bimestre o nota..."
+                texto={textoFiltro}
+                setTexto={setTextoFiltro}
+            />
 
       <Tabla
         columnas={[
@@ -44,7 +63,7 @@ export default function AuditoriaNota() {
           { key: "fecha_modificacion", label: "Fecha Modificación" },
           { key: "usuario_modificador", label: "Usuario Modificador" },
         ]}
-        datos={auditorias}
+        datos={auditoriasFiltradas}
         idKey="id_audit_examen"
       />
     </div>

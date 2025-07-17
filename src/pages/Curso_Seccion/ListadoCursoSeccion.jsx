@@ -4,6 +4,7 @@ import { cursoSeccionService } from "../../api/requestApi";
 import Tabla from "../../components/Tabla";
 import FormularioCursoSeccion from "./FormularioCursoSeccion";
 import Notificacion from "../../components/Notificacion";
+import FiltroTabla from "../../components/FiltroTabla";
 
 export default function ListadoCursoSeccion() {
   const [lista, setLista] = useState([]);
@@ -11,6 +12,9 @@ export default function ListadoCursoSeccion() {
   const [mensaje, setMensaje] = useState(null);
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
   const navigate = useNavigate();
+
+  const [datosFiltrados, setDatosFiltrados] = useState([]);
+  const [textoFiltro, setTextoFiltro] = useState("");      
 
   const [rol] = useState(() => localStorage.getItem("rol"));
   const puedeAdministrar = rol === "administrador";
@@ -23,6 +27,7 @@ export default function ListadoCursoSeccion() {
           : await cursoSeccionService.obtener();
       const ordenados = datos.sort((a, b) => a.id_curso_seccion - b.id_curso_seccion);
       setLista(ordenados);
+      setDatosFiltrados(ordenados);
     } catch (error) {
       setMensaje({ tipo: "error", texto: "Error al cargar los datos: " + error });
     }
@@ -80,7 +85,7 @@ export default function ListadoCursoSeccion() {
         {puedeAdministrar ? "Gestión Curso-Sección" : "Listado Curso-Sección"}
       </h1>
 
-      <button onClick={() => navigate("/")} className="btn btn-secondary mb-4">
+      <button onClick={() => {setTextoFiltro(""); navigate("/");}} className="btn btn-secondary mb-4">
         ← Volver al Menú
       </button>
 
@@ -117,6 +122,16 @@ export default function ListadoCursoSeccion() {
         <Notificacion mensaje={mensaje?.texto} tipo={mensaje?.tipo} />
       </div>
 
+      {/* Filtro */}        
+            <FiltroTabla
+              datos={lista}
+              clavesFiltro={["curso", "seccion", "docente"]}
+              onFiltrar={setDatosFiltrados}
+              placeholder="Buscar cualquier dato..."
+              texto={textoFiltro}
+              setTexto={setTextoFiltro}
+            />
+
       <Tabla
         columnas={[
           { key: "curso", label: "Curso" },
@@ -124,7 +139,7 @@ export default function ListadoCursoSeccion() {
           { key: "docente", label: "Docente" },
           ...(puedeAdministrar ? [{ key: "estado", label: "Estado" }] : []),
         ]}
-        datos={lista}
+        datos={datosFiltrados}
         onEditar={handleEditar}
         onEliminar={handleEliminar}
         idKey="id_curso_seccion"

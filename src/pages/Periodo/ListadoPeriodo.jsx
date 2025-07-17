@@ -4,6 +4,7 @@ import { periodoService } from "../../api/requestApi";
 import Tabla from "../../components/Tabla";
 import FormularioPeriodo from "./FormularioPeriodo";
 import Notificacion from "../../components/Notificacion";
+import FiltroTabla from "../../components/FiltroTabla";  
 
 export default function ListadoPeriodo() {
   const [periodos, setPeriodos] = useState([]);
@@ -11,6 +12,8 @@ export default function ListadoPeriodo() {
   const [mensaje, setMensaje] = useState(null);
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
   const navigate = useNavigate();
+  const [datosFiltrados, setDatosFiltrados] = useState([]);
+  const [textoFiltro, setTextoFiltro] = useState("");      
 
   const [rol] = useState(() => localStorage.getItem("rol"));
   const puedeAdministrar = rol === "administrador";
@@ -23,6 +26,7 @@ export default function ListadoPeriodo() {
 
       const ordenados = data.sort((a, b) => a.anio - b.anio);
       setPeriodos(ordenados);
+      setDatosFiltrados(ordenados);
     } catch (error) {
       setMensaje({
         tipo: "error",
@@ -79,7 +83,7 @@ export default function ListadoPeriodo() {
         {puedeAdministrar ? "Gestión de Periodos" : "Listado de Periodos"}
       </h1>
 
-      <button onClick={() => navigate("/")} className="btn btn-secondary mb-4">
+      <button onClick={() => {setTextoFiltro(""); navigate("/");}} className="btn btn-secondary mb-4">
         ← Volver al Menú
       </button>
 
@@ -116,6 +120,16 @@ export default function ListadoPeriodo() {
         <Notificacion mensaje={mensaje?.texto} tipo={mensaje?.tipo} />
       </div>
 
+      {/* Filtro */}        
+            <FiltroTabla
+              datos={periodos}
+              clavesFiltro={["anio", "descripcion", "progreso"]}
+              onFiltrar={setDatosFiltrados}
+              placeholder="Buscar cualquier dato..."
+              texto={textoFiltro}
+              setTexto={setTextoFiltro}
+            />
+
       <Tabla
         columnas={[
           { key: "anio", label: "Año" },
@@ -123,7 +137,7 @@ export default function ListadoPeriodo() {
           { key: "progreso", label: "Progreso" },
           ...(puedeAdministrar ? [{ key: "estado", label: "Estado" }] : []),
         ]}
-        datos={periodos}
+        datos={datosFiltrados}
         onEditar={handleEditar}
         onEliminar={handleEliminar}
         idKey="id_periodo"

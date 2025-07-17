@@ -131,12 +131,12 @@ export default function ListadoCursosAsistencia() {
             { key: "grado", label: "Grado" },
             { key: "periodo", label: "Periodo" },
           ]}
-         datos={cursos}
-  onEditar={handleEditar}
-  idKey="id_curso_seccion"
-  mostrarAcciones={true}
-  textoBotonAccion="Ingresar Asistencia"  
-  soloBotonEditar={true}  
+          datos={cursos}
+          onEditar={handleEditar}
+          idKey="id_curso_seccion"
+          mostrarAcciones={true}
+          textoBotonAccion="Ingresar Asistencia"  
+          soloBotonEditar={true}  
         />
       )}
     </div>

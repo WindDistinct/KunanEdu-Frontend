@@ -5,6 +5,7 @@ import { gradoService } from "../../api/requestApi";
 import Tabla from "../../components/Tabla";
 import FormularioGrado from "./FormularioGrado";
 import Notificacion from "../../components/Notificacion";
+import FiltroTabla from "../../components/FiltroTabla";
 
 export default function ListadoGrado() {
   const [grados, setGrados] = useState([]);
@@ -12,6 +13,8 @@ export default function ListadoGrado() {
   const [mensaje, setMensaje] = useState(null);
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
   const navigate = useNavigate();
+  const [datosFiltrados, setDatosFiltrados] = useState([]);
+  const [textoFiltro, setTextoFiltro] = useState("");      
 
   const [rol] = useState(() => localStorage.getItem("rol"));
   const puedeAdministrar = rol === "administrador";
@@ -24,6 +27,7 @@ export default function ListadoGrado() {
           : await gradoService.obtener();
  
       setGrados(data);
+      setDatosFiltrados(data);
     } catch (error) {
       setMensaje({
         tipo: "error",
@@ -81,7 +85,7 @@ export default function ListadoGrado() {
         {puedeAdministrar ? "Gestión de Grados" : "Listado de Grados"}
       </h1>
 
-      <button onClick={() => navigate("/")} className="btn btn-secondary mb-4">
+      <button onClick={() => {setTextoFiltro(""); navigate("/");}} className="btn btn-secondary mb-4">
         ← Volver al Menú
       </button>
 
@@ -118,6 +122,16 @@ export default function ListadoGrado() {
         <Notificacion mensaje={mensaje?.texto} tipo={mensaje?.tipo} />
       </div>
 
+      {/* Filtro */}        
+            <FiltroTabla
+              datos={grados}
+              clavesFiltro={["nivel", "anio"]}
+              onFiltrar={setDatosFiltrados}
+              placeholder="Buscar por nivel o año..."
+              texto={textoFiltro}
+              setTexto={setTextoFiltro}
+            />
+
       <Tabla
         columnas={[
           { key: "nivel", label: "Nivel del Grado" },
@@ -132,7 +146,7 @@ export default function ListadoGrado() {
               ]
             : []),
         ]}
-        datos={grados}
+        datos={datosFiltrados}
         onEditar={handleEditar}
         onEliminar={handleEliminar}
         idKey="id_grado"

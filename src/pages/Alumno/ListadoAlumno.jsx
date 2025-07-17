@@ -4,13 +4,17 @@ import { alumnoService } from "../../api/requestApi";
 import Tabla from "../../components/Tabla";
 import FormularioAlumno from "./FormularioAlumno";
 import Notificacion from "../../components/Notificacion";
+import FiltroTabla from "../../components/FiltroTabla";                 /////////////////////////
 
 export default function ListadoAlumno() {
   const [alumnos, setAlumnos] = useState([]);
   const [formData, setFormData] = useState(null);
   const [mensaje, setMensaje] = useState(null);
-  const [mostrarFormulario, setMostrarFormulario] = useState(false);
+  const [mostrarFormulario, setMostrarFormulario] = useState(false);    
   const navigate = useNavigate();
+
+  const [datosFiltrados, setDatosFiltrados] = useState([]);           //////////////////////////
+  const [textoFiltro, setTextoFiltro] = useState("");                 //////////////////////////
 
   const [rol] = useState(() => localStorage.getItem("rol"));
   const puedeAdministrar = rol === "administrador";
@@ -32,6 +36,7 @@ export default function ListadoAlumno() {
         .sort((a, b) => a.id_alumno - b.id_alumno);
 
       setAlumnos(alumnosFormateados);
+      setDatosFiltrados(alumnosFormateados);                    //////////////////////////
     } catch (error) {
       setMensaje({ tipo: "error", texto: "Error al cargar los alumnos" });
     }
@@ -81,7 +86,7 @@ export default function ListadoAlumno() {
         {puedeAdministrar ? "Gestión de Alumno" : "Listado de Alumnos"}
       </h1>
 
-      <button onClick={() => navigate("/")} className="btn btn-secondary mb-4">
+      <button type="button"  onClick={() => {setTextoFiltro(""); navigate("/");}} className="btn btn-secondary mb-4">   {/*/////////////*/}
         ← Volver al Menú
       </button>
 
@@ -120,6 +125,17 @@ export default function ListadoAlumno() {
         </dialog>
       )}
 
+      {/*/////////////////////////////////////*/}
+      {/* Filtro */}        
+      <FiltroTabla
+        datos={alumnos}
+        clavesFiltro={["nombre", "apellido_paterno", "apellido_materno", "numero_documento"]}
+        onFiltrar={setDatosFiltrados}
+        placeholder="Buscar por nombre, apellido o número de documento..."
+        texto={textoFiltro}
+        setTexto={setTextoFiltro}
+      />
+
       {/* Tabla */}
       <Tabla
         columnas={[
@@ -133,7 +149,7 @@ export default function ListadoAlumno() {
           { key: "fecha_nacimiento", label: "Fecha Nacimiento" },
           ...(puedeAdministrar ? [{ key: "estado", label: "Estado" }] : []),
         ]}
-        datos={alumnos}
+        datos={datosFiltrados}              ///////////////////////////////////////
         onEditar={handleEditar}
         onEliminar={handleEliminar}
         idKey="id_alumno"

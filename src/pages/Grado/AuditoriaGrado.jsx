@@ -2,14 +2,18 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { gradoService } from "../../api/requestApi";
 import Tabla from "../../components/TablaAuditoria";
+import FiltroTabla from "../../components/FiltroTabla"; 
 
 export default function AuditoriaGrado() {
   const [auditorias, setAuditorias] = useState([]);
   const navigate = useNavigate();
+  const [auditoriasFiltradas, setAuditoriasFiltradas] = useState([]);
+  const [textoFiltro, setTextoFiltro] = useState("");                
 
   const cargarAuditorias = async () => {
     const data = await gradoService.auditar();
     setAuditorias(data);
+    setAuditoriasFiltradas(data);
   };
 
   useEffect(() => {
@@ -20,11 +24,27 @@ export default function AuditoriaGrado() {
     <div className="container mt-4">
       <h1 className="text-4xl font-semibold mb-4">Auditoría de Grados</h1>
 
-      <button onClick={() => navigate("/")} className="btn btn-secondary mb-3">
+      <button onClick={() => {setTextoFiltro(""); navigate("/");}} className="btn btn-secondary mb-3">
         Volver al Menú
       </button>
       <br />
       <br />
+
+      <FiltroTabla
+                datos={auditorias}
+                clavesFiltro={[
+                  "nivel_anterior",
+                  "nivel_nuevo",
+                  "anio_anterior",
+                  "anio_nuevo",
+                  "usuario_modificador",
+                  "observacion"
+                 ]}
+                onFiltrar={setAuditoriasFiltradas}
+                placeholder="Buscar cualquier dato..."
+                texto={textoFiltro}
+                setTexto={setTextoFiltro}
+            />
 
       <Tabla
         columnas={[
@@ -39,7 +59,7 @@ export default function AuditoriaGrado() {
           { key: "fecha_modificacion", label: "Fecha Modificación" },
           { key: "usuario_modificador", label: "Usuario Modificador" }
         ]}
-        datos={auditorias}
+        datos={auditoriasFiltradas}
         idKey="id_audit_grado"
       />
     </div>

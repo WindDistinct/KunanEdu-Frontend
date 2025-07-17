@@ -4,6 +4,7 @@ import { aulaService } from "../../api/requestApi";
 import Tabla from "../../components/Tabla";
 import FormularioAula from "./FormularioAula";
 import Notificacion from "../../components/Notificacion";
+import FiltroTabla from "../../components/FiltroTabla";
 
 export default function ListadoAula() {
   const [aulas, setAulas] = useState([]);
@@ -15,6 +16,9 @@ export default function ListadoAula() {
   const [rol] = useState(() => localStorage.getItem("rol"));
   const puedeAdministrar = rol === "administrador";
 
+  const [datosFiltrados, setDatosFiltrados] = useState([]);
+  const [textoFiltro, setTextoFiltro] = useState("");      
+
   const cargarAulas = useCallback(async () => {
     try {
       const data =
@@ -24,6 +28,7 @@ export default function ListadoAula() {
 
       const aulasOrdenadas = data.sort((a, b) => a.id_aula - b.id_aula);
       setAulas(aulasOrdenadas);
+      setDatosFiltrados(aulasOrdenadas); 
     } catch (error) {
       setMensaje({ tipo: "error", texto: "Error al cargar las aulas: " + error });
     }
@@ -75,7 +80,7 @@ export default function ListadoAula() {
         {puedeAdministrar ? "Gestión de Aulas" : "Listado de Aulas"}
       </h1>
 
-      <button onClick={() => navigate("/")} className="btn btn-secondary mb-4">
+      <button onClick={() => {setTextoFiltro(""); navigate("/");}} className="btn btn-secondary mb-4">
         ← Volver al Menú
       </button>
 
@@ -112,6 +117,16 @@ export default function ListadoAula() {
         <Notificacion mensaje={mensaje?.texto} tipo={mensaje?.tipo} />
       </div>
 
+      {/* Filtro */}        
+            <FiltroTabla
+              datos={aulas}
+              clavesFiltro={["numero_aula", "aforo", "ubicacion"]}
+              onFiltrar={setDatosFiltrados}
+              placeholder="Buscar cualquier dato..."
+              texto={textoFiltro}
+              setTexto={setTextoFiltro}
+            />
+
       <Tabla
         columnas={[
           { key: "numero_aula", label: "N° Aula" },
@@ -119,7 +134,7 @@ export default function ListadoAula() {
           { key: "ubicacion", label: "Ubicación" },
           ...(puedeAdministrar ? [{ key: "estado", label: "Estado" }] : []),
         ]}
-        datos={aulas}
+        datos={datosFiltrados}
         onEditar={handleEditar}
         onEliminar={handleEliminar}
         idKey="id_aula"

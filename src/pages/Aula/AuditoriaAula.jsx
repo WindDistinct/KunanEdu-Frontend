@@ -1,15 +1,20 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { aulaService } from "../../api/requestApi"
-import Tabla from "../../components/TablaAuditoria";   
+import Tabla from "../../components/TablaAuditoria";
+import FiltroTabla from "../../components/FiltroTabla";
 
 export default function AuditoriaAula() {
   const [auditorias, setAuditorias] = useState([]);
   const navigate = useNavigate();
 
+  const [auditoriasFiltradas, setAuditoriasFiltradas] = useState([]);
+  const [textoFiltro, setTextoFiltro] = useState("");                
+
   const cargarAuditorias = async () => {
     const data = await aulaService.auditar();
     setAuditorias(data);
+    setAuditoriasFiltradas(data);
   };
 
   useEffect(() => {
@@ -19,11 +24,29 @@ export default function AuditoriaAula() {
   return (
     <div className="container mt-4">
     <h1 className="text-4xl font-semibold mb-4">Auditoría de Aulas</h1>
-      <button onClick={() => navigate("/")} className="btn btn-secondary mb-3">
+      <button onClick={() => {setTextoFiltro(""); navigate("/");}} className="btn btn-secondary mb-3">
         Volver al Menú
       </button>
       <br />
        <br />
+
+       <FiltroTabla
+                 datos={auditorias}
+                 clavesFiltro={[
+                   "numero_aula_anterior",
+                   "numero_aula_nuevo",
+                   "aforo_anterior",
+                   "aforo_nuevo",
+                   "ubicacion_anterior",
+                   "ubicacion_nuevo",
+                   "usuario_modificador",
+                  ]}
+                 onFiltrar={setAuditoriasFiltradas}
+                 placeholder="Buscar cualquier dato..."
+                 texto={textoFiltro}
+                 setTexto={setTextoFiltro}
+             />
+
       <Tabla
         columnas={[
           { key: "id_audit_aula", label: "ID Auditoría" },
@@ -39,7 +62,7 @@ export default function AuditoriaAula() {
           { key: "fecha_modificacion", label: "Fecha Modificación" },
           { key: "usuario_modificador", label: "Usuario Modificador" },
         ]}
-        datos={auditorias}
+        datos={auditoriasFiltradas}
         idKey="id_audit_aula"
       />
     </div>

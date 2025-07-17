@@ -4,6 +4,7 @@ import { cursoService } from "../../api/requestApi";
 import Tabla from "../../components/Tabla";
 import FormularioCurso from "./FormularioCurso";
 import Notificacion from "../../components/Notificacion";
+import FiltroTabla from "../../components/FiltroTabla"; 
 
 export default function ListadoCurso() {
   const [cursos, setCursos] = useState([]);
@@ -15,6 +16,9 @@ export default function ListadoCurso() {
   const [rol] = useState(() => localStorage.getItem("rol"));
   const puedeAdministrar = rol === "administrador";
 
+  const [datosFiltrados, setDatosFiltrados] = useState([]);
+  const [textoFiltro, setTextoFiltro] = useState("");      
+
   const cargarCursos = useCallback(async () => {
     try {
       const data =
@@ -24,6 +28,7 @@ export default function ListadoCurso() {
 
       const cursosOrdenados = data.sort((a, b) => a.id_curso - b.id_curso);
       setCursos(cursosOrdenados);
+      setDatosFiltrados(cursosOrdenados); 
     } catch (error) {
       setMensaje({ tipo: "error", texto: "Error al cargar los cursos: " + error });
     }
@@ -75,7 +80,7 @@ export default function ListadoCurso() {
         {puedeAdministrar ? "Gestión de Cursos" : "Listado de Cursos"}
       </h1>
 
-      <button onClick={() => navigate("/")} className="btn btn-secondary mb-4">
+      <button onClick={() => {setTextoFiltro(""); navigate("/");}} className="btn btn-secondary mb-4">
         ← Volver al Menú
       </button>
 
@@ -112,12 +117,22 @@ export default function ListadoCurso() {
         <Notificacion mensaje={mensaje?.texto} tipo={mensaje?.tipo} />
       </div>
 
+      {/* Filtro */}        
+            <FiltroTabla
+              datos={cursos}
+              clavesFiltro={["nombre_curso"]}
+              onFiltrar={setDatosFiltrados}
+              placeholder="Buscar por nombre..."
+              texto={textoFiltro}
+              setTexto={setTextoFiltro}
+            />
+
       <Tabla
         columnas={[
           { key: "nombre_curso", label: "Nombre del Curso" },
           ...(puedeAdministrar ? [{ key: "estado", label: "Estado" }] : []),
         ]}
-        datos={cursos}
+        datos={datosFiltrados}  
         onEditar={handleEditar}
         onEliminar={handleEliminar}
         idKey="id_curso"

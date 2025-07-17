@@ -3,14 +3,18 @@ import { useNavigate } from "react-router-dom";
 import { empleadoService } from "../../api/requestApi";
 import Tabla from "../../components/TablaAuditoria";
 import "../../styles/Botones.css";
+import FiltroTabla from "../../components/FiltroTabla";
 
 export default function AuditoriaEmpleado() {
   const [auditorias, setAuditorias] = useState([]);
   const navigate = useNavigate();
+  const [auditoriasFiltradas, setAuditoriasFiltradas] = useState([]);
+  const [textoFiltro, setTextoFiltro] = useState("");                
 
   const cargarAuditorias = async () => {
     const data = await empleadoService.auditar();
     setAuditorias(data);
+    setAuditoriasFiltradas(data);
   };
 
   useEffect(() => {
@@ -20,10 +24,29 @@ export default function AuditoriaEmpleado() {
   return (
       <div className="p-4">
       <h1 className="text-3xl font-bold mb-6 text-primary">Auditoría de Empleados</h1>
-      <button onClick={() => navigate("/")} className="btn btn-secondary mb-3">
+      <button onClick={() => {setTextoFiltro(""); navigate("/");}} className="btn btn-secondary mb-3">
         Volver al Menú
       </button>
       <br />
+      <FiltroTabla
+                datos={auditorias}
+                clavesFiltro={[
+                  "nombre_emp_anterior",
+                  "nombre_emp_nuevo",
+                  "ape_pat_emp_anterior",
+                  "ape_pat_emp_nuevo",
+                  "ape_mat_emp_anterior",
+                  "ape_mat_emp_nuevo",
+                  "numero_documento_anterior",
+                  "numero_documento_nuevo",
+                  "usuario_modificador",
+                  "observacion"
+                 ]}
+                onFiltrar={setAuditoriasFiltradas}
+                placeholder="Buscar cualquier dato..."
+                texto={textoFiltro}
+                setTexto={setTextoFiltro}
+            />
       <Tabla
         columnas={[
           { key: "id_audit_emp", label: "ID Auditoría" },
@@ -51,7 +74,7 @@ export default function AuditoriaEmpleado() {
           { key: "fecha_modificacion", label: "Fecha Modificación" },
           { key: "usuario_modificador", label: "Usuario Modificador" }
         ]}
-        datos={auditorias}
+        datos={auditoriasFiltradas} 
         idKey="id_audit_emp"
       />
     </div>
