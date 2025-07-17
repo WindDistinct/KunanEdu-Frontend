@@ -148,8 +148,19 @@ export default function ListadoAlumno() {
           { key: "telefono", label: "Teléfono" },
           { key: "fecha_nacimiento", label: "Fecha Nacimiento" },
           ...(puedeAdministrar ? [{ key: "estado", label: "Estado" }] : []),
+          { key: "acciones_historial", label: "Historial" },
         ]}
-        datos={datosFiltrados}              ///////////////////////////////////////
+        datos={datosFiltrados.map((alumno) => ({
+          ...alumno,
+          acciones_historial: (
+            <button
+              onClick={() => navigate(`/historial/${alumno.id_alumno}`)}
+              className="btn btn-outline btn-info btn-sm"
+            >
+              Ver Historial
+            </button>
+          ),
+        }))}
         onEditar={handleEditar}
         onEliminar={handleEliminar}
         idKey="id_alumno"

@@ -37,6 +37,7 @@ import ReporteAsistenciaAlumno from "./pages/Asistencia/ListadoAsistencia";
 import AuditoriaAsistencia from "./pages/Asistencia/AuditoriaAsistencia";
 import ListadoAsistenciaAlumno from "./pages/Asistencia/ListadoAsistencia";
 import ReporteAsistencia from "./pages/Asistencia/ReporteAsistencia";
+import HistorialAcademico from "./pages/Alumno/HistorialAcademico";
 
 
 function App() {
@@ -85,6 +86,7 @@ function App() {
               <Route path="/asistencias" element={<ListadoCursosAsistencia />} />
               <Route path="/asistencia_alumno" element={<ListadoAsistenciaAlumno />} />
               <Route path="/asistencia_reporte" element={<ReporteAsistencia />} />
+              <Route path="/historial/:id" element={<HistorialAcademico />} />
 
               <Route path="/auditoria/aulas" element={<AuditoriaAula />} />
               <Route path="/auditoria/alumnos" element={<AuditoriaAlumno />} />
@@ -99,6 +101,7 @@ function App() {
               <Route path="/auditoria/curso_seccion" element={<AuditoriaCursoSeccion />} />
               <Route path="/auditoria/notas" element={<AuditoriaNota />} />
               <Route path="/auditoria/asistencias" element={<AuditoriaAsistencia />} />
+
 
             </Routes>
         ) : (

@@ -14,7 +14,9 @@ const alumnoService = {
   obtenerAlumnosPorAula: (aula, cursoseccion) =>
     axiosInstance.get(`/api/estudiante/alumnos-aula/${aula}/${cursoseccion}`).then(r => r.data),
   obtenerPorPeriodo: (periodoId) =>
-    axiosInstance.get(`/api/estudiante/por-periodo/${periodoId}`).then(r => r.data)
+    axiosInstance.get(`/api/estudiante/por-periodo/${periodoId}`).then(r => r.data),
+  obtenerHistorial: (idAlumno) =>
+    axiosInstance.get(`/api/nota/historial/${idAlumno}`).then(r => r.data),
 };
 
 const usuarioService = {
