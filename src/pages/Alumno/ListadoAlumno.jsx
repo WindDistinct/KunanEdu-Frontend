@@ -154,7 +154,10 @@ export default function ListadoAlumno() {
           ...alumno,
           acciones_historial: (
             <button
-              onClick={() => navigate(`/historial/${alumno.id_alumno}`)}
+              onClick={() => {
+                setTextoFiltro("");
+                navigate(`/historial/${alumno.id_alumno}`);
+              }}
               className="btn btn-outline btn-info btn-sm"
             >
               Ver Historial
